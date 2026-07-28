@@ -111,7 +111,19 @@ signalColor="red";
 if(signal.includes("WAIT")){
 signalColor="gold";
 }
+let now=new Date();
+
+let time=
+now.getHours()+":"+
+String(now.getMinutes()).padStart(2,"0");
+
+let date=
+now.getFullYear()+"/"+
+(now.getMonth()+1)+"/"+
+now.getDate();
 document.getElementById("result").innerHTML=`
+<p>📅 ${date}</p>
+<p>🕒 ${time}</p>
 <h3>📈 GoldAI Signal</h3>
 
 <p><b>Signal:</b>
