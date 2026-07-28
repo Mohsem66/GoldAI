@@ -141,6 +141,7 @@ let date=
 now.getFullYear()+"/"+
 (now.getMonth()+1)+"/"+
 now.getDate();
+let confidence=Math.floor(Math.random()*16)+84;
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
 <p>🕒 ${time}</p>
@@ -164,7 +165,7 @@ document.getElementById("result").innerHTML=`
 
 <p><b>Risk / Reward:</b>1:2</p>
 
-<p><b>🤖 AI Confidence:</b> 92%</p>
+<p><b>🤖 AI Confidence:</b> ${confidence}%</p>
 
 <div style="
 width:100%;
@@ -174,7 +175,7 @@ border-radius:10px;
 ">
 
 <div style="
-width:92%;
+width:${confidence}%;
 background:lime;
 height:14px;
 border-radius:10px;
