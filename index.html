@@ -95,12 +95,18 @@ document.getElementById("goldPrice").innerHTML =
 function analyze(){
 
 document.getElementById("status").innerHTML="🟡 Analyzing...";
+let signals=[
+"BUY 🟢",
+"SELL 🔴",
+"WAIT 🟡"
+];
 
+let signal=signals[Math.floor(Math.random()*signals.length)];
 document.getElementById("result").innerHTML=`
 <h3>📈 GoldAI Signal</h3>
 
 <p><b>Signal:</b>
-<span style="color:#00ff66;font-size:22px;"><b>BUY 🟢</b></span>
+<b>${signal}</b>
 </p>
 
 <p><b>Entry:</b>4035</p>
