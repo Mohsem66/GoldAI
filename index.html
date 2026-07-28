@@ -95,15 +95,15 @@ document.getElementById("goldPrice").innerHTML =
 function analyze(){
 
 document.getElementById("status").innerHTML="🟡 Analyzing...";
-document.getElementById("result").innerHTML = `
+
+document.getElementById("result").innerHTML=`
 <h3>📈 GoldAI Signal</h3>
 
 <p><b>Signal:</b>
-<span style="color:#00ff66;font-size:22px;">
 <span style="color:#00ff66;font-size:22px;"><b>BUY 🟢</b></span>
-</span>
 </p>
-p><b>Entry:</b> 4035</p>
+
+<p><b>Entry:</b>4035</p>
 
 <p><b>Stop Loss:</b>
 <span style="color:#ff4444;">4025</span>
@@ -113,15 +113,14 @@ p><b>Entry:</b> 4035</p>
 <span style="color:#00ff66;">4055</span>
 </p>
 
-<p><b>Risk / Reward:</b> 1 : 2</p>
-<p><b>AI Confidence:</b> 92%</p>
-<p style="color:#00ff66;">
-Status: Waiting for confirmation
-<br><br>
-<b>🤖 AI Confidence</b><br>
-█████████░ 92%
-</p>
+<p><b>Risk / Reward:</b>1:2</p>
+
+<p><b>🤖 AI Confidence:</b>92%</p>
+
+<p>Status: Waiting for confirmation</p>
 `;
+
+document.getElementById("status").innerHTML="🟢 Analysis Complete";
 
 }
 </script>
