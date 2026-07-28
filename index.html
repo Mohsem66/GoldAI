@@ -102,11 +102,22 @@ let signals=[
 ];
 
 let signal=signals[Math.floor(Math.random()*signals.length)];
+let signalColor="lime";
+
+if(signal.includes("SELL")){
+signalColor="red";
+}
+
+if(signal.includes("WAIT")){
+signalColor="gold";
+}
 document.getElementById("result").innerHTML=`
 <h3>📈 GoldAI Signal</h3>
 
 <p><b>Signal:</b>
+<span style="color:${signalColor};font-size:22px;">
 <b>${signal}</b>
+</span>
 </p>
 
 <p><b>Entry:</b>4035</p>
