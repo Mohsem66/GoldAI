@@ -122,6 +122,19 @@ let signals=[
 ];
 
 let signal=signals[Math.floor(Math.random()*signals.length)];
+let confidence;
+
+if(signal.includes("BUY")){
+confidence=Math.floor(Math.random()*10)+90;
+}
+
+else if(signal.includes("SELL")){
+confidence=Math.floor(Math.random()*16)+80;
+}
+
+else{
+confidence=Math.floor(Math.random()*21)+40;
+}
 let signalColor="lime";
 
 if(signal.includes("SELL")){
