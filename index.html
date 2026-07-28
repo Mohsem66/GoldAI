@@ -3,31 +3,50 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>GoldAI</title>
 
 <style>
 body{
-    font-family: Arial;
-    direction: rtl;
-    background:#111;
-    color:white;
-    text-align:center;
+margin:0;
+padding:20px;
+font-family:Arial,sans-serif;
+background:#111;
+color:white;
+text-align:center;
 }
-.box{
-    background:#222;
-    margin:20px;
-    padding:20px;
-    border-radius:15px;
-}
+
 h1{
-    color:#ffd700;
+color:#FFD700;
 }
+
+.box{
+background:#222;
+margin:20px auto;
+padding:20px;
+border-radius:15px;
+max-width:400px;
+}
+
 button{
-    background:#ffd700;
-    border:0;
-    padding:15px 30px;
-    border-radius:10px;
-    font-size:18px;
+background:#FFD700;
+color:#000;
+border:none;
+padding:15px 30px;
+font-size:18px;
+border-radius:12px;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:#ffea4d;
+}
+
+#result{
+margin-top:20px;
+font-size:18px;
+line-height:1.8;
 }
 </style>
 
@@ -51,24 +70,36 @@ button{
 </div>
 
 <div class="box">
+
 <button onclick="analyze()">
-    Start AI Analysis
+Start AI Analysis
 </button>
 
-<div id="result" style="margin-top:20px;font-size:18px;"></div>
-
+<div id="result"></div>
 <script>
 function analyze(){
-document.getElementById("result").innerHTML =
-""📈 GoldAI Signal<br><br>"+
-"Signal: BUY 🟢<br>"+
-"Entry: 4035<br>"+
-"Stop Loss: 4025<br>"+
-"Take Profit: 4055<br>"+
-"Risk/Reward: 1:2<br><br>"+
-"Status: Waiting for confirmation";
+
+document.getElementById("result").innerHTML = `
+<h3>📈 GoldAI Signal</h3>
+
+<p><b>Signal:</b> BUY 🟢</p>
+
+<p><b>Entry:</b> 4035</p>
+
+<p><b>Stop Loss:</b> 4025</p>
+
+<p><b>Take Profit:</b> 4055</p>
+
+<p><b>Risk / Reward:</b> 1 : 2</p>
+
+<p style="color:#00ff66;">
+Status: Waiting for confirmation
+</p>
+`;
+
 }
 </script>
+
 </div>
 
 </body>
