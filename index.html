@@ -86,6 +86,12 @@ Start AI Analysis
 
 <div id="result"></div>
 <script>
+setInterval(function(){
+
+document.getElementById("goldPrice").innerHTML =
+"🥇 XAUUSD : " + (4030 + Math.random()*10).toFixed(2);
+
+},1000);
 function analyze(){
 document.getElementById("status").innerHTML="🟡 Analyzing...";
 document.getElementById("result").innerHTML = `
