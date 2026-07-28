@@ -92,7 +92,14 @@ document.getElementById("goldPrice").innerHTML =
 "🥇 XAUUSD : " + (4030 + Math.random()*10).toFixed(2);
 
 },1000);
-function analyze(){
+function analyze()setTimeout(function(){
+
+document.getElementById("analyzeBtn").disabled = false;
+document.getElementById("analyzeBtn").innerHTML = "Start AI Analysis";
+
+},2000);{
+document.getElementById("analyzeBtn").disabled = true;
+document.getElementById("analyzeBtn").innerHTML = "🔄 AI is analyzing...";
 document.getElementById("status").innerHTML="🟡 Analyzing...";
 document.getElementById("result").innerHTML = `
 <h3>📈 GoldAI Signal</h3>
