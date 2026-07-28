@@ -51,9 +51,18 @@ button{
 </div>
 
 <div class="box">
-<button>
-Start AI Analysis
+<button onclick="analyze()">
+    Start AI Analysis
 </button>
+
+<div id="result" style="margin-top:20px;font-size:20px;"></div>
+
+<script>
+function analyze(){
+document.getElementById("result").innerHTML =
+"📊 AI Signal: WAIT<br><br>روند در حال بررسی است...<br>Risk: Low";
+}
+</script>
 </div>
 
 </body>
