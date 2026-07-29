@@ -204,6 +204,10 @@ if(signal.includes("WAIT")){
 sl="-";
 tp="-";
 }
+history =
+`<hr>${date} ${time} - ${signal}<br>` + history;
+
+localStorage.setItem("history", history);
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
 <p>🕒 ${time}</p>
@@ -248,6 +252,11 @@ border-radius:10px;
 </div>
 
 <p>Status: Waiting for confirmation</p>
+<hr>
+
+<h3>📜 History</h3>
+
+${history}
 `;
 
 document.getElementById("status").innerHTML="🟢 Analysis Complete";
