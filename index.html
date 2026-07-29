@@ -285,6 +285,17 @@ ${profit==0 ? "-" : "+"+profit+"$"}
 ${loss==0 ? "-" : "-"+loss+"$"}
 </span>
 </p>
+<p><b>📈 Profit Percentage:</b>
+<span style="color:#00ff66;">
+${profitPercent==0 ? "-" : "+"+profitPercent+"%"}
+</span>
+</p>
+
+<p><b>📉 Loss Percentage:</b>
+<span style="color:#ff4444;">
+${lossPercent==0 ? "-" : "-"+lossPercent+"%"}
+</span>
+</p>
 <p><b>🤖 AI Confidence:</b> ${confidence}% - ${confidenceText}</p>
 <p><b>🧠 AI Reason:</b></p>
 <p>${reason}</p>
