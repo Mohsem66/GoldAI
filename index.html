@@ -194,26 +194,41 @@ let loss=0;
 let profitPercent=0;
 let lossPercent=0;
 let rr="-";
+
 if(signal.includes("BUY")){
-    profitPercent = (((Number(tp)-Number(entry))/Number(entry))*100).toFixed(2);
-    lossPercent = (((Number(entry)-Number(sl))/Number(entry))*100).toFixed(2);
+    sl=(Number(entry)-10).toFixed(2);
+    tp=(Number(entry)+20).toFixed(2);
+
+    profit=(Number(tp)-Number(entry)).toFixed(2);
+    loss=(Number(entry)-Number(sl)).toFixed(2);
+
+    rr="1:2";
+
+    profitPercent=((profit/Number(entry))*100).toFixed(2);
+    lossPercent=((loss/Number(entry))*100).toFixed(2);
 }
 
 else if(signal.includes("SELL")){
-    profitPercent = (((Number(entry)-Number(tp))/Number(entry))*100).toFixed(2);
-    lossPercent = (((Number(sl)-Number(entry))/Number(entry))*100).toFixed(2);
+    sl=(Number(entry)+10).toFixed(2);
+    tp=(Number(entry)-20).toFixed(2);
+
+    profit=(Number(entry)-Number(tp)).toFixed(2);
+    loss=(Number(sl)-Number(entry)).toFixed(2);
+
+    rr="1:2";
+
+    profitPercent=((profit/Number(entry))*100).toFixed(2);
+    lossPercent=((loss/Number(entry))*100).toFixed(2);
 }
 
 else{
-    profitPercent = 0;
-    lossPercent = 0;
-}
-if(signal.includes("WAIT")){
-sl="-";
-tp="-";
-profit=0;
-loss=0;
-rr="-";
+    sl="-";
+    tp="-";
+    profit=0;
+    loss=0;
+    profitPercent=0;
+    lossPercent=0;
+    rr="-";
 }
 history =
 `<hr>${date} ${time} - ${signal}<br>` + history;
