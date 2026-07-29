@@ -195,13 +195,18 @@ let profitPercent=0;
 let lossPercent=0;
 let rr="-";
 if(signal.includes("BUY")){
-profitPercent=(((Number(tp)-Number(entry))/Number(entry))*100).toFixed(2);
-lossPercent=(((Number(entry)-Number(sl))/Number(entry))*100).toFixed(2);
+    profitPercent = (((Number(tp)-Number(entry))/Number(entry))*100).toFixed(2);
+    lossPercent = (((Number(entry)-Number(sl))/Number(entry))*100).toFixed(2);
 }
 
-if(signal.includes("SELL")){
-profitPercent=(((Number(entry)-Number(tp))/Number(entry))*100).toFixed(2);
-lossPercent=(((Number(sl)-Number(entry))/Number(entry))*100).toFixed(2);
+else if(signal.includes("SELL")){
+    profitPercent = (((Number(entry)-Number(tp))/Number(entry))*100).toFixed(2);
+    lossPercent = (((Number(sl)-Number(entry))/Number(entry))*100).toFixed(2);
+}
+
+else{
+    profitPercent = 0;
+    lossPercent = 0;
 }
 if(signal.includes("WAIT")){
 sl="-";
