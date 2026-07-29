@@ -170,8 +170,23 @@ Market Condition: بهتر است صبر شود
 `;
 }
 let entry=(4030+Math.random()*10).toFixed(2);
-let sl=(entry-10).toFixed(2);
-let tp=(Number(entry)+20).toFixed(2);
+
+let sl,tp;
+
+if(signal.includes("BUY")){
+sl=(entry-10).toFixed(2);
+tp=(Number(entry)+20).toFixed(2);
+}
+
+if(signal.includes("SELL")){
+sl=(Number(entry)+10).toFixed(2);
+tp=(entry-20).toFixed(2);
+}
+
+if(signal.includes("WAIT")){
+sl="-";
+tp="-";
+}
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
 <p>🕒 ${time}</p>
