@@ -211,7 +211,21 @@ localStorage.setItem("history", history);
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
 <p>🕒 ${time}</p>
+<div style="
+background:${
+signal.includes("BUY") ? "#0b3d0b" :
+signal.includes("SELL") ? "#4d0000" :
+"#5a4700"
+};
+padding:12px;
+border-radius:10px;
+margin:10px 0;
+text-align:center;
+">
+
 <h3>📈 GoldAI Signal</h3>
+
+</div>
 
 <p><b>Signal:</b>
 <span style="color:${signalColor};font-size:22px;">
