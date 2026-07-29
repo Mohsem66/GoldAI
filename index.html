@@ -241,6 +241,8 @@ if(confidence >= 90){
 }else if(confidence >= 75){
     confidenceText = "🟡 متوسط";
 }
+profitPercent=((profit/Number(entry))*100).toFixed(2);
+lossPercent=((loss/Number(entry))*100).toFixed(2);
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
 <p>🕒 ${time}</p>
