@@ -191,23 +191,27 @@ let entry=(4030+Math.random()*10).toFixed(2);
 let sl,tp;
 let profit=0;
 let loss=0;
+let rr="-";
 if(signal.includes("BUY")){
 sl=(entry-10).toFixed(2);
 tp=(Number(entry)+20).toFixed(2);
 profit=20;
 loss=10;
+rr="1:2";
 }
 if(signal.includes("SELL")){
 sl=(Number(entry)+10).toFixed(2);
 tp=(entry-20).toFixed(2);
 profit=20;
 loss=10;
+rr="1:2";
 }
 if(signal.includes("WAIT")){
 sl="-";
 tp="-";
 profit=0;
 loss=0;
+rr="-";
 }
 history =
 `<hr>${date} ${time} - ${signal}<br>` + history;
