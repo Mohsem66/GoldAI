@@ -217,6 +217,21 @@ history =
 `<hr>${date} ${time} - ${signal}<br>` + history;
 
 localStorage.setItem("history", history);
+
+if(confidence>=90){
+    confidenceColor="lime";
+}else if(confidence>=75){
+    confidenceColor="gold";
+}else{
+    confidenceColor="red";
+}
+if(confidence>=90){
+  confidenceColor="lime";
+}else if(confidence>=75){
+  confidenceColor="gold";
+}else{
+  confidenceColor="red";
+}
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
 <p>🕒 ${time}</p>
