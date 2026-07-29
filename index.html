@@ -203,7 +203,7 @@ rr="1:2";
 }
 if(signal.includes("SELL")){
 sl=(Number(entry)+10).toFixed(2);
-tp=(entry-20).toFixed(2);
+tp=(Number(entry)-20).toFixed(2);
 profit=(Number(entry)-Number(tp)).toFixed(2);
 loss=(Number(sl)-Number(entry)).toFixed(2);
 rr="1:2";
