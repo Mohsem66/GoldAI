@@ -193,18 +193,18 @@ let profit=0;
 if(signal.includes("BUY")){
 sl=(entry-10).toFixed(2);
 tp=(Number(entry)+20).toFixed(2);
-}
 profit=20;
+}
 if(signal.includes("SELL")){
 sl=(Number(entry)+10).toFixed(2);
 tp=(entry-20).toFixed(2);
-}
 profit=20;
+}
 if(signal.includes("WAIT")){
 sl="-";
 tp="-";
-}
 profit=0;
+}
 history =
 `<hr>${date} ${time} - ${signal}<br>` + history;
 
