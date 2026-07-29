@@ -232,6 +232,13 @@ if(confidence>=90){
 }else{
   confidenceColor="red";
 }
+let confidenceText = "🔴 ضعیف";
+
+if(confidence >= 90){
+    confidenceText = "🟢 بسیار قوی";
+}else if(confidence >= 75){
+    confidenceText = "🟡 متوسط";
+}
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
 <p>🕒 ${time}</p>
