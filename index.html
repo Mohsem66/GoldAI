@@ -305,6 +305,13 @@ if(confidence >= 90){
     confidenceText = "🟡 متوسط";
 }
 let aiScore = confidence;
+let total = Number(localStorage.getItem("totalSignals") || 0);
+
+let buyPercent = total ? ((Number(localStorage.getItem("buySignals") || 0) / total) * 100).toFixed(1) : 0;
+
+let sellPercent = total ? ((Number(localStorage.getItem("sellSignals") || 0) / total) * 100).toFixed(1) : 0;
+
+let waitPercent = total ? ((Number(localStorage.getItem("waitSignals") || 0) / total) * 100).toFixed(1) : 0;
 let riskLevel = "🔴 High Risk";
 
 if(confidence >= 90 && rr=="1:2"){
