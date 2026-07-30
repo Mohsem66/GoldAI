@@ -342,7 +342,70 @@ reason;
 
 </script>
 
+<script>
 
+
+// ==========================
+// GoldAI V2 Risk Calculator
+// ==========================
+
+
+let capital = 97;
+
+let lot = 0.01;
+
+
+
+function calculateRisk(entry,sl,tp,signal){
+
+
+let profit = 0;
+let loss = 0;
+
+
+
+if(signal.includes("BUY")){
+
+
+profit =
+((tp-entry)*lot*100).toFixed(2);
+
+
+loss =
+((entry-sl)*lot*100).toFixed(2);
+
+
+}
+
+
+else if(signal.includes("SELL")){
+
+
+profit =
+((entry-tp)*lot*100).toFixed(2);
+
+
+loss =
+((sl-entry)*lot*100).toFixed(2);
+
+
+}
+
+
+
+return {
+
+profit:profit,
+
+loss:loss
+
+};
+
+
+}
+
+
+</script>
 </body>
 
 </html>
