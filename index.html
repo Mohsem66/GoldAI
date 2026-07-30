@@ -203,7 +203,8 @@ Momentum: ضعیف<br>
 Market Condition: بهتر است صبر شود
 `;
 }
-let entry=(4030+Math.random()*10).toFixed(2);
+let entry = await getGoldPrice();
+entry = Number(entry).toFixed(2);
 
 let sl,tp;
 let profit=0;
