@@ -116,6 +116,23 @@ document.getElementById("goldPrice").innerHTML =
 "🥇 XAUUSD : " + goldPrice.toFixed(2);
 
 },1000);
+async function getGoldPrice(){
+
+    try{
+
+        let response = await fetch("https://api.gold-api.com/price/XAU");
+
+        let data = await response.json();
+
+        return Number(data.price).toFixed(2);
+
+    }catch(e){
+
+        return (4030 + Math.random()*10).toFixed(2);
+
+    }
+
+}
 function analyze(){
 
 document.getElementById("status").innerHTML="🟡 Analyzing...";
