@@ -406,6 +406,86 @@ loss:loss
 
 
 </script>
+<script>
+
+
+// ==========================
+// GoldAI V2 Profit Output
+// ==========================
+
+
+function showProfitLoss(signal,entry,sl,tp){
+
+
+let result =
+calculateRisk(
+Number(entry),
+Number(sl),
+Number(tp),
+signal
+);
+
+
+
+let profitText =
+document.createElement("div");
+
+
+
+profitText.className="info";
+
+
+
+profitText.innerHTML=
+
+"<span>🟢 سود احتمالی</span>" +
+
+"<span>+"+
+result.profit+
+"$</span>";
+
+
+
+
+let lossText =
+document.createElement("div");
+
+
+
+lossText.className="info";
+
+
+
+lossText.innerHTML=
+
+"<span>🔴 ضرر احتمالی</span>" +
+
+"<span>-"+
+result.loss+
+"$</span>";
+
+
+
+
+
+let box =
+document.querySelector(".card:last-child");
+
+
+
+box.appendChild(profitText);
+
+box.appendChild(lossText);
+
+
+
+}
+
+
+
+
+
+</script>
 </body>
 
 </html>
