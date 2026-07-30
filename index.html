@@ -343,7 +343,15 @@ else if(confidence >=75){
     riskLevel = "🟡 Medium Risk";
 }
 
+let marketStatus = "🟡 بازار خنثی";
 
+if(signal.includes("BUY")){
+    marketStatus = "🟢 روند صعودی";
+}
+
+if(signal.includes("SELL")){
+    marketStatus = "🔴 روند نزولی";
+}
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
 <p>🕒 ${time}</p>
@@ -409,7 +417,18 @@ ${lossPercent==0 ? "-" : "-"+lossPercent+"%"}
 <p><b>⭐ AI Score:</b> ${aiScore}/100</p>
 <p><b>🛡️ Risk Level:</b> ${riskLevel}</p>
 <p><b>🧠 AI Reason:</b></p>
-
+<p>
+<b>🌍 Market Status:</b>
+<span style="
+color:
+${signal.includes("BUY") ? "#00ff66" :
+signal.includes("SELL") ? "#ff4444" :
+"#ffd700"};
+font-weight:bold;
+">
+${marketStatus}
+</span>
+</p>
 <div style="
 background:#1b1b1b;
 padding:10px;
