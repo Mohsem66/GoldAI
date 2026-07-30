@@ -259,7 +259,11 @@ history =
 `<hr>${date} ${time} - ${signal}<br>` + history;
 
 localStorage.setItem("history", history);
+let totalSignals = Number(localStorage.getItem("totalSignals") || 0);
 
+totalSignals++;
+
+localStorage.setItem("totalSignals", totalSignals);
 if(confidence>=90){
     confidenceColor="lime";
 }else if(confidence>=75){
