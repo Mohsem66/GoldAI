@@ -313,6 +313,11 @@ if(confidence >= 90 && rr=="1:2"){
 else if(confidence >=75){
     riskLevel = "🟡 Medium Risk";
 }
+let waitPercent = total ? 
+((Number(localStorage.getItem("waitSignals") || 0) / total) * 100).toFixed(1)
+: 0;
+
+
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
 <p>🕒 ${time}</p>
