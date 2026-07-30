@@ -421,19 +421,7 @@ ${localStorage.getItem("sellSignals") || 0}
 🟡 WAIT:
 ${localStorage.getItem("waitSignals") || 0}
 </p>
-let total = Number(localStorage.getItem("totalSignals") || 0);
 
-let buyPercent = total ? 
-((Number(localStorage.getItem("buySignals") || 0) / total) * 100).toFixed(1)
-: 0;
-
-let sellPercent = total ? 
-((Number(localStorage.getItem("sellSignals") || 0) / total) * 100).toFixed(1)
-: 0;
-
-let waitPercent = total ? 
-((Number(localStorage.getItem("waitSignals") || 0) / total) * 100).toFixed(1)
-: 0;
 <h3>📜 History</h3>
 
 ${history}
