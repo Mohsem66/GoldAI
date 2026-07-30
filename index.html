@@ -373,12 +373,22 @@ document.getElementById("status").innerHTML="🟢 Analysis Complete";
 }
 function copySignal(){
 
-let text = document.getElementById("result").innerText;
+let text =
+`📈 GoldAI Signal
+
+${document.querySelector("#result p:nth-of-type(3)").innerText}
+${document.querySelector("#result p:nth-of-type(4)").innerText}
+${document.querySelector("#result p:nth-of-type(5)").innerText}
+${document.querySelector("#result p:nth-of-type(6)").innerText}
+${document.querySelector("#result p:nth-of-type(7)").innerText}
+${document.querySelector("#result p:nth-of-type(8)").innerText}
+${document.querySelector("#result p:nth-of-type(9)").innerText}
+${document.querySelector("#result p:nth-of-type(10)").innerText}`;
 
 navigator.clipboard.writeText(text);
 
 alert("✅ Signal Copied");
-    
+
 }
 
 </script>
