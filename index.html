@@ -381,7 +381,12 @@ border-radius:10px;
 <button onclick="copySignal()">📋 Copy Signal </button>
 <button onclick="shareSignal()">📤 Share Signal</button>
 <hr>
+<h3>📊 AI Statistics</h3>
 
+<p>
+Total Signals:
+${localStorage.getItem("totalSignals") || 0}
+</p>
 <h3>📜 History</h3>
 
 ${history}
