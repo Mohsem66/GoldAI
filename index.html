@@ -136,13 +136,18 @@ async function getGoldPrice(){
 async function analyze(){
 
 document.getElementById("status").innerHTML="🟡 Analyzing...";
-let signals=[
-"BUY 🟢",
-"SELL 🔴",
-"WAIT 🟡"
-];
+let entry = await getGoldPrice();
+let signal = "WAIT 🟡";
 
-let signal=signals[Math.floor(Math.random()*signals.length)];
+if(Number(entry) >= 4040){
+    signal = "SELL 🔴";
+}
+else if(Number(entry) <= 4032){
+    signal = "BUY 🟢";
+}
+else{
+    signal = "WAIT 🟡";
+}
 let signalColor="lime";
 
 if(signal.includes("SELL")){
