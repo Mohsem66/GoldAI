@@ -282,6 +282,14 @@ if(confidence >= 90){
     confidenceText = "🟡 متوسط";
 }
 let aiScore = confidence;
+let riskLevel = "🔴 High Risk";
+
+if(confidence >= 90 && rr=="1:2"){
+    riskLevel = "🟢 Low Risk";
+}
+else if(confidence >=75){
+    riskLevel = "🟡 Medium Risk";
+}
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
 <p>🕒 ${time}</p>
