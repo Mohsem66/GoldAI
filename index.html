@@ -339,12 +339,15 @@ else if(confidence >=75){
 
 let marketStatus = "🟡 بازار خنثی";
 
-if(signal.includes("BUY")){
-    marketStatus = "🟢 روند صعودی";
-}
+if(signal.indexOf("BUY") !== -1){
 
-else if(signal.includes("SELL")){
+    marketStatus = "🟢 روند صعودی";
+
+}
+else if(signal.indexOf("SELL") !== -1){
+
     marketStatus = "🔴 روند نزولی";
+
 }
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
