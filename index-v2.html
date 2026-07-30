@@ -547,6 +547,114 @@ tp
 
 
 </script>
+<script>
+
+
+// ==========================
+// GoldAI V2 History System
+// ==========================
+
+
+function saveHistory(){
+
+
+let history =
+JSON.parse(
+localStorage.getItem("goldAI_history")
+) || [];
+
+
+
+let data = {
+
+
+date:
+new Date().toLocaleString(),
+
+
+signal:
+document.getElementById("result").innerHTML,
+
+
+entry:
+document.getElementById("entry").innerHTML,
+
+
+sl:
+document.getElementById("sl").innerHTML,
+
+
+tp:
+document.getElementById("tp").innerHTML,
+
+
+confidence:
+document.getElementById("confidence").innerHTML
+
+
+
+};
+
+
+
+history.unshift(data);
+
+
+
+if(history.length > 20){
+
+
+history.pop();
+
+
+}
+
+
+
+localStorage.setItem(
+
+"goldAI_history",
+
+JSON.stringify(history)
+
+);
+
+
+
+}
+
+
+
+
+
+let oldSaveAnalyze = analyze;
+
+
+
+analyze = function(){
+
+
+oldSaveAnalyze();
+
+
+
+setTimeout(function(){
+
+
+saveHistory();
+
+
+
+},200);
+
+
+
+}
+
+
+
+
+</script>
 </body>
 
 </html>
