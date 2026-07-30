@@ -281,7 +281,7 @@ if(confidence >= 90){
 }else if(confidence >= 75){
     confidenceText = "🟡 متوسط";
 }
-
+let aiScore = confidence;
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
 <p>🕒 ${time}</p>
@@ -344,6 +344,7 @@ ${lossPercent==0 ? "-" : "-"+lossPercent+"%"}
 </span>
 </p>
 <p><b>🤖 AI Confidence:</b> ${confidence}% - ${confidenceText}</p>
+<p><b>⭐ AI Score:</b> ${aiScore}/100</p>
 <p><b>🧠 AI Reason:</b></p>
 <p>${reason}</p>
 <div style="
