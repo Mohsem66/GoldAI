@@ -264,6 +264,25 @@ let totalSignals = Number(localStorage.getItem("totalSignals") || 0);
 totalSignals++;
 
 localStorage.setItem("totalSignals", totalSignals);
+let buySignals = Number(localStorage.getItem("buySignals") || 0);
+let sellSignals = Number(localStorage.getItem("sellSignals") || 0);
+let waitSignals = Number(localStorage.getItem("waitSignals") || 0);
+
+if(signal.includes("BUY")){
+    buySignals++;
+}
+
+else if(signal.includes("SELL")){
+    sellSignals++;
+}
+
+else{
+    waitSignals++;
+}
+
+localStorage.setItem("buySignals", buySignals);
+localStorage.setItem("sellSignals", sellSignals);
+localStorage.setItem("waitSignals", waitSignals);
 if(confidence>=90){
     confidenceColor="lime";
 }else if(confidence>=75){
