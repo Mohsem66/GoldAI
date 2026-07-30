@@ -759,7 +759,189 @@ tp,
 confidence
 
 );
+}
+
+
+// ==========================
+// History System
+// ==========================
+
+
+function saveSignal(signal,entry,sl,tp,confidence){
+
+
+let history =
+
+JSON.parse(
+
+localStorage.getItem("goldAI_v2_history")
+
+) || [];
+
+
+
+history.unshift({
+
+
+date:new Date().toLocaleString(),
+
+
+signal:signal,
+
+
+entry:entry.toFixed(2),
+
+
+sl:sl.toFixed(2),
+
+
+tp:tp.toFixed(2),
+
+
+confidence:confidence+"%"
+
+
+});
+
+
+
+if(history.length > 10){
+
+
+history.pop();
+
+
+}
+
+
+
+localStorage.setItem(
+
+"goldAI_v2_history",
+
+JSON.stringify(history)
+
+);
+
+
+
+showHistory();
+
+
+}
+
+
+
+
+
+function showHistory(){
+
+
+
+let history =
+
+JSON.parse(
+
+localStorage.getItem("goldAI_v2_history")
+
+)
+
+|| [];
+
+
+
+let box =
+
+document.getElementById("history");
+
+
+
+if(history.length===0){
+
+
+box.innerHTML="هنوز سیگنالی ثبت نشده";
+
+
+return;
+
+
+}
+
+
+
+box.innerHTML="";
+
+
+
+history.forEach(function(item){
+
+
+
+box.innerHTML += `
+
+
+<div class="info">
+
+
+<div>
+
+
+${item.signal}
+
+<br>
+
+<span class="small">
+
+${item.date}
+
+</span>
+
+
+</div>
+
+
+
+<div>
+
+
+Entry: ${item.entry}
+
+<br>
+
+TP: ${item.tp}
+
+<br>
+
+AI: ${item.confidence}
+
+
+</div>
+
+
+</div>
+
+
+`;
+
+
+});
 
 
 
 }
+
+
+
+
+
+showHistory();
+
+
+
+</script>
+
+
+</body>
+
+
+</html>
