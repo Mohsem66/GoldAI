@@ -486,6 +486,67 @@ box.appendChild(lossText);
 
 
 </script>
+<script>
+
+
+// ==========================
+// Connect AI Analysis V2
+// ==========================
+
+
+let oldAnalyze = analyze;
+
+
+
+analyze = function(){
+
+
+oldAnalyze();
+
+
+
+setTimeout(function(){
+
+
+
+let signal =
+document.getElementById("result").innerHTML;
+
+
+
+let entry =
+document.getElementById("entry").innerHTML;
+
+
+
+let sl =
+document.getElementById("sl").innerHTML;
+
+
+
+let tp =
+document.getElementById("tp").innerHTML;
+
+
+
+showProfitLoss(
+signal,
+entry,
+sl,
+tp
+);
+
+
+
+},100);
+
+
+
+}
+
+
+
+</script>
 </body>
 
 </html>
