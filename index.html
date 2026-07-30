@@ -305,19 +305,13 @@ else{
 localStorage.setItem("buySignals", buySignals);
 localStorage.setItem("sellSignals", sellSignals);
 localStorage.setItem("waitSignals", waitSignals);
+let confidenceColor = "red";
+
 if(confidence>=90){
     confidenceColor="lime";
-}else if(confidence>=75){
-    confidenceColor="gold";
-}else{
-    confidenceColor="red";
 }
-if(confidence>=90){
-  confidenceColor="lime";
-}else if(confidence>=75){
-  confidenceColor="gold";
-}else{
-  confidenceColor="red";
+else if(confidence>=75){
+    confidenceColor="gold";
 }
 let confidenceText = "🔴 ضعیف";
 
