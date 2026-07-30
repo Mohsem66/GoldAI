@@ -136,7 +136,6 @@ async function getGoldPrice(){
 async function analyze(){
 
 document.getElementById("status").innerHTML="🟡 Analyzing...";
-let entry = await getGoldPrice();
 let signal = "WAIT 🟡";
 
 if(Number(entry) >= 4040){
@@ -208,7 +207,7 @@ Momentum: ضعیف<br>
 Market Condition: بهتر است صبر شود
 `;
 }
-
+let entry = await getGoldPrice();
 entry = Number(entry).toFixed(2);
 
 let sl,tp;
