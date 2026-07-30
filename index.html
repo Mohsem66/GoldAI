@@ -158,7 +158,7 @@ confidence=Math.floor(Math.random()*9)+88;
 if(signal.includes("WAIT")){
 confidence=Math.floor(Math.random()*16)+65;
 }
-let reason="✅ تست AI Reason";
+let reason="";
 
 if(signal.includes("BUY")){
 reason=`
@@ -387,9 +387,16 @@ ${lossPercent==0 ? "-" : "-"+lossPercent+"%"}
 <p><b>⭐ AI Score:</b> ${aiScore}/100</p>
 <p><b>🛡️ Risk Level:</b> ${riskLevel}</p>
 <p><b>🧠 AI Reason:</b></p>
-<p style="color:#00ffcc;">
+
+<div style="
+background:#1b1b1b;
+padding:10px;
+border-radius:8px;
+margin-top:5px;
+line-height:1.6;
+">
 ${reason}
-</p>
+</div>
 <div style="
 width:100%;
 background:#333;
