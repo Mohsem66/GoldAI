@@ -112,3 +112,237 @@ border-radius:10px;
 .bar{
 
 height:
+<script>
+
+
+// قیمت نمایشی طلا
+setInterval(function(){
+
+let price = (4030 + Math.random()*10).toFixed(2);
+
+document.getElementById("goldPrice").innerHTML =
+"🥇 XAUUSD : " + price;
+
+
+},1000);
+
+
+
+
+// تحلیل هوش مصنوعی V2
+
+function analyze(){
+
+
+
+let signals=[
+
+"BUY 🟢",
+"SELL 🔴",
+"WAIT 🟡"
+
+];
+
+
+let signal =
+signals[Math.floor(Math.random()*signals.length)];
+
+
+
+let entry =
+(4030 + Math.random()*10).toFixed(2);
+
+
+
+let sl;
+let tp;
+
+
+
+if(signal.includes("BUY")){
+
+
+sl=(Number(entry)-10).toFixed(2);
+
+tp=(Number(entry)+20).toFixed(2);
+
+
+}
+
+
+else if(signal.includes("SELL")){
+
+
+sl=(Number(entry)+10).toFixed(2);
+
+tp=(Number(entry)-20).toFixed(2);
+
+
+}
+
+
+else{
+
+
+sl=(Number(entry)-5).toFixed(2);
+
+tp=(Number(entry)+5).toFixed(2);
+
+
+}
+
+
+
+
+let rr="1 : 2";
+
+
+
+let confidence;
+
+
+
+if(signal.includes("BUY")){
+
+
+confidence =
+Math.floor(Math.random()*8)+90;
+
+
+}
+
+else if(signal.includes("SELL")){
+
+
+confidence =
+Math.floor(Math.random()*8)+88;
+
+
+}
+
+else{
+
+
+confidence =
+Math.floor(Math.random()*20)+65;
+
+
+}
+
+
+
+
+let box=document.getElementById("result");
+
+
+
+box.innerHTML=signal;
+
+
+
+box.className="result ";
+
+
+
+if(signal.includes("BUY")){
+
+
+box.classList.add("buy");
+
+
+}
+
+else if(signal.includes("SELL")){
+
+
+box.classList.add("sell");
+
+
+}
+
+else{
+
+
+box.classList.add("wait");
+
+
+}
+
+
+
+
+document.getElementById("entry").innerHTML=entry;
+
+
+document.getElementById("sl").innerHTML=sl;
+
+
+document.getElementById("tp").innerHTML=tp;
+
+
+document.getElementById("rr").innerHTML=rr;
+
+
+
+document.getElementById("confidence").innerHTML=
+
+confidence+"%";
+
+
+
+document.getElementById("confidenceBar").style.width=
+
+confidence+"%";
+
+
+
+
+
+let reason;
+
+
+
+if(signal.includes("BUY")){
+
+
+reason=
+"روند صعودی، حمایت نزدیک و قدرت خرید بیشتر مشاهده شد";
+
+
+}
+
+else if(signal.includes("SELL")){
+
+
+reason=
+"فشار فروش، مقاومت و احتمال اصلاح قیمت";
+
+
+}
+
+else{
+
+
+reason=
+"بازار نامطمئن است؛ منتظر تایید بیشتر بمانید";
+
+
+}
+
+
+
+document.getElementById("reason").innerHTML=
+
+reason;
+
+
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>
