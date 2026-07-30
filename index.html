@@ -406,6 +406,21 @@ border-radius:10px;
 Total Signals:
 ${localStorage.getItem("totalSignals") || 0}
 </p>
+
+<p>
+🟢 BUY:
+${localStorage.getItem("buySignals") || 0}
+</p>
+
+<p>
+🔴 SELL:
+${localStorage.getItem("sellSignals") || 0}
+</p>
+
+<p>
+🟡 WAIT:
+${localStorage.getItem("waitSignals") || 0}
+</p>
 <h3>📜 History</h3>
 
 ${history}
