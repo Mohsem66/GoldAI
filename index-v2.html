@@ -451,3 +451,315 @@ Loss
 
 
 </div>
+<div class="card">
+
+
+<div class="title">
+
+📜 تاریخچه سیگنال‌ها
+
+</div>
+
+
+<div id="history">
+
+هنوز سیگنالی ثبت نشده
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+
+let capital = 97;
+
+let lot = 0.01;
+
+
+
+// نمایش قیمت طلا (فعلاً دمو)
+
+setInterval(function(){
+
+
+let price = (4030 + Math.random()*10).toFixed(2);
+
+
+document.getElementById("goldPrice").innerHTML =
+
+"🥇 XAUUSD : " + price;
+
+
+},1000);
+
+
+
+
+
+
+function analyze(){
+
+
+
+let signals = [
+
+"BUY 🟢",
+
+"SELL 🔴",
+
+"WAIT 🟡"
+
+];
+
+
+
+let signal =
+
+signals[Math.floor(Math.random()*signals.length)];
+
+
+
+let entry =
+
+Number((4030 + Math.random()*10).toFixed(2));
+
+
+
+let sl;
+
+let tp;
+
+
+
+if(signal.includes("BUY")){
+
+
+sl = entry - 10;
+
+tp = entry + 20;
+
+
+}
+
+
+else if(signal.includes("SELL")){
+
+
+sl = entry + 10;
+
+tp = entry - 20;
+
+
+}
+
+
+else{
+
+
+sl = entry - 5;
+
+tp = entry + 5;
+
+
+}
+
+
+
+
+let riskReward = "1 : 2";
+
+
+
+let confidence;
+
+
+
+if(signal.includes("BUY")){
+
+
+confidence = Math.floor(Math.random()*8)+90;
+
+
+}
+
+else if(signal.includes("SELL")){
+
+
+confidence = Math.floor(Math.random()*8)+88;
+
+
+}
+
+else{
+
+
+confidence = Math.floor(Math.random()*20)+65;
+
+
+}
+
+
+
+
+
+
+let box =
+
+document.getElementById("signalBox");
+
+
+
+box.innerHTML = signal;
+
+
+
+box.className="result";
+
+
+
+if(signal.includes("BUY")){
+
+
+box.classList.add("buy");
+
+
+}
+
+else if(signal.includes("SELL")){
+
+
+box.classList.add("sell");
+
+
+}
+
+else{
+
+
+box.classList.add("wait");
+
+
+}
+
+
+
+
+
+document.getElementById("entry").innerHTML =
+
+entry.toFixed(2);
+
+
+
+document.getElementById("sl").innerHTML =
+
+sl.toFixed(2);
+
+
+
+document.getElementById("tp").innerHTML =
+
+tp.toFixed(2);
+
+
+
+document.getElementById("rr").innerHTML =
+
+riskReward;
+
+
+
+
+document.getElementById("confidence").innerHTML =
+
+confidence + "%";
+
+
+
+document.getElementById("confidenceBar").style.width =
+
+confidence + "%";
+
+
+
+
+
+let profit;
+
+let loss;
+
+
+
+if(signal.includes("BUY")){
+
+
+profit = ((tp-entry)*lot*100).toFixed(2);
+
+loss = ((entry-sl)*lot*100).toFixed(2);
+
+
+}
+
+
+else if(signal.includes("SELL")){
+
+
+profit = ((entry-tp)*lot*100).toFixed(2);
+
+loss = ((sl-entry)*lot*100).toFixed(2);
+
+
+}
+
+
+else{
+
+
+profit = "0";
+
+loss = "0";
+
+
+}
+
+
+
+
+
+document.getElementById("profit").innerHTML =
+
+"+" + profit + "$";
+
+
+
+document.getElementById("loss").innerHTML =
+
+"-" + loss + "$";
+
+
+
+
+saveSignal(
+
+signal,
+
+entry,
+
+sl,
+
+tp,
+
+confidence
+
+);
+
+
+
+}
