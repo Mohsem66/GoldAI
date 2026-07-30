@@ -458,7 +458,7 @@ ${localStorage.getItem("waitSignals") || 0} (${waitPercent}%)
 
 <h3>📜 History</h3>
 
-${history}
+${localStorage.getItem("goldAI_history") || "هنوز سیگنالی ثبت نشده"}
 `;
 
 document.getElementById("status").innerHTML="🟢 Analysis Complete";
