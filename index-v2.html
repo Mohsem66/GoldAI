@@ -655,6 +655,168 @@ saveHistory();
 
 
 </script>
+<script>
+
+
+// ==========================
+// GoldAI V2 History Viewer
+// ==========================
+
+
+let historyCard =
+document.createElement("div");
+
+
+
+historyCard.className="card";
+
+
+
+historyCard.innerHTML = `
+
+<h2 style="text-align:center;color:#ffd700">
+
+📜 Signal History
+
+</h2>
+
+<div id="historyList">
+
+هنوز سیگنالی ثبت نشده
+
+</div>
+
+`;
+
+
+
+document
+.querySelector(".container")
+.appendChild(historyCard);
+
+
+
+
+
+function showHistory(){
+
+
+
+let history =
+
+JSON.parse(
+
+localStorage.getItem("goldAI_history")
+
+) || [];
+
+
+
+let box =
+document.getElementById("historyList");
+
+
+
+if(history.length===0){
+
+box.innerHTML="هنوز سیگنالی ثبت نشده";
+
+return;
+
+}
+
+
+
+box.innerHTML="";
+
+
+
+history.forEach(function(item){
+
+
+
+box.innerHTML += `
+
+
+<div class="info">
+
+<div>
+
+${item.signal}
+
+<br>
+
+<span class="small">
+
+${item.date}
+
+</span>
+
+
+</div>
+
+
+<div>
+
+Entry:
+${item.entry}
+
+<br>
+
+TP:
+${item.tp}
+
+</div>
+
+
+</div>
+
+
+`;
+
+
+
+});
+
+
+
+}
+
+
+
+
+
+showHistory();
+
+
+
+
+
+let oldHistoryAnalyze = analyze;
+
+
+
+analyze = function(){
+
+
+oldHistoryAnalyze();
+
+
+setTimeout(function(){
+
+
+showHistory();
+
+
+},400);
+
+
+
+}
+
+
+
+</script>
 </body>
 
 </html>
