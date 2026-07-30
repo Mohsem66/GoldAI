@@ -9,78 +9,101 @@
 
 <title>GoldAI V2</title>
 
+
 <style>
 
 body{
-    margin:0;
-    padding:0;
-    background:#0b0f19;
-    color:white;
-    font-family:tahoma,Arial;
+
+margin:0;
+background:#070b14;
+color:white;
+font-family:tahoma,Arial;
+
 }
+
 
 .container{
-    width:90%;
-    max-width:500px;
-    margin:20px auto;
+
+width:92%;
+max-width:520px;
+margin:20px auto;
+
 }
+
+
 
 .card{
-    background:#151b2b;
-    border-radius:18px;
-    padding:20px;
-    margin-bottom:15px;
-    box-shadow:0 0 20px #000;
+
+background:#151c2b;
+padding:18px;
+border-radius:18px;
+margin-bottom:15px;
+box-shadow:0 0 15px #000;
+
 }
+
+
 
 h1{
-    text-align:center;
-    color:#ffd700;
+
+text-align:center;
+color:#ffd700;
+
 }
 
+
+
 .price{
-    text-align:center;
-    font-size:28px;
-    color:#00ff99;
+
+text-align:center;
+font-size:28px;
+color:#00ff99;
+
 }
+
+
 
 button{
 
-    width:100%;
-    padding:15px;
-    border:none;
-    border-radius:12px;
-    background:#ffd700;
-    color:#000;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
+width:100%;
+padding:15px;
+border:none;
+border-radius:12px;
+background:#ffd700;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
 
 }
 
 
-button:hover{
 
-    opacity:0.8;
+button:active{
+
+transform:scale(.98);
 
 }
+
 
 
 .result{
 
-    text-align:center;
-    font-size:22px;
-    padding:15px;
-    border-radius:15px;
+text-align:center;
+padding:18px;
+border-radius:15px;
+font-size:24px;
+font-weight:bold;
 
 }
+
 
 
 .buy{
 
-background:#064d20;
+background:#064d25;
 
 }
+
 
 
 .sell{
@@ -90,6 +113,7 @@ background:#650000;
 }
 
 
+
 .wait{
 
 background:#665000;
@@ -97,726 +121,333 @@ background:#665000;
 }
 
 
+
 .info{
 
 display:flex;
 justify-content:space-between;
-margin:10px 0;
+background:#20283a;
 padding:10px;
-background:#20283b;
 border-radius:10px;
+margin:8px 0;
 
 }
+
+
+
+.title{
+
+color:#ffd700;
+font-size:18px;
+
+}
+
 
 
 .bar{
 
-height:
-<script>
-
-
-// قیمت نمایشی طلا
-setInterval(function(){
-
-let price = (4030 + Math.random()*10).toFixed(2);
-
-document.getElementById("goldPrice").innerHTML =
-"🥇 XAUUSD : " + price;
-
-
-},1000);
-
-
-
-
-// تحلیل هوش مصنوعی V2
-
-function analyze(){
-
-
-
-let signals=[
-
-"BUY 🟢",
-"SELL 🔴",
-"WAIT 🟡"
-
-];
-
-
-let signal =
-signals[Math.floor(Math.random()*signals.length)];
-
-
-
-let entry =
-(4030 + Math.random()*10).toFixed(2);
-
-
-
-let sl;
-let tp;
-
-
-
-if(signal.includes("BUY")){
-
-
-sl=(Number(entry)-10).toFixed(2);
-
-tp=(Number(entry)+20).toFixed(2);
-
-
-}
-
-
-else if(signal.includes("SELL")){
-
-
-sl=(Number(entry)+10).toFixed(2);
-
-tp=(Number(entry)-20).toFixed(2);
-
-
-}
-
-
-else{
-
-
-sl=(Number(entry)-5).toFixed(2);
-
-tp=(Number(entry)+5).toFixed(2);
-
+height:20px;
+background:#333;
+border-radius:20px;
+overflow:hidden;
 
 }
 
 
 
+.progress{
 
-let rr="1 : 2";
-
-
-
-let confidence;
-
-
-
-if(signal.includes("BUY")){
-
-
-confidence =
-Math.floor(Math.random()*8)+90;
-
-
-}
-
-else if(signal.includes("SELL")){
-
-
-confidence =
-Math.floor(Math.random()*8)+88;
-
-
-}
-
-else{
-
-
-confidence =
-Math.floor(Math.random()*20)+65;
-
+height:100%;
+width:0%;
+background:#00ff88;
+transition:1s;
 
 }
 
 
 
+.small{
 
-let box=document.getElementById("result");
-
-
-
-box.innerHTML=signal;
-
-
-
-box.className="result ";
-
-
-
-if(signal.includes("BUY")){
-
-
-box.classList.add("buy");
-
-
-}
-
-else if(signal.includes("SELL")){
-
-
-box.classList.add("sell");
-
-
-}
-
-else{
-
-
-box.classList.add("wait");
-
+font-size:13px;
+color:#aaa;
 
 }
 
 
 
+.green{
 
-document.getElementById("entry").innerHTML=entry;
-
-
-document.getElementById("sl").innerHTML=sl;
-
-
-document.getElementById("tp").innerHTML=tp;
-
-
-document.getElementById("rr").innerHTML=rr;
-
-
-
-document.getElementById("confidence").innerHTML=
-
-confidence+"%";
-
-
-
-document.getElementById("confidenceBar").style.width=
-
-confidence+"%";
-
-
-
-
-
-let reason;
-
-
-
-if(signal.includes("BUY")){
-
-
-reason=
-"روند صعودی، حمایت نزدیک و قدرت خرید بیشتر مشاهده شد";
-
-
-}
-
-else if(signal.includes("SELL")){
-
-
-reason=
-"فشار فروش، مقاومت و احتمال اصلاح قیمت";
-
-
-}
-
-else{
-
-
-reason=
-"بازار نامطمئن است؛ منتظر تایید بیشتر بمانید";
-
+color:#00ff88;
 
 }
 
 
 
-document.getElementById("reason").innerHTML=
+.red{
 
-reason;
-
-
-
-}
-
-
-</script>
-
-<script>
-
-
-// ==========================
-// GoldAI V2 Risk Calculator
-// ==========================
-
-
-let capital = 97;
-
-let lot = 0.01;
-
-
-
-function calculateRisk(entry,sl,tp,signal){
-
-
-let profit = 0;
-let loss = 0;
-
-
-
-if(signal.includes("BUY")){
-
-
-profit =
-((tp-entry)*lot*100).toFixed(2);
-
-
-loss =
-((entry-sl)*lot*100).toFixed(2);
-
-
-}
-
-
-else if(signal.includes("SELL")){
-
-
-profit =
-((entry-tp)*lot*100).toFixed(2);
-
-
-loss =
-((sl-entry)*lot*100).toFixed(2);
-
+color:#ff5555;
 
 }
 
 
 
-return {
+</style>
 
-profit:profit,
+</head>
 
-loss:loss
 
-};
+<body>
 
 
-}
+<div class="container">
 
 
-</script>
-<script>
+<div class="card">
 
+<h1>
 
-// ==========================
-// GoldAI V2 Profit Output
-// ==========================
+🥇 GoldAI V2
 
+</h1>
 
-function showProfitLoss(signal,entry,sl,tp){
 
+<div class="price" id="goldPrice">
 
-let result =
-calculateRisk(
-Number(entry),
-Number(sl),
-Number(tp),
-signal
-);
-
-
-
-let profitText =
-document.createElement("div");
-
-
-
-profitText.className="info";
-
-
-
-profitText.innerHTML=
-
-"<span>🟢 سود احتمالی</span>" +
-
-"<span>+"+
-result.profit+
-"$</span>";
-
-
-
-
-let lossText =
-document.createElement("div");
-
-
-
-lossText.className="info";
-
-
-
-lossText.innerHTML=
-
-"<span>🔴 ضرر احتمالی</span>" +
-
-"<span>-"+
-result.loss+
-"$</span>";
-
-
-
-
-
-let box =
-document.querySelector(".card:last-child");
-
-
-
-box.appendChild(profitText);
-
-box.appendChild(lossText);
-
-
-
-}
-
-
-
-
-
-</script>
-<script>
-
-
-// ==========================
-// Connect AI Analysis V2
-// ==========================
-
-
-let oldAnalyze = analyze;
-
-
-
-analyze = function(){
-
-
-oldAnalyze();
-
-
-
-setTimeout(function(){
-
-
-
-let signal =
-document.getElementById("result").innerHTML;
-
-
-
-let entry =
-document.getElementById("entry").innerHTML;
-
-
-
-let sl =
-document.getElementById("sl").innerHTML;
-
-
-
-let tp =
-document.getElementById("tp").innerHTML;
-
-
-
-showProfitLoss(
-signal,
-entry,
-sl,
-tp
-);
-
-
-
-},100);
-
-
-
-}
-
-
-
-</script>
-<script>
-
-
-// ==========================
-// GoldAI V2 History System
-// ==========================
-
-
-function saveHistory(){
-
-
-let history =
-JSON.parse(
-localStorage.getItem("goldAI_history")
-) || [];
-
-
-
-let data = {
-
-
-date:
-new Date().toLocaleString(),
-
-
-signal:
-document.getElementById("result").innerHTML,
-
-
-entry:
-document.getElementById("entry").innerHTML,
-
-
-sl:
-document.getElementById("sl").innerHTML,
-
-
-tp:
-document.getElementById("tp").innerHTML,
-
-
-confidence:
-document.getElementById("confidence").innerHTML
-
-
-
-};
-
-
-
-history.unshift(data);
-
-
-
-if(history.length > 20){
-
-
-history.pop();
-
-
-}
-
-
-
-localStorage.setItem(
-
-"goldAI_history",
-
-JSON.stringify(history)
-
-);
-
-
-
-}
-
-
-
-
-
-let oldSaveAnalyze = analyze;
-
-
-
-analyze = function(){
-
-
-oldSaveAnalyze();
-
-
-
-setTimeout(function(){
-
-
-saveHistory();
-
-
-
-},200);
-
-
-
-}
-
-
-
-
-</script>
-<script>
-
-
-// ==========================
-// GoldAI V2 History Viewer
-// ==========================
-
-
-let historyCard =
-document.createElement("div");
-
-
-
-historyCard.className="card";
-
-
-
-historyCard.innerHTML = `
-
-<h2 style="text-align:center;color:#ffd700">
-
-📜 Signal History
-
-</h2>
-
-<div id="historyList">
-
-هنوز سیگنالی ثبت نشده
+XAUUSD : Loading...
 
 </div>
 
-`;
+
+</div>
 
 
 
-document
-.querySelector(".container")
-.appendChild(historyCard);
+<div class="card">
+
+
+<button onclick="analyze()">
+
+🤖 شروع تحلیل هوش مصنوعی
+
+</button>
+
+
+</div>
 
 
 
+<div class="card">
 
 
-function showHistory(){
+<div id="signalBox" class="result wait">
+
+⏳ منتظر تحلیل
+
+</div>
 
 
-
-let history =
-
-JSON.parse(
-
-localStorage.getItem("goldAI_history")
-
-) || [];
-
-
-
-let box =
-document.getElementById("historyList");
+</div>
 
 
 
-if(history.length===0){
-
-box.innerHTML="هنوز سیگنالی ثبت نشده";
-
-return;
-
-}
+<div class="card">
 
 
+<div class="title">
 
-box.innerHTML="";
+📊 معامله پیشنهادی
 
+</div>
 
-
-history.forEach(function(item){
-
-
-
-box.innerHTML += `
 
 
 <div class="info">
 
-<div>
+<span>
 
-${item.signal}
-
-<br>
-
-<span class="small">
-
-${item.date}
+Entry
 
 </span>
 
+<span id="entry">
+
+-
+
+</span>
 
 </div>
 
 
-<div>
 
-Entry:
-${item.entry}
+<div class="info">
+
+<span>
+
+Stop Loss
+
+</span>
+
+<span id="sl">
+
+-
+
+</span>
+
+</div>
+
+
+
+<div class="info">
+
+<span>
+
+Take Profit
+
+</span>
+
+<span id="tp">
+
+-
+
+</span>
+
+</div>
+
+
+
+<div class="info">
+
+<span>
+
+Risk Reward
+
+</span>
+
+<span id="rr">
+
+-
+
+</span>
+
+</div>
+
+
+</div>
+
+
+
+<div class="card">
+
+
+<div class="title">
+
+🧠 AI Confidence
+
+</div>
+
 
 <br>
 
-TP:
-${item.tp}
+
+<div class="bar">
+
+<div id="confidenceBar" class="progress">
+
+</div>
+
+</div>
+
+
+<h3 id="confidence">
+
+-
+
+</h3>
+
+
+</div>
+
+
+
+<div class="card">
+
+
+<div class="title">
+
+💰 مدیریت سرمایه
+
+</div>
+
+
+
+<div class="info">
+
+<span>
+
+Capital
+
+</span>
+
+<span id="capital">
+
+97$
+
+</span>
+
+</div>
+
+
+
+<div class="info">
+
+<span>
+
+Lot
+
+</span>
+
+<span id="lot">
+
+0.01
+
+</span>
+
+</div>
+
+
+<div class="info">
+
+<span>
+
+Profit
+
+</span>
+
+<span id="profit" class="green">
+
+-
+
+</span>
+
+</div>
+
+
+
+<div class="info">
+
+<span>
+
+Loss
+
+</span>
+
+<span id="loss" class="red">
+
+-
+
+</span>
 
 </div>
 
 
 </div>
-
-
-`;
-
-
-
-});
-
-
-
-}
-
-
-
-
-
-showHistory();
-
-
-
-
-
-let oldHistoryAnalyze = analyze;
-
-
-
-analyze = function(){
-
-
-oldHistoryAnalyze();
-
-
-setTimeout(function(){
-
-
-showHistory();
-
-
-},400);
-
-
-
-}
-
-
-
-</script>
-</body>
-
-</html>
