@@ -375,7 +375,9 @@ function copySignal(){
 
 let text = document.getElementById("result").innerText;
 
-alert(text);
+navigator.clipboard.writeText(text);
+
+alert("✅ Signal Copied");
     
 }
 
