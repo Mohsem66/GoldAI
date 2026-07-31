@@ -60,7 +60,7 @@ Version 1.1 | by Mohsen
 </p>
 <div class="box">
 <h2>🥇 XAUUSD</h2>
-<p style="font-size:24px;color:#FFD700;">
+<p id="goldPrice" style="font-size:24px;color:#FFD700;">
 Price : Loading...
 </p>
 </div>
@@ -136,6 +136,10 @@ async function getGoldPrice(){
 async function analyze(){
 
 document.getElementById("status").innerHTML="🟡 Analyzing...";
+
+let entry = await getGoldPrice();
+entry = Number(entry).toFixed(2);
+
 let signal = "WAIT 🟡";
 
 if(Number(entry) >= 4040){
@@ -207,8 +211,6 @@ Momentum: ضعیف<br>
 Market Condition: بهتر است صبر شود
 `;
 }
-let entry = await getGoldPrice();
-entry = Number(entry).toFixed(2);
 
 let sl,tp;
 let profit=0;
@@ -336,7 +338,14 @@ if(confidence >= 90 && rr=="1:2"){
 else if(confidence >=75){
     riskLevel = "🟡 Medium Risk";
 }
+let marketStatus = "🟡 بازار خنثی";
 
+if(signal.includes("BUY")){
+    marketStatus = "🟢 روند صعودی";
+}
+else if(signal.includes("SELL")){
+    marketStatus = "🔴 روند نزولی";
+}
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
 <p>🕒 ${time}</p>
@@ -401,7 +410,6 @@ ${lossPercent==0 ? "-" : "-"+lossPercent+"%"}
 <p>
 <b>🌍 Market Status:</b>
 <span style="font-weight:bold;">
-let marketStatus = "🟡 بازار خنثی";
 ${marketStatus}
 </span>
 </p>
