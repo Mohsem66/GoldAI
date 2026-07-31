@@ -127,6 +127,75 @@ document.getElementById("goldPrice").innerHTML =
 "🥇 XAUUSD : " + goldPrice.toFixed(2);
 
 },1000);
+function updateMarketStatus(){
+
+let now = new Date();
+
+// زمان UTC
+let day = now.getUTCDay();     // 0=یکشنبه ... 6=شنبه
+let hour = now.getUTCHours();
+
+let marketOpen = true;
+let session = "Sydney";
+
+// تعطیلی آخر هفته
+if(day == 6){
+    marketOpen = false;
+}
+else if(day == 0 && hour < 22){
+    marketOpen = false;
+}
+else if(day == 5 && hour >= 22){
+    marketOpen = false;
+}
+
+// سشن فعال
+if(hour >= 0 && hour < 7){
+    session = "Sydney";
+}
+else if(hour >= 7 && hour < 12){
+    session = "Tokyo";
+}
+else if(hour >= 12 && hour < 17){
+    session = "London";
+}
+else{
+    session = "New York";
+}
+
+if(marketOpen){
+
+    document.getElementById("marketStatus").innerHTML =
+    "🟢 Gold Market: OPEN";
+
+    document.getElementById("marketSession").innerHTML =
+    "🕒 Session: " + session;
+
+    document.getElementById("marketCountdown").innerHTML =
+    "✅ Trading Allowed";
+
+    document.getElementById("analyzeBtn").disabled = false;
+
+}else{
+
+    document.getElementById("marketStatus").innerHTML =
+    "🔴 Gold Market: CLOSED";
+
+    document.getElementById("marketSession").innerHTML =
+    "📅 Weekend";
+
+    document.getElementById("marketCountdown").innerHTML =
+    "🚫 Trading Disabled";
+
+    document.getElementById("analyzeBtn").disabled = true;
+
+}
+
+}
+
+updateMarketStatus();
+
+setInterval(updateMarketStatus,60000);
 function analyze(){
 
 document.getElementById("status").innerHTML="🟡 Analyzing...";
