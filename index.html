@@ -60,7 +60,7 @@ Version 1.1 | by Mohsen
 </p>
 <div class="box">
 <h2>🥇 XAUUSD</h2>
-<p id="goldPrice" style="font-size:24px;color:#FFD700;">
+<p style="font-size:24px;color:#FFD700;">
 Price : Loading...
 </p>
 </div>
@@ -116,41 +116,16 @@ document.getElementById("goldPrice").innerHTML =
 "🥇 XAUUSD : " + goldPrice.toFixed(2);
 
 },1000);
-async function getGoldPrice(){
-
-    try{
-
-        let response = await fetch("https://api.gold-api.com/price/XAU");
-
-        let data = await response.json();
-
-        return Number(data.price).toFixed(2);
-
-    }catch(e){
-
-        return (4030 + Math.random()*10).toFixed(2);
-
-    }
-
-}
-async function analyze(){
+function analyze(){
 
 document.getElementById("status").innerHTML="🟡 Analyzing...";
+let signals=[
+"BUY 🟢",
+"SELL 🔴",
+"WAIT 🟡"
+];
 
-let entry = await getGoldPrice();
-entry = Number(entry).toFixed(2);
-
-let signal = "WAIT 🟡";
-
-if(Number(entry) >= 4040){
-    signal = "SELL 🔴";
-}
-else if(Number(entry) <= 4032){
-    signal = "BUY 🟢";
-}
-else{
-    signal = "WAIT 🟡";
-}
+let signal=signals[Math.floor(Math.random()*signals.length)];
 let signalColor="lime";
 
 if(signal.includes("SELL")){
@@ -211,75 +186,74 @@ Momentum: ضعیف<br>
 Market Condition: بهتر است صبر شود
 `;
 }
+let entry=(4030+Math.random()*10).toFixed(2);
 
-let sl, tp;
-let profit = 0;
-let loss = 0;
-let profitPercent = 0;
-let lossPercent = 0;
-let rr = "-";
-let riskReward = "-";
+let sl,tp;
+let profit=0;
+let loss=0;
+let profitPercent=0;
+let lossPercent=0;
+let rr="-";
+let riskReward="-";
+let capital=97; // سرمایه دلاری
+let lot=0.01;   // حجم معامله
 
-let capital = 97;
-let lot = 0.01;
-
-let profitDollar = 0;
-let lossDollar = 0;
+let profitDollar=0;
+let lossDollar=0;
 
 if(signal.includes("BUY")){
+    let profitDistance = Number(tp)-Number(entry);
+    let lossDistance = Number(entry)-Number(sl);
 
-    sl = (Number(entry) - 10).toFixed(2);
-    tp = (Number(entry) + 20).toFixed(2);
-
-    profit = (Number(tp) - Number(entry)).toFixed(2);
-    loss = (Number(entry) - Number(sl)).toFixed(2);
-
-    rr = "1:2";
-
-    profitPercent = ((Number(profit) / Number(entry)) * 100).toFixed(2);
-    lossPercent = ((Number(loss) / Number(entry)) * 100).toFixed(2);
-
-    let profitDistance = Number(tp) - Number(entry);
-    let lossDistance = Number(entry) - Number(sl);
-
-    riskReward = (profitDistance / lossDistance).toFixed(2);
+    riskReward = (profitDistance/lossDistance).toFixed(2);
 
     profitDollar = ((profitDistance / Number(entry)) * capital * 100).toFixed(2);
     lossDollar = ((lossDistance / Number(entry)) * capital * 100).toFixed(2);
-
 }
+
 else if(signal.includes("SELL")){
+    let profitDistance = Number(entry)-Number(tp);
+    let lossDistance = Number(sl)-Number(entry);
 
-    sl = (Number(entry) + 10).toFixed(2);
-    tp = (Number(entry) - 20).toFixed(2);
-
-    profit = (Number(entry) - Number(tp)).toFixed(2);
-    loss = (Number(sl) - Number(entry)).toFixed(2);
-
-    rr = "1:2";
-
-    profitPercent = ((Number(profit) / Number(entry)) * 100).toFixed(2);
-    lossPercent = ((Number(loss) / Number(entry)) * 100).toFixed(2);
-
-    let profitDistance = Number(entry) - Number(tp);
-    let lossDistance = Number(sl) - Number(entry);
-
-    riskReward = (profitDistance / lossDistance).toFixed(2);
+    riskReward = (profitDistance/lossDistance).toFixed(2);
 
     profitDollar = ((profitDistance / Number(entry)) * capital * 100).toFixed(2);
     lossDollar = ((lossDistance / Number(entry)) * capital * 100).toFixed(2);
-
 }
+if(signal.includes("BUY")){
+    sl=(Number(entry)-10).toFixed(2);
+    tp=(Number(entry)+20).toFixed(2);
+
+    profit=(Number(tp)-Number(entry)).toFixed(2);
+    loss=(Number(entry)-Number(sl)).toFixed(2);
+
+    rr="1:2";
+
+    profitPercent=((profit/Number(entry))*100).toFixed(2);
+    lossPercent=((loss/Number(entry))*100).toFixed(2);
+}
+
+else if(signal.includes("SELL")){
+    sl=(Number(entry)+10).toFixed(2);
+    tp=(Number(entry)-20).toFixed(2);
+
+    profit=(Number(entry)-Number(tp)).toFixed(2);
+    loss=(Number(sl)-Number(entry)).toFixed(2);
+
+    rr="1:2";
+
+    profitPercent=((profit/Number(entry))*100).toFixed(2);
+    lossPercent=((loss/Number(entry))*100).toFixed(2);
+}
+
 else{
-
-    sl = "-";
-    tp = "-";
-    profit = 0;
-    loss = 0;
-    profitPercent = 0;
-    lossPercent = 0;
-    rr = "-";
-
+    sl="-";
+    tp="-";
+    profit=0;
+    loss=0;
+    profitPercent=0;
+    lossPercent=0;
+    rr="-";
 }
 history =
 `<hr>${date} ${time} - ${signal}<br>` + history;
@@ -309,13 +283,19 @@ else{
 localStorage.setItem("buySignals", buySignals);
 localStorage.setItem("sellSignals", sellSignals);
 localStorage.setItem("waitSignals", waitSignals);
-let confidenceColor = "red";
-
 if(confidence>=90){
     confidenceColor="lime";
-}
-else if(confidence>=75){
+}else if(confidence>=75){
     confidenceColor="gold";
+}else{
+    confidenceColor="red";
+}
+if(confidence>=90){
+  confidenceColor="lime";
+}else if(confidence>=75){
+  confidenceColor="gold";
+}else{
+  confidenceColor="red";
 }
 let confidenceText = "🔴 ضعیف";
 
@@ -341,11 +321,16 @@ else if(confidence >=75){
     riskLevel = "🟡 Medium Risk";
 }
 
+
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
 <p>🕒 ${time}</p>
 <div style="
-background:#063b1c;
+background:${
+signal.includes("BUY") ? "#063b1c" :
+signal.includes("SELL") ? "#4b0b0b" :
+"#4a3b00"
+};
 padding:18px;
 border-radius:18px;
 margin:15px 0;
@@ -402,15 +387,7 @@ ${lossPercent==0 ? "-" : "-"+lossPercent+"%"}
 <p><b>⭐ AI Score:</b> ${aiScore}/100</p>
 <p><b>🛡️ Risk Level:</b> ${riskLevel}</p>
 <p><b>🧠 AI Reason:</b></p>
-<div style="
-background:#1b1b1b;
-padding:10px;
-border-radius:8px;
-margin-top:5px;
-line-height:1.6;
-">
-${reason}
-</div>
+<p>${reason}</p>
 <div style="
 width:100%;
 background:#333;
@@ -456,13 +433,12 @@ ${localStorage.getItem("waitSignals") || 0} (${waitPercent}%)
 
 <h3>📜 History</h3>
 
-هنوز تاریخچه اضافه نشده
-
+${history}
 `;
 
 document.getElementById("status").innerHTML="🟢 Analysis Complete";
 
-    }
+}
 function copySignal(){
 
 let text =
