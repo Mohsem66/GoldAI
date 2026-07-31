@@ -194,3 +194,28 @@ ${history}
 document.getElementById("status").innerHTML="🟢 Analysis Complete";
 }
   
+function copySignal(){
+let text=document.getElementById("result").innerText;
+navigator.clipboard.writeText(text);
+alert("✅ Signal Copied");
+}
+
+async function shareSignal(){
+let text=document.getElementById("result").innerText;
+if(navigator.share){
+try{
+await navigator.share({
+title:"GoldAI V2 Signal",
+text:text
+});
+}catch(e){}
+}else{
+navigator.clipboard.writeText(text);
+alert("📋 Share not supported - Signal Copied");
+}
+}
+
+</script>
+
+</body>
+</html>
