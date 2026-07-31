@@ -198,6 +198,17 @@ updateMarketStatus();
 setInterval(updateMarketStatus,60000);
 function analyze(){
 
+let marketText =
+document.getElementById("marketStatus").innerText;
+
+if(marketText.includes("CLOSED")){
+
+    alert("🚫 Gold Market is CLOSED\n\nAnalysis is disabled until the market opens.");
+
+    return;
+
+}
+
 document.getElementById("status").innerHTML="🟡 Analyzing...";
 let signals=[
 "BUY 🟢",
