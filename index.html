@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GoldAI</title>
+
+<style>
+body{
+margin:0;
+padding:20px;
+font-family:Arial,sans-serif;
+background:#111;
+color:white;
+text-align:center;
+}
+
+h1{
+color:#FFD700;
+}
+
+.box{
+background:#222;
+margin:20px auto;
+padding:20px;
+border-radius:15px;
+max-width:400px;
+}
+
+button{
+background:#FFD700;
+color:#000;
+border:none;
+padding:15px 30px;
+font-size:18px;
+border-radius:12px;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:#ffea4d;
+}
+
+#result{
+margin-top:20px;
+font-size:18px;
+line-height:1.8;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>GoldAI</h1>
+<p style="color:#999;font-size:14px;">
+Version 1.1 | by Mohsen
+</p>
+<div class="box">
+<h2>🥇 XAUUSD</h2>
+<p style="font-size:24px;color:#FFD700;">
+Price : Loading...
+</p>
+</div>
+<div class="box">
+
+<h2>💰 Risk Calculator</h2>
+
+<p>Capital : 70 $</p>
+
+<p>Risk : 2%</p>
+
+<p style="color:#00ff66;">
+Max Loss : 1.40 $
+</p>
+
+<p style="color:#FFD700;">
+Suggested Lot : 0.01
+</p>
+
+</div>
+<div class="box">
+<h2>🤖 AI STATUS</h2>
+<p id="status">🟢 Ready</p>
+</div>
+<div class="box">
+<h2>XAUUSD</h2>
+<p>AI Gold Analysis</p>
+<p>Timeframe: M1 + M5</p>
+<p>M15 Trend Filter: Active</p>
+</div>
+
+<div class="box">
+<h2>Risk Manager</h2>
+<p>Small Account Mode: ON</p>
+<p>Max Trades: 3 / Day</p>
+</div>
+
+<div class="box">
+
+<button id="analyzeBtn" onclick="analyze()">
+Start AI Analysis
+</button>
+
+<div id="result"></div>
+<script>
+let goldPrice=4035;
+
+setInterval(function(){
+
+goldPrice=(4030 + Math.random()*10);
+
+document.getElementById("goldPrice").innerHTML =
+"🥇 XAUUSD : " + goldPrice.toFixed(2);
+
+},1000);
+function analyze(){
+
+document.getElementById("status").innerHTML="🟡 Analyzing...";
+let signals=[
+"BUY 🟢",
+"SELL 🔴",
+"WAIT 🟡"
+];
+
+let signal=signals[Math.floor(Math.random()*signals.length)];
+let signalColor="lime";
+
+if(signal.includes("SELL")){
+signalColor="red";
+}
+
+if(signal.includes("WAIT")){
+signalColor="gold";
+}
+let history=localStorage.getItem("history") || "";
+let now=new Date();
+let time=
+now.getHours()+":"+
+String(now.getMinutes()).padStart(2,"0");
+
+let date=
+now.getFullYear()+"/"+
+(now.getMonth()+1)+"/"+
+now.getDate();
+let confidence;
+let confidenceColor="lime";
+if(signal.includes("BUY")){
+confidence=Math.floor(Math.random()*9)+90;
+}
+
+if(signal.includes("SELL")){
+confidence=Math.floor(Math.random()*9)+88;
+}
+
+if(signal.includes("WAIT")){
+confidence=Math.floor(Math.random()*16)+65;
+}
+let reason="";
+
+if(signal.includes("BUY")){
+reason=`
+Trend: صعودی 📈<br>
+Structure: حمایت حفظ شده ✅<br>
+Momentum: مثبت ⚡<br>
+Market Condition: احتمال ادامه حرکت صعودی
+`;
+}
+
+if(signal.includes("SELL")){
+reason=`
+Trend: نزولی 📉<br>
+Structure: مقاومت حفظ شده ✅<br>
+Momentum: منفی ⚡<br>
+Market Condition: احتمال ادامه حرکت نزولی
+`;
+}
+
+if(signal.includes("WAIT")){
+reason=`
+Trend: نامشخص ⚠️<br>
+Structure: نیاز به تایید بیشتر<br>
+Momentum: ضعیف<br>
+Market Condition: بهتر است صبر شود
+`;
+}
+let entry=(4030+Math.random()*10).toFixed(2);
+
+let sl,tp;
+let profit=0;
+let loss=0;
+let profitPercent=0;
+let lossPercent=0;
+let rr="-";
+let riskReward="-";
+let capital=97; // سرمایه دلاری
+let lot=0.01;   // حجم معامله
+
+let profitDollar=0;
+let lossDollar=0;
+
+if(signal.includes("BUY")){
+    let profitDistance = Number(tp)-Number(entry);
+    let lossDistance = Number(entry)-Number(sl);
+
+    riskReward = (profitDistance/lossDistance).toFixed(2);
+
+    profitDollar = ((profitDistance / Number(entry)) * capital * 100).toFixed(2);
+    lossDollar = ((lossDistance / Number(entry)) * capital * 100).toFixed(2);
+}
+
+else if(signal.includes("SELL")){
+    let profitDistance = Number(entry)-Number(tp);
+    let lossDistance = Number(sl)-Number(entry);
+
+    riskReward = (profitDistance/lossDistance).toFixed(2);
+
+    profitDollar = ((profitDistance / Number(entry)) * capital * 100).toFixed(2);
+    lossDollar = ((lossDistance / Number(entry)) * capital * 100).toFixed(2);
+}
+if(signal.includes("BUY")){
+    sl=(Number(entry)-10).toFixed(2);
+    tp=(Number(entry)+20).toFixed(2);
+
+    profit=(Number(tp)-Number(entry)).toFixed(2);
+    loss=(Number(entry)-Number(sl)).toFixed(2);
+
+    rr="1:2";
+
+    profitPercent=((profit/Number(entry))*100).toFixed(2);
+    lossPercent=((loss/Number(entry))*100).toFixed(2);
+}
+
+else if(signal.includes("SELL")){
+    sl=(Number(entry)+10).toFixed(2);
+    tp=(Number(entry)-20).toFixed(2);
+
+    profit=(Number(entry)-Number(tp)).toFixed(2);
+    loss=(Number(sl)-Number(entry)).toFixed(2);
+
+    rr="1:2";
+
+    profitPercent=((profit/Number(entry))*100).toFixed(2);
+    lossPercent=((loss/Number(entry))*100).toFixed(2);
+}
+
+else{
+    sl="-";
+    tp="-";
+    profit=0;
+    loss=0;
+    profitPercent=0;
+    lossPercent=0;
+    rr="-";
+}
+history =
+`<hr>${date} ${time} - ${signal}<br>` + history;
+
+localStorage.setItem("history", history);
+let totalSignals = Number(localStorage.getItem("totalSignals") || 0);
+
+totalSignals++;
+
+localStorage.setItem("totalSignals", totalSignals);
+let buySignals = Number(localStorage.getItem("buySignals") || 0);
+let sellSignals = Number(localStorage.getItem("sellSignals") || 0);
+let waitSignals = Number(localStorage.getItem("waitSignals") || 0);
+
+if(signal.includes("BUY")){
+    buySignals++;
+}
+
+else if(signal.includes("SELL")){
+    sellSignals++;
+}
+
+else{
+    waitSignals++;
+}
+
+localStorage.setItem("buySignals", buySignals);
+localStorage.setItem("sellSignals", sellSignals);
+localStorage.setItem("waitSignals", waitSignals);
+if(confidence>=90){
+    confidenceColor="lime";
+}else if(confidence>=75){
+    confidenceColor="gold";
+}else{
+    confidenceColor="red";
+}
+if(confidence>=90){
+  confidenceColor="lime";
+}else if(confidence>=75){
+  confidenceColor="gold";
+}else{
+  confidenceColor="red";
+}
+let confidenceText = "🔴 ضعیف";
+
+if(confidence >= 90){
+    confidenceText = "🟢 بسیار قوی";
+}else if(confidence >= 75){
+    confidenceText = "🟡 متوسط";
+}
+let aiScore = confidence;
+let total = Number(localStorage.getItem("totalSignals") || 0);
+
+let buyPercent = total ? ((Number(localStorage.getItem("buySignals") || 0) / total) * 100).toFixed(1) : 0;
+
+let sellPercent = total ? ((Number(localStorage.getItem("sellSignals") || 0) / total) * 100).toFixed(1) : 0;
+
+let waitPercent = total ? ((Number(localStorage.getItem("waitSignals") || 0) / total) * 100).toFixed(1) : 0;
+let riskLevel = "🔴 High Risk";
+
+if(confidence >= 90 && rr=="1:2"){
+    riskLevel = "🟢 Low Risk";
+}
+else if(confidence >=75){
+    riskLevel = "🟡 Medium Risk";
+}
+
+
+document.getElementById("result").innerHTML=`
+<p>📅 ${date}</p>
+<p>🕒 ${time}</p>
+<div style="
+background:${
+signal.includes("BUY") ? "#063b1c" :
+signal.includes("SELL") ? "#4b0b0b" :
+"#4a3b00"
+};
+padding:18px;
+border-radius:18px;
+margin:15px 0;
+text-align:center;
+box-shadow:0 0 15px rgba(255,255,255,0.15);
+">
+
+<h3>📈 GoldAI Signal</h3>
+<p style="font-size:18px;">
+🥇 XAUUSD Price: ${entry}
+</p>
+
+</div>
+
+<p><b>Signal:</b>
+<span style="color:${signalColor};font-size:22px;">
+<b>${signal}</b>
+</span>
+</p>
+
+<p><b>Entry:</b>${entry}</p>
+
+<p><b>Stop Loss:</b>
+<span style="color:#ff4444;">${sl}</span>
+</p>
+
+<p><b>Take Profit:</b>
+<span style="color:#00ff66;">${tp}</span>
+</p>
+
+<p><b>Risk / Reward:</b> ${rr}</p>
+<p><b>💰 Estimated Profit:</b>
+<span style="color:#00ff66;">
+${profit==0 ? "-" : "+"+profit+"$"}
+</span>
+</p>
+<p><b>💸 Estimated Loss:</b>
+<span style="color:#ff4444;">
+${loss==0 ? "-" : "-"+loss+"$"}
+</span>
+</p>
+<p><b>📈 Profit Percentage:</b>
+<span style="color:#00ff66;">
+${profitPercent==0 ? "-" : "+"+profitPercent+"%"}
+</span>
+</p>
+
+<p><b>📉 Loss Percentage:</b>
+<span style="color:#ff4444;">
+${lossPercent==0 ? "-" : "-"+lossPercent+"%"}
+</span>
+</p>
+<p><b>🤖 AI Confidence:</b> ${confidence}% - ${confidenceText}</p>
+<p><b>⭐ AI Score:</b> ${aiScore}/100</p>
+<p><b>🛡️ Risk Level:</b> ${riskLevel}</p>
+<p><b>🧠 AI Reason:</b></p>
+<p>${reason}</p>
+<div style="
+width:100%;
+background:#333;
+height:14px;
+border-radius:10px;
+">
+
+<div style="
+width:${confidence}%;
+background:${confidenceColor};
+height:14px;
+border-radius:10px;
+">
+</div>
+
+</div>
+
+<p>Status: Waiting for confirmation</p>
+<button onclick="copySignal()">📋 Copy Signal </button>
+<button onclick="shareSignal()">📤 Share Signal</button>
+<hr>
+<h3>📊 AI Statistics</h3>
+
+<p>
+Total Signals:
+${localStorage.getItem("totalSignals") || 0}
+</p>
+
+<p>
+🟢 BUY:
+${localStorage.getItem("buySignals") || 0} (${buyPercent}%)
+</p>
+
+<p>
+🔴 SELL:
+${localStorage.getItem("sellSignals") || 0} (${sellPercent}%)
+</p>
+
+<p>
+🟡 WAIT:
+${localStorage.getItem("waitSignals") || 0} (${waitPercent}%)
+</p>
+
+<h3>📜 History</h3>
+
+${history}
+`;
+
+document.getElementById("status").innerHTML="🟢 Analysis Complete";
+
+}
+function copySignal(){
+
+let text =
+`📈 GoldAI Signal
+
+${document.querySelector("#result p:nth-of-type(3)").innerText}
+${document.querySelector("#result p:nth-of-type(4)").innerText}
+${document.querySelector("#result p:nth-of-type(5)").innerText}
+${document.querySelector("#result p:nth-of-type(6)").innerText}
+${document.querySelector("#result p:nth-of-type(7)").innerText}
+${document.querySelector("#result p:nth-of-type(8)").innerText}
+${document.querySelector("#result p:nth-of-type(9)").innerText}
+${document.querySelector("#result p:nth-of-type(10)").innerText}`;
+
+navigator.clipboard.writeText(text);
+
+alert("✅ Signal Copied");
+
+}
+    
+function shareSignal(){
+
+let text =
+`📈 GoldAI Signal
+
+${document.querySelector("#result p:nth-of-type(3)").innerText}
+${document.querySelector("#result p:nth-of-type(4)").innerText}
+${document.querySelector("#result p:nth-of-type(5)").innerText}
+${document.querySelector("#result p:nth-of-type(6)").innerText}
+${document.querySelector("#result p:nth-of-type(7)").innerText}
+${document.querySelector("#result p:nth-of-type(8)").innerText}
+${document.querySelector("#result p:nth-of-type(9)").innerText}
+${document.querySelector("#result p:nth-of-type(10)").innerText}`;
+
+if(navigator.share){
+
+navigator.share({
+title:"GoldAI Signal",
+text:text
+});
+
+}else{
+
+navigator.clipboard.writeText(text);
+
+alert("📋 Share not supported - Signal Copied");
+
+}
+
+}
+
+</script>
+
+</div>
+
+</body>
+</html>
