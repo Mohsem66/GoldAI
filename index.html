@@ -131,14 +131,14 @@ function updateMarketStatus(){
 
 let now = new Date();
 
-// زمان UTC
-let day = now.getUTCDay();     // 0=یکشنبه ... 6=شنبه
+let day = now.getUTCDay();
 let hour = now.getUTCHours();
+let minute = now.getUTCMinutes();
+let second = now.getUTCSeconds();
 
 let marketOpen = true;
 let session = "Sydney";
 
-// تعطیلی آخر هفته
 if(day == 6){
     marketOpen = false;
 }
@@ -149,7 +149,6 @@ else if(day == 5 && hour >= 22){
     marketOpen = false;
 }
 
-// سشن فعال
 if(hour >= 0 && hour < 7){
     session = "Sydney";
 }
@@ -163,7 +162,28 @@ else{
     session = "New York";
 }
 
+let countdown = "";
+
 if(marketOpen){
+
+    let remainHours = 21 - hour;
+    let remainMinutes = 59 - minute;
+    let remainSeconds = 59 - second;
+
+    if(remainSeconds < 0){
+        remainSeconds += 60;
+        remainMinutes--;
+    }
+
+    if(remainMinutes < 0){
+        remainMinutes += 60;
+        remainHours--;
+    }
+
+    countdown =
+    remainHours + "h " +
+    remainMinutes + "m " +
+    remainSeconds + "s";
 
     document.getElementById("marketStatus").innerHTML =
     "🟢 Gold Market: OPEN";
@@ -172,11 +192,12 @@ if(marketOpen){
     "🕒 Session: " + session;
 
     document.getElementById("marketCountdown").innerHTML =
-    "✅ Trading Allowed";
+    "⏳ Next Close: " + countdown;
 
     document.getElementById("analyzeBtn").disabled = false;
 
-}else{
+}
+else{
 
     document.getElementById("marketStatus").innerHTML =
     "🔴 Gold Market: CLOSED";
@@ -185,7 +206,7 @@ if(marketOpen){
     "📅 Weekend";
 
     document.getElementById("marketCountdown").innerHTML =
-    "🚫 Trading Disabled";
+    "⏳ Waiting for Market Open";
 
     document.getElementById("analyzeBtn").disabled = true;
 
@@ -195,7 +216,7 @@ if(marketOpen){
 
 updateMarketStatus();
 
-setInterval(updateMarketStatus,60000);
+setInterval(updateMarketStatus,1000);
 function analyze(){
 
 let marketText =
