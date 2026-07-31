@@ -212,72 +212,74 @@ Market Condition: بهتر است صبر شود
 `;
 }
 
-let sl,tp;
-let profit=0;
-let loss=0;
-let profitPercent=0;
-let lossPercent=0;
-let rr="-";
-let riskReward="-";
-let capital=97; // سرمایه دلاری
-let lot=0.01;   // حجم معامله
+let sl, tp;
+let profit = 0;
+let loss = 0;
+let profitPercent = 0;
+let lossPercent = 0;
+let rr = "-";
+let riskReward = "-";
 
-let profitDollar=0;
-let lossDollar=0;
+let capital = 97;
+let lot = 0.01;
+
+let profitDollar = 0;
+let lossDollar = 0;
 
 if(signal.includes("BUY")){
-    let profitDistance = Number(tp)-Number(entry);
-    let lossDistance = Number(entry)-Number(sl);
 
-    riskReward = (profitDistance/lossDistance).toFixed(2);
+    sl = (Number(entry) - 10).toFixed(2);
+    tp = (Number(entry) + 20).toFixed(2);
+
+    profit = (Number(tp) - Number(entry)).toFixed(2);
+    loss = (Number(entry) - Number(sl)).toFixed(2);
+
+    rr = "1:2";
+
+    profitPercent = ((Number(profit) / Number(entry)) * 100).toFixed(2);
+    lossPercent = ((Number(loss) / Number(entry)) * 100).toFixed(2);
+
+    let profitDistance = Number(tp) - Number(entry);
+    let lossDistance = Number(entry) - Number(sl);
+
+    riskReward = (profitDistance / lossDistance).toFixed(2);
 
     profitDollar = ((profitDistance / Number(entry)) * capital * 100).toFixed(2);
     lossDollar = ((lossDistance / Number(entry)) * capital * 100).toFixed(2);
+
 }
-
 else if(signal.includes("SELL")){
-    let profitDistance = Number(entry)-Number(tp);
-    let lossDistance = Number(sl)-Number(entry);
 
-    riskReward = (profitDistance/lossDistance).toFixed(2);
+    sl = (Number(entry) + 10).toFixed(2);
+    tp = (Number(entry) - 20).toFixed(2);
+
+    profit = (Number(entry) - Number(tp)).toFixed(2);
+    loss = (Number(sl) - Number(entry)).toFixed(2);
+
+    rr = "1:2";
+
+    profitPercent = ((Number(profit) / Number(entry)) * 100).toFixed(2);
+    lossPercent = ((Number(loss) / Number(entry)) * 100).toFixed(2);
+
+    let profitDistance = Number(entry) - Number(tp);
+    let lossDistance = Number(sl) - Number(entry);
+
+    riskReward = (profitDistance / lossDistance).toFixed(2);
 
     profitDollar = ((profitDistance / Number(entry)) * capital * 100).toFixed(2);
     lossDollar = ((lossDistance / Number(entry)) * capital * 100).toFixed(2);
+
 }
-if(signal.includes("BUY")){
-    sl=(Number(entry)-10).toFixed(2);
-    tp=(Number(entry)+20).toFixed(2);
-
-    profit=(Number(tp)-Number(entry)).toFixed(2);
-    loss=(Number(entry)-Number(sl)).toFixed(2);
-
-    rr="1:2";
-
-    profitPercent=((profit/Number(entry))*100).toFixed(2);
-    lossPercent=((loss/Number(entry))*100).toFixed(2);
-}
-
-else if(signal.includes("SELL")){
-    sl=(Number(entry)+10).toFixed(2);
-    tp=(Number(entry)-20).toFixed(2);
-
-    profit=(Number(entry)-Number(tp)).toFixed(2);
-    loss=(Number(sl)-Number(entry)).toFixed(2);
-
-    rr="1:2";
-
-    profitPercent=((profit/Number(entry))*100).toFixed(2);
-    lossPercent=((loss/Number(entry))*100).toFixed(2);
-}
-
 else{
-    sl="-";
-    tp="-";
-    profit=0;
-    loss=0;
-    profitPercent=0;
-    lossPercent=0;
-    rr="-";
+
+    sl = "-";
+    tp = "-";
+    profit = 0;
+    loss = 0;
+    profitPercent = 0;
+    lossPercent = 0;
+    rr = "-";
+
 }
 history =
 `<hr>${date} ${time} - ${signal}<br>` + history;
