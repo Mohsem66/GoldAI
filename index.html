@@ -209,7 +209,14 @@ if(marketOpen){
     "⏳ Next Close: " + countdown;
 
     document.getElementById("analyzeBtn").disabled = false;
+document.getElementById("tradeStatus").innerHTML =
+"🟢 SAFE TO TRADE";
 
+document.getElementById("tradeStatus").style.color =
+"lime";
+
+document.getElementById("tradeReason").innerHTML =
+"Market is open and trading is allowed.";
 }
 else{
 
@@ -223,7 +230,14 @@ else{
     "⏳ Waiting for Market Open";
 
     document.getElementById("analyzeBtn").disabled = true;
+document.getElementById("tradeStatus").innerHTML =
+"🔴 DO NOT TRADE";
 
+document.getElementById("tradeStatus").style.color =
+"red";
+
+document.getElementById("tradeReason").innerHTML =
+"Market is closed. Trading is not allowed.";
 }
 
 }
