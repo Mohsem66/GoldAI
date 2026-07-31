@@ -106,16 +106,34 @@ Start AI Analysis
 
 <div id="result"></div>
 <script>
-let goldPrice=4035;
+async function updateGoldPrice(){
 
-setInterval(function(){
+try{
 
-goldPrice=(4030 + Math.random()*10);
+let response = await fetch(
+"https://api.metals.live/v1/spot/gold"
+);
+
+let data = await response.json();
+
+let price = data[0].price;
 
 document.getElementById("goldPrice").innerHTML =
-"🥇 XAUUSD : " + goldPrice.toFixed(2);
+"🥇 XAUUSD : " + price.toFixed(2);
 
-},1000);
+}
+catch(error){
+
+document.getElementById("goldPrice").innerHTML =
+"⚠️ Price Error";
+
+}
+
+}
+
+updateGoldPrice();
+
+setInterval(updateGoldPrice,10000);
 function analyze(){
 
 document.getElementById("status").innerHTML="🟡 Analyzing...";
