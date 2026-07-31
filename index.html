@@ -131,15 +131,36 @@ Start AI Analysis
 
 <div id="result"></div>
 <script>
-let useRealPrice = false;
-
 async function loadGoldPrice(){
 
 if(!useRealPrice){
     return;
 }
 
-// در مرحله بعد کد دریافت قیمت واقعی اینجا قرار می‌گیرد.
+try{
+
+const response = await fetch("https://api.gold-api.com/price/XAU");
+
+if(!response.ok){
+    throw new Error("API Error");
+}
+
+const data = await response.json();
+
+if(data.price){
+
+goldPrice = Number(data.price);
+
+document.getElementById("goldPrice").innerHTML =
+"🥇 XAUUSD : " + goldPrice.toFixed(2);
+
+}
+
+}catch(error){
+
+console.log("Gold Price Error:",error);
+
+}
 
 }
 let goldPrice=4035;
