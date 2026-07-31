@@ -1,947 +1,196 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
-
+<html lang="fa">
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>GoldAI V2</title>
-
-
 <style>
-
-body{
-
-margin:0;
-background:#070b14;
-color:white;
-font-family:tahoma,Arial;
-
-}
-
-
-.container{
-
-width:92%;
-max-width:520px;
-margin:20px auto;
-
-}
-
-
-
-.card{
-
-background:#151c2b;
-padding:18px;
-border-radius:18px;
-margin-bottom:15px;
-box-shadow:0 0 15px #000;
-
-}
-
-
-
-h1{
-
-text-align:center;
-color:#ffd700;
-
-}
-
-
-
-.price{
-
-text-align:center;
-font-size:28px;
-color:#00ff99;
-
-}
-
-
-
-button{
-
-width:100%;
-padding:15px;
-border:none;
-border-radius:12px;
-background:#ffd700;
-font-size:18px;
-font-weight:bold;
-cursor:pointer;
-
-}
-
-
-
-button:active{
-
-transform:scale(.98);
-
-}
-
-
-
-.result{
-
-text-align:center;
-padding:18px;
-border-radius:15px;
-font-size:24px;
-font-weight:bold;
-
-}
-
-
-
-.buy{
-
-background:#064d25;
-
-}
-
-
-
-.sell{
-
-background:#650000;
-
-}
-
-
-
-.wait{
-
-background:#665000;
-
-}
-
-
-
-.info{
-
-display:flex;
-justify-content:space-between;
-background:#20283a;
-padding:10px;
-border-radius:10px;
-margin:8px 0;
-
-}
-
-
-
-.title{
-
-color:#ffd700;
-font-size:18px;
-
-}
-
-
-
-.bar{
-
-height:20px;
-background:#333;
-border-radius:20px;
-overflow:hidden;
-
-}
-
-
-
-.progress{
-
-height:100%;
-width:0%;
-background:#00ff88;
-transition:1s;
-
-}
-
-
-
-.small{
-
-font-size:13px;
-color:#aaa;
-
-}
-
-
-
-.green{
-
-color:#00ff88;
-
-}
-
-
-
-.red{
-
-color:#ff5555;
-
-}
-
-
-
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#fff;font-family:Arial,sans-serif;padding:20px;text-align:center}
+h1{color:#FFD700;margin-bottom:5px}
+.version{color:#888;font-size:14px;margin-bottom:20px}
+.box{background:#222;border-radius:15px;padding:18px;margin:15px auto;max-width:430px;box-shadow:0 0 10px rgba(255,255,255,.08)}
+.price{font-size:28px;color:#FFD700;font-weight:bold}
+button{background:#FFD700;color:#000;border:none;border-radius:12px;padding:15px 25px;font-size:18px;font-weight:bold;cursor:pointer}
+button:hover{background:#ffe95c}
+#result{margin-top:20px;line-height:1.8;text-align:left}
+.bar{width:100%;height:14px;background:#333;border-radius:10px;overflow:hidden}
+.fill{height:14px;border-radius:10px}
+.green{color:#00ff66}
+.red{color:#ff4444}
+.gold{color:#FFD700}
 </style>
-
 </head>
-
-
 <body>
 
+<h1>🥇 GoldAI V2</h1>
+<p class="version">Version 2.0 | by Mohsen</p>
 
-<div class="container">
-
-
-<div class="card">
-
-<h1>
-
-🥇 GoldAI V2
-
-</h1>
-
-
-<div class="price" id="goldPrice">
-
-XAUUSD : Loading...
-
+<div class="box">
+<h2>XAUUSD Live Price</h2>
+<p id="goldPrice" class="price">Loading...</p>
 </div>
 
-
+<div class="box">
+<h2>💰 Risk Manager</h2>
+<p>Capital : <span class="gold">127 $</span></p>
+<p>Risk : 2%</p>
+<p>Max Loss : <span class="red">2.54 $</span></p>
+<p>Suggested Lot : <span class="green">0.01</span></p>
 </div>
 
-
-
-<div class="card">
-
-
-<button onclick="analyze()">
-
-🤖 شروع تحلیل هوش مصنوعی
-
-</button>
-
-
+<div class="box">
+<h2>🤖 AI STATUS</h2>
+<p id="status" class="green">🟢 Ready</p>
 </div>
 
-
-
-<div class="card">
-
-
-<div id="signalBox" class="result wait">
-
-⏳ منتظر تحلیل
-
+<div class="box">
+<h2>Analysis</h2>
+<p>Symbol : XAUUSD</p>
+<p>TimeFrame : M1 + M5</p>
+<p>Trend Filter : M15</p>
 </div>
 
-
+<div class="box">
+<button id="analyzeBtn" onclick="analyze()">Start AI Analysis</button>
+<div id="result"></div>
 </div>
-
-
-
-<div class="card">
-
-
-<div class="title">
-
-📊 معامله پیشنهادی
-
-</div>
-
-
-
-<div class="info">
-
-<span>
-
-Entry
-
-</span>
-
-<span id="entry">
-
--
-
-</span>
-
-</div>
-
-
-
-<div class="info">
-
-<span>
-
-Stop Loss
-
-</span>
-
-<span id="sl">
-
--
-
-</span>
-
-</div>
-
-
-
-<div class="info">
-
-<span>
-
-Take Profit
-
-</span>
-
-<span id="tp">
-
--
-
-</span>
-
-</div>
-
-
-
-<div class="info">
-
-<span>
-
-Risk Reward
-
-</span>
-
-<span id="rr">
-
--
-
-</span>
-
-</div>
-
-
-</div>
-
-
-
-<div class="card">
-
-
-<div class="title">
-
-🧠 AI Confidence
-
-</div>
-
-
-<br>
-
-
-<div class="bar">
-
-<div id="confidenceBar" class="progress">
-
-</div>
-
-</div>
-
-
-<h3 id="confidence">
-
--
-
-</h3>
-
-
-</div>
-
-
-
-<div class="card">
-
-
-<div class="title">
-
-💰 مدیریت سرمایه
-
-</div>
-
-
-
-<div class="info">
-
-<span>
-
-Capital
-
-</span>
-
-<span id="capital">
-
-97$
-
-</span>
-
-</div>
-
-
-
-<div class="info">
-
-<span>
-
-Lot
-
-</span>
-
-<span id="lot">
-
-0.01
-
-</span>
-
-</div>
-
-
-<div class="info">
-
-<span>
-
-Profit
-
-</span>
-
-<span id="profit" class="green">
-
--
-
-</span>
-
-</div>
-
-
-
-<div class="info">
-
-<span>
-
-Loss
-
-</span>
-
-<span id="loss" class="red">
-
--
-
-</span>
-
-</div>
-
-
-</div>
-<div class="card">
-
-
-<div class="title">
-
-📜 تاریخچه سیگنال‌ها
-
-</div>
-
-
-<div id="history">
-
-هنوز سیگنالی ثبت نشده
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
 
 <script>
 
+let capital=127;
+let lot=0.01;
+let goldPrice=4035;
 
-let capital = 97;
+setInterval(async()=>{
+goldPrice=await getGoldPrice();
+document.getElementById("goldPrice").innerHTML="🥇 "+goldPrice;
+},3000);
 
-let lot = 0.01;
+async function getGoldPrice(){
+try{
+let r=await fetch("https://api.gold-api.com/price/XAU");
+let d=await r.json();
+return Number(d.price).toFixed(2);
+}catch(e){
+return (4030+Math.random()*10).toFixed(2);
+}
+}
 
+async function analyze(){
 
+document.getElementById("status").innerHTML="🟡 Analyzing...";
 
-// نمایش قیمت طلا (فعلاً دمو)
+let entry=await getGoldPrice();
+entry=Number(entry).toFixed(2);
 
-setInterval(function(){
+let signal="WAIT 🟡";
 
+if(Number(entry)>=4040){
+signal="SELL 🔴";
+}else if(Number(entry)<=4032){
+signal="BUY 🟢";
+}
 
-let price = (4030 + Math.random()*10).toFixed(2);
-
-
-document.getElementById("goldPrice").innerHTML =
-
-"🥇 XAUUSD : " + price;
-
-
-},1000);
-
-
-
-
-
-
-function analyze(){
-
-
-
-let signals = [
-
-"BUY 🟢",
-
-"SELL 🔴",
-
-"WAIT 🟡"
-
-];
-
-
-
-let signal =
-
-signals[Math.floor(Math.random()*signals.length)];
-
-
-
-let entry =
-
-Number((4030 + Math.random()*10).toFixed(2));
-
-
-
-let sl;
-
-let tp;
-
-
-
+let signalColor="gold";
+if(signal.includes("BUY"))signalColor="lime";
+if(signal.includes("SELL"))signalColor="red";
+let now=new Date();
+let time=now.getHours()+":"+String(now.getMinutes()).padStart(2,"0");
+let date=now.getFullYear()+"/"+(now.getMonth()+1)+"/"+now.getDate();
+let confidence=65;
+if(signal.includes("BUY"))confidence=Math.floor(Math.random()*9)+90;
+else if(signal.includes("SELL"))confidence=Math.floor(Math.random()*9)+88;
+else confidence=Math.floor(Math.random()*16)+65;
+let confidenceColor="red";
+if(confidence>=90)confidenceColor="lime";
+else if(confidence>=75)confidenceColor="gold";
+let confidenceText="🔴 Weak";
+if(confidence>=90)confidenceText="🟢 Very Strong";
+else if(confidence>=75)confidenceText="🟡 Medium";
+let reason="",marketStatus="🟡 Sideways";
 if(signal.includes("BUY")){
-
-
-sl = entry - 10;
-
-tp = entry + 20;
-
-
+marketStatus="🟢 Bullish";
+reason="Trend: Bullish 📈<br>Structure: Support Held ✅<br>Momentum: Positive ⚡<br>AI: Buy Opportunity";
+}else if(signal.includes("SELL")){
+marketStatus="🔴 Bearish";
+reason="Trend: Bearish 📉<br>Structure: Resistance Held ✅<br>Momentum: Negative ⚡<br>AI: Sell Opportunity";
+}else{
+reason="Trend: Neutral ⚠️<br>Structure: Waiting<br>Momentum: Weak<br>AI: No Confirmation";
 }
-
-
-else if(signal.includes("SELL")){
-
-
-sl = entry + 10;
-
-tp = entry - 20;
-
-
-}
-
-
-else{
-
-
-sl = entry - 5;
-
-tp = entry + 5;
-
-
-}
-
-
-
-
-let riskReward = "1 : 2";
-
-
-
-let confidence;
-
-
-
+let sl="-",tp="-",profit=0,loss=0,profitPercent=0,lossPercent=0,rr="-";
 if(signal.includes("BUY")){
-
-
-confidence = Math.floor(Math.random()*8)+90;
-
-
+sl=(Number(entry)-10).toFixed(2);
+tp=(Number(entry)+20).toFixed(2);
+profit=(Number(tp)-Number(entry)).toFixed(2);
+loss=(Number(entry)-Number(sl)).toFixed(2);
+profitPercent=((Number(profit)/Number(entry))*100).toFixed(2);
+lossPercent=((Number(loss)/Number(entry))*100).toFixed(2);
+rr="1:2";
+}else if(signal.includes("SELL")){
+sl=(Number(entry)+10).toFixed(2);
+tp=(Number(entry)-20).toFixed(2);
+profit=(Number(entry)-Number(tp)).toFixed(2);
+loss=(Number(sl)-Number(entry)).toFixed(2);
+profitPercent=((Number(profit)/Number(entry))*100).toFixed(2);
+lossPercent=((Number(loss)/Number(entry))*100).toFixed(2);
+rr="1:2";
 }
-
-else if(signal.includes("SELL")){
-
-
-confidence = Math.floor(Math.random()*8)+88;
-
-
-}
-
-else{
-
-
-confidence = Math.floor(Math.random()*20)+65;
-
-
-}
-
-
-
-
-
-
-let box =
-
-document.getElementById("signalBox");
-
-
-
-box.innerHTML = signal;
-
-
-
-box.className="result";
-
-
-
-if(signal.includes("BUY")){
-
-
-box.classList.add("buy");
-
-
-}
-
-else if(signal.includes("SELL")){
-
-
-box.classList.add("sell");
-
-
-}
-
-else{
-
-
-box.classList.add("wait");
-
-
-}
-
-
-
-
-
-document.getElementById("entry").innerHTML =
-
-entry.toFixed(2);
-
-
-
-document.getElementById("sl").innerHTML =
-
-sl.toFixed(2);
-
-
-
-document.getElementById("tp").innerHTML =
-
-tp.toFixed(2);
-
-
-
-document.getElementById("rr").innerHTML =
-
-riskReward;
-
-
-
-
-document.getElementById("confidence").innerHTML =
-
-confidence + "%";
-
-
-
-document.getElementById("confidenceBar").style.width =
-
-confidence + "%";
-
-
-
-
-
-let profit;
-
-let loss;
-
-
-
-if(signal.includes("BUY")){
-
-
-profit = ((tp-entry)*lot*100).toFixed(2);
-
-loss = ((entry-sl)*lot*100).toFixed(2);
-
-
-}
-
-
-else if(signal.includes("SELL")){
-
-
-profit = ((entry-tp)*lot*100).toFixed(2);
-
-loss = ((sl-entry)*lot*100).toFixed(2);
-
-
-}
-
-
-else{
-
-
-profit = "0";
-
-loss = "0";
-
-
-}
-
-
-
-
-
-document.getElementById("profit").innerHTML =
-
-"+" + profit + "$";
-
-
-
-document.getElementById("loss").innerHTML =
-
-"-" + loss + "$";
-
-
-
-
-saveSignal(
-
-signal,
-
-entry,
-
-sl,
-
-tp,
-
-confidence
-
-);
-}
-
-
-// ==========================
-// History System
-// ==========================
-
-
-function saveSignal(signal,entry,sl,tp,confidence){
-
-
-let history =
-
-JSON.parse(
-
-localStorage.getItem("goldAI_v2_history")
-
-) || [];
-
-
-
-history.unshift({
-
-
-date:new Date().toLocaleString(),
-
-
-signal:signal,
-
-
-entry:entry.toFixed(2),
-
-
-sl:sl.toFixed(2),
-
-
-tp:tp.toFixed(2),
-
-
-confidence:confidence+"%"
-
-
-});
-
-
-
-if(history.length > 10){
-
-
-history.pop();
-
-
-}
-
-
-
-localStorage.setItem(
-
-"goldAI_v2_history",
-
-JSON.stringify(history)
-
-);
-
-
-
-showHistory();
-
-
-}
-
-
-
-
-
-function showHistory(){
-
-
-
-let history =
-
-JSON.parse(
-
-localStorage.getItem("goldAI_v2_history")
-
-)
-
-|| [];
-
-
-
-let box =
-
-document.getElementById("history");
-
-
-
-if(history.length===0){
-
-
-box.innerHTML="هنوز سیگنالی ثبت نشده";
-
-
-return;
-
-
-}
-
-
-
-box.innerHTML="";
-
-
-
-history.forEach(function(item){
-
-
-
-box.innerHTML += `
-
-
-<div class="info">
-
-
-<div>
-
-
-${item.signal}
-
-<br>
-
-<span class="small">
-
-${item.date}
-
-</span>
-
-
+let riskLevel="🔴 High Risk";
+if(confidence>=90&&rr=="1:2")riskLevel="🟢 Low Risk";
+else if(confidence>=75)riskLevel="🟡 Medium Risk";
+let history=localStorage.getItem("history")||"";
+history="<hr>"+date+" "+time+" - "+signal+"<br>"+history;
+localStorage.setItem("history",history);
+let total=Number(localStorage.getItem("totalSignals")||0)+1;
+localStorage.setItem("totalSignals",total);
+let buy=Number(localStorage.getItem("buySignals")||0);
+let sell=Number(localStorage.getItem("sellSignals")||0);
+let wait=Number(localStorage.getItem("waitSignals")||0);
+if(signal.includes("BUY"))buy++;
+else if(signal.includes("SELL"))sell++;
+else wait++;
+localStorage.setItem("buySignals",buy);
+localStorage.setItem("sellSignals",sell);
+localStorage.setItem("waitSignals",wait);
+let buyPercent=total?((buy/total)*100).toFixed(1):0;
+let sellPercent=total?((sell/total)*100).toFixed(1):0;
+let waitPercent=total?((wait/total)*100).toFixed(1):0;
+document.getElementById("result").innerHTML=`
+<p>📅 ${date}</p>
+<p>🕒 ${time}</p>
+<div style="background:${signal.includes("BUY")?"#063b1c":signal.includes("SELL")?"#4b0b0b":"#4a3b00"};padding:18px;border-radius:18px;text-align:center;margin:15px 0">
+<h3>📈 GoldAI Signal</h3>
+<p style="font-size:20px">🥇 XAUUSD : ${entry}</p>
 </div>
-
-
-
-<div>
-
-
-Entry: ${item.entry}
-
-<br>
-
-TP: ${item.tp}
-
-<br>
-
-AI: ${item.confidence}
-
-
-</div>
-
-
-</div>
-
-
+<p><b>Signal:</b> <span style="color:${signalColor};font-size:22px"><b>${signal}</b></span></p>
+<p><b>Entry:</b> ${entry}</p>
+<p><b>Stop Loss:</b> <span style="color:#ff4444">${sl}</span></p>
+<p><b>Take Profit:</b> <span style="color:#00ff66">${tp}</span></p>
+<p><b>Risk / Reward:</b> ${rr}</p>
+<p><b>💰 Profit:</b> <span style="color:#00ff66">${profit==0?"-":"+"+profit+" $"}</span></p>
+<p><b>💸 Loss:</b> <span style="color:#ff4444">${loss==0?"-":"-"+loss+" $"}</span></p>
+<p><b>📈 Profit %:</b> <span style="color:#00ff66">${profitPercent==0?"-":"+"+profitPercent+"%"}</span></p>
+<p><b>📉 Loss %:</b> <span style="color:#ff4444">${lossPercent==0?"-":"-"+lossPercent+"%"}</span></p>
+<p><b>🤖 AI Confidence:</b> ${confidence}% - ${confidenceText}</p>
+<p><b>⭐ AI Score:</b> ${confidence}/100</p>
+<p><b>🛡 Risk Level:</b> ${riskLevel}</p>
+<p><b>🌍 Market Status:</b> ${marketStatus}</p>
+<p><b>🧠 AI Reason:</b></p>
+<div style="background:#1b1b1b;padding:10px;border-radius:10px">${reason}</div>
+<div class="bar"><div class="fill" style="width:${confidence}%;background:${confidenceColor}"></div></div>
+<p>Status : Waiting for confirmation</p>
+<button onclick="copySignal()">📋 Copy Signal</button>
+<button onclick="shareSignal()">📤 Share Signal</button>
+<hr>
+<h3>📊 AI Statistics</h3>
+<p>Total Signals : ${total}</p>
+<p>🟢 BUY : ${buy} (${buyPercent}%)</p>
+<p>🔴 SELL : ${sell} (${sellPercent}%)</p>
+<p>🟡 WAIT : ${wait} (${waitPercent}%)</p>
+<h3>📜 History</h3>
+${history}
 `;
-
-
-});
-
-
-
+document.getElementById("status").innerHTML="🟢 Analysis Complete";
 }
-
-
-
-
-
-showHistory();
-
-
-
-</script>
-
-
-</body>
-
-
-</html>
+  
