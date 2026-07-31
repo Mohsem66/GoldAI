@@ -112,10 +112,29 @@ setInterval(function(){
 
 goldPrice=(4030 + Math.random()*10);
 
-document.getElementById("goldPrice").innerHTML =
-"🥇 XAUUSD : " + goldPrice.toFixed(2);
+async function updateGoldPrice(){
 
-},1000);
+try{
+
+const res = await fetch("https://api.gold-api.com/price/XAU");
+
+const data = await res.json();
+
+document.getElementById("goldPrice").innerHTML =
+"🥇 XAUUSD : " + Number(data.price).toFixed(2);
+
+}catch(e){
+
+document.getElementById("goldPrice").innerHTML =
+"❌ Price Offline";
+
+}
+
+}
+
+updateGoldPrice();
+
+setInterval(updateGoldPrice,10000);
 function analyze(){
 
 document.getElementById("status").innerHTML="🟡 Analyzing...";
