@@ -81,7 +81,8 @@ Max Loss :
 </p>
 
 <p style="color:#FFD700;">
-Suggested Lot : 0.01
+Suggested Lot :
+<span id="lotText">0.01</span>
 </p>
 
 <button onclick="changeCapital()">
@@ -184,6 +185,13 @@ Number(localStorage.getItem("capital") || 97);
 
 document.getElementById("maxLossText").innerHTML =
 ((currentCapital * riskPercent) / 100).toFixed(2);
+let suggestedLot = (currentCapital / 10000).toFixed(2);
+
+if(suggestedLot < 0.01){
+    suggestedLot = 0.01;
+}
+
+document.getElementById("lotText").innerHTML = suggestedLot;
 setInterval(function(){
 
 loadGoldPrice();
@@ -323,6 +331,13 @@ localStorage.setItem("capital", newCapital);
 document.getElementById("capitalText").innerHTML = newCapital;
 document.getElementById("maxLossText").innerHTML =
 ((newCapital * 2) / 100).toFixed(2);
+let suggestedLot = (newCapital / 10000).toFixed(2);
+
+if(suggestedLot < 0.01){
+    suggestedLot = 0.01;
+}
+
+document.getElementById("lotText").innerHTML = suggestedLot;
 alert("✅ Capital Updated");
 
 }
