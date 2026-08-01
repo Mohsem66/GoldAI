@@ -356,6 +356,37 @@ document.getElementById("status").innerHTML="🟡 Analyzing...";
 let signals=["BUY 🟢","SELL 🔴","WAIT 🟡"];
 
 let signal=signals[Math.floor(Math.random()*signals.length)];
+// =====================
+// GoldAI Score Engine
+// =====================
+
+let buyScore = 0;
+let sellScore = 0;
+
+// شبیه‌سازی روند
+let trend = Math.random();
+
+if(trend > 0.6){
+    buyScore += 2;
+}
+else if(trend < 0.4){
+    sellScore += 2;
+}
+else{
+    buyScore++;
+    sellScore++;
+}
+
+// شبیه‌سازی قدرت حرکت
+let strength = Math.random()*100;
+
+if(strength > 70){
+    if(buyScore > sellScore){
+        buyScore++;
+    }else{
+        sellScore++;
+    }
+}
 let signalColor="lime";
 
 if(signal.includes("SELL")){
