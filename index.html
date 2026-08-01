@@ -355,8 +355,8 @@ if(marketText.includes("CLOSED")){
 document.getElementById("status").innerHTML="🟡 Analyzing...";
 // تحلیل منطقی اولیه GoldAI
 
-let marketPrice = 4040;
-let previousPrice = 4030;
+let marketPrice = 4035 + Math.random()*5;
+let previousPrice = marketPrice - 2 + Math.random()*4;
 
 let buyScore = 0;
 let sellScore = 0;
