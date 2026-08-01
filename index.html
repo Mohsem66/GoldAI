@@ -402,7 +402,7 @@ let profitPercent=0;
 let lossPercent=0;
 let rr="-";
 let riskReward="-";
-let capital=97; // سرمایه دلاری
+let capital = Number(localStorage.getItem("capital") || 97); // سرمایه دلاری
 let lot=0.01;   // حجم معامله
 
 let profitDollar=0;
