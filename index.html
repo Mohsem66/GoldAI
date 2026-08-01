@@ -374,7 +374,18 @@ else{
     buyScore++;
     sellScore++;
 }
+// بررسی حرکت قوی قیمت
 
+let priceMove = Math.abs(goldPrice - lastPrice);
+
+if(priceMove > 1){
+    if(goldPrice > lastPrice){
+        buyScore += 1;
+    }
+    else{
+        sellScore += 1;
+    }
+}
 localStorage.setItem("lastPrice", goldPrice);
 // ذخیره 10 قیمت آخر
 
