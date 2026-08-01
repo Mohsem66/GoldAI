@@ -353,17 +353,7 @@ if(marketText.includes("CLOSED")){
 }
 
 document.getElementById("status").innerHTML="🟡 Analyzing...";
-let signal;
 
-if(buyScore > sellScore){
-    signal = "BUY 🟢";
-}
-else if(sellScore > buyScore){
-    signal = "SELL 🔴";
-}
-else{
-    signal = "WAIT 🟡";
-}
 // =====================
 // GoldAI Score Engine
 // =====================
@@ -394,6 +384,17 @@ if(strength > 70){
     }else{
         sellScore++;
     }
+}
+let signal;
+
+if(buyScore > sellScore){
+    signal = "BUY 🟢";
+}
+else if(sellScore > buyScore){
+    signal = "SELL 🔴";
+}
+else{
+    signal = "WAIT 🟡";
 }
 let signalColor="lime";
 
