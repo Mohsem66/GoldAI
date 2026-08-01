@@ -289,6 +289,31 @@ document.getElementById("tradeReason").innerHTML =
 updateMarketStatus();
 
 setInterval(updateMarketStatus,1000);
+function changeCapital(){
+
+let newCapital = prompt("Enter your capital ($)", localStorage.getItem("capital") || "97");
+
+if(newCapital===null){
+    return;
+}
+
+newCapital = Number(newCapital);
+
+if(isNaN(newCapital) || newCapital<=0){
+
+    alert("Please enter a valid number.");
+
+    return;
+
+}
+
+localStorage.setItem("capital", newCapital);
+
+document.getElementById("capitalText").innerHTML = newCapital;
+
+alert("✅ Capital Updated");
+
+}
 function analyze(){
 
 let marketText =
