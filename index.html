@@ -244,7 +244,7 @@ if(marketOpen){
     document.getElementById("marketCountdown").innerHTML =
     "⏳ Next Close: " + countdown;
 
-    document.getElementById("analyzeBtn").disabled = false;
+    
 document.getElementById("tradeStatus").innerHTML =
 "🟢 SAFE TO TRADE";
 
@@ -265,7 +265,7 @@ else{
     document.getElementById("marketCountdown").innerHTML =
     "⏳ Waiting for Market Open";
 
-    document.getElementById("analyzeBtn").disabled = true;
+
 document.getElementById("tradeStatus").innerHTML =
 "🔴 DO NOT TRADE";
 
@@ -288,9 +288,7 @@ document.getElementById("marketStatus").innerText;
 
 if(marketText.includes("CLOSED")){
 
-    alert("🚫 Gold Market is CLOSED\n\nAnalysis is disabled until the market opens.");
-
-    return;
+    alert("⚠️ Gold Market is CLOSED.\n\nThe analysis is for educational purposes only because the market is currently closed.");
 
 }
 
