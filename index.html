@@ -172,7 +172,10 @@ console.log("Gold Price Error:",error);
 
 }
 let goldPrice=4035;
-
+if(localStorage.getItem("capital")){
+    document.getElementById("capitalText").innerHTML =
+    localStorage.getItem("capital");
+    }
 setInterval(function(){
 
 loadGoldPrice();
