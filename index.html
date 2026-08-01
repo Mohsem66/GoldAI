@@ -378,13 +378,13 @@ else{
 localStorage.setItem("lastPrice", goldPrice);
 
 // شبیه‌سازی قدرت حرکت
-let strength = Math.random()*100;
+let strength = Math.abs(goldPrice - lastPrice);
 
-if(strength > 70){
+if(strength >= 2){
     if(buyScore > sellScore){
-        buyScore++;
-    }else{
-        sellScore++;
+        buyScore += 1;
+    }else if(sellScore > buyScore){
+        sellScore += 1;
     }
 }
 let signal;
