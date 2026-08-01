@@ -387,6 +387,18 @@ if(priceHistory.length > 10){
 }
 
 localStorage.setItem("priceHistory", JSON.stringify(priceHistory));
+let averagePrice = goldPrice;
+
+if(priceHistory.length > 0){
+
+    let sum = 0;
+
+    for(let i=0;i<priceHistory.length;i++){
+        sum += priceHistory[i];
+    }
+
+    averagePrice = sum / priceHistory.length;
+}
 // میانگین 10 قیمت آخر
 
 let averagePrice = goldPrice;
