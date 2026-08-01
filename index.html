@@ -362,18 +362,20 @@ let buyScore = 0;
 let sellScore = 0;
 
 // شبیه‌سازی روند
-let trend = Math.random();
+let lastPrice = Number(localStorage.getItem("lastPrice") || goldPrice);
 
-if(trend > 0.6){
+if(goldPrice > lastPrice){
     buyScore += 2;
 }
-else if(trend < 0.4){
+else if(goldPrice < lastPrice){
     sellScore += 2;
 }
 else{
     buyScore++;
     sellScore++;
 }
+
+localStorage.setItem("lastPrice", goldPrice);
 
 // شبیه‌سازی قدرت حرکت
 let strength = Math.random()*100;
