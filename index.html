@@ -376,7 +376,31 @@ else{
 }
 
 localStorage.setItem("lastPrice", goldPrice);
+// ذخیره 10 قیمت آخر
 
+let priceHistory = JSON.parse(localStorage.getItem("priceHistory") || "[]");
+
+priceHistory.push(Number(goldPrice));
+
+if(priceHistory.length > 10){
+    priceHistory.shift();
+}
+
+localStorage.setItem("priceHistory", JSON.stringify(priceHistory));
+// میانگین 10 قیمت آخر
+
+let averagePrice = goldPrice;
+
+if(priceHistory.length > 0){
+
+    let sum = 0;
+
+    for(let i=0;i<priceHistory.length;i++){
+        sum += priceHistory[i];
+    }
+
+    averagePrice = sum / priceHistory.length;
+}
 // شبیه‌سازی قدرت حرکت
 let strength = Math.abs(goldPrice - lastPrice);
 
