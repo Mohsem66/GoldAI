@@ -353,13 +353,63 @@ if(marketText.includes("CLOSED")){
 }
 
 document.getElementById("status").innerHTML="🟡 Analyzing...";
-let signals=[
-"BUY 🟢",
-"SELL 🔴",
-"WAIT 🟡"
-];
+// تحلیل منطقی اولیه GoldAI
 
-let signal=signals[Math.floor(Math.random()*signals.length)];
+let marketPrice = 4035 + Math.random()*5;
+let previousPrice = marketPrice - 2 + Math.random()*4;
+
+let buyScore = 0;
+let sellScore = 0;
+
+// بررسی روند
+if(marketPrice > previousPrice){
+    buyScore += 2;
+}else{
+    sellScore += 2;
+}
+
+// قدرت حرکت
+let movement = Math.abs(marketPrice - previousPrice);
+
+if(movement > 1.5){
+    if(marketPrice > previousPrice){
+        buyScore += 1;
+    }else{
+        sellScore += 1;
+    }
+}
+
+// نتیجه نهایی
+
+let signal;
+
+if(buyScore > sellScore){
+    signal="BUY 🟢";
+}
+else if(sellScore > buyScore){
+    signal="SELL 🔴";
+}
+else{
+    signal="WAIT 🟡";
+}
+
+
+// درصد اطمینان بر اساس امتیاز
+let confidence;
+
+if(signal.includes("BUY")){
+    confidence = 75 + buyScore*5;
+}
+else if(signal.includes("SELL")){
+    confidence = 75 + sellScore*5;
+}
+else{
+    confidence = 65;
+}
+
+if(confidence>95){
+    confidence=95;
+}
 let signalColor="lime";
 
 if(signal.includes("SELL")){
