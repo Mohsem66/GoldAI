@@ -76,7 +76,8 @@ Capital :
 <p>Risk : 2%</p>
 
 <p style="color:#00ff66;">
-Max Loss : 1.40 $
+Max Loss :
+<span id="maxLossText">1.94</span> $
 </p>
 
 <p style="color:#FFD700;">
@@ -176,6 +177,13 @@ if(localStorage.getItem("capital")){
     document.getElementById("capitalText").innerHTML =
     localStorage.getItem("capital");
     }
+let riskPercent = 2;
+
+let currentCapital =
+Number(localStorage.getItem("capital") || 97);
+
+document.getElementById("maxLossText").innerHTML =
+((currentCapital * riskPercent) / 100).toFixed(2);
 setInterval(function(){
 
 loadGoldPrice();
@@ -313,7 +321,8 @@ if(isNaN(newCapital) || newCapital<=0){
 localStorage.setItem("capital", newCapital);
 
 document.getElementById("capitalText").innerHTML = newCapital;
-
+document.getElementById("maxLossText").innerHTML =
+((newCapital * 2) / 100).toFixed(2);
 alert("✅ Capital Updated");
 
 }
