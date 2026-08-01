@@ -374,14 +374,7 @@ else{
     buyScore++;
     sellScore++;
 }
-// بررسی میانگین 10 قیمت آخر
 
-if(goldPrice > averagePrice){
-    buyScore += 2;
-}
-else if(goldPrice < averagePrice){
-    sellScore += 2;
-    }
 localStorage.setItem("lastPrice", goldPrice);
 // ذخیره 10 قیمت آخر
 
