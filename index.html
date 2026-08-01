@@ -167,7 +167,11 @@ let goldPrice=4035;
 
 setInterval(function(){
 
+loadGoldPrice();
+
+if(!useRealPrice){
 goldPrice=(4030 + Math.random()*10);
+}
 
 document.getElementById("goldPrice").innerHTML =
 "🥇 XAUUSD : " + goldPrice.toFixed(2);
