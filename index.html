@@ -364,10 +364,12 @@ let sellScore = 0;
 // شبیه‌سازی روند
 let lastPrice = Number(localStorage.getItem("lastPrice") || goldPrice);
 
-if(goldPrice > lastPrice){
+let diff = goldPrice - lastPrice;
+
+if(diff > 0.5){
     buyScore += 2;
 }
-else if(goldPrice < lastPrice){
+else if(diff < -0.5){
     sellScore += 2;
 }
 else{
