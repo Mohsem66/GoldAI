@@ -194,7 +194,17 @@ async function loadCandles(){
     let closePrices = candles.map(candle => Number(candle.close));
 
 let ema20 = calculateEMA(closePrices, 20);
+let emaStatus = "-";
 
+if(ema20 !== null){
+
+    if(goldPrice > ema20){
+        emaStatus = "🟢 Bullish";
+    }else{
+        emaStatus = "🔴 Bearish";
+    }
+
+    }
 console.log("EMA20:", ema20);
 console.log(closePrices);
 
