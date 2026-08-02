@@ -192,7 +192,7 @@ async function loadCandles(){
     candles = data.values.reverse();
 
     let closePrices = candles.map(candle => Number(candle.close));
-
+alert("Candles: " + candles.length);
 let ema20 = calculateEMA(closePrices, 20);
 let emaStatus = "-";
 
