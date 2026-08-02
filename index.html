@@ -399,8 +399,13 @@ else if(diff < -0.5){
     sellScore += 2;
 }
 else{
-    buyScore++;
-    sellScore++;
+
+    if(Math.random() > 0.5){
+        buyScore++;
+    }else{
+        sellScore++;
+    }
+
 }
 // بررسی حرکت قوی قیمت
 
