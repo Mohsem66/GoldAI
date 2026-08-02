@@ -424,6 +424,11 @@ if(strength >= 2){
         sellScore += 1;
     }
 }
+// فیلتر قدرت سیگنال
+
+if(Math.abs(buyScore - sellScore) < 2){
+    buyScore = sellScore;
+}
 let signal;
 
 if(buyScore > sellScore){
