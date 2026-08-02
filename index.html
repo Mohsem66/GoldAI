@@ -193,7 +193,10 @@ async function loadCandles(){
 
     let closePrices = candles.map(candle => Number(candle.close));
 
-    console.log(closePrices);
+let ema20 = calculateEMA(closePrices, 20);
+
+console.log("EMA20:", ema20);
+console.log(closePrices);
 
         }
 
