@@ -417,7 +417,15 @@ let ema20 = calculateEMA(closePrices, 20);
 
 let buyScore = 0;
 let sellScore = 0;
+if(ema20 !== null){
 
+    if(goldPrice > ema20){
+        buyScore += 2;
+    }else{
+        sellScore += 2;
+    }
+
+    }
 // شبیه‌سازی روند
 let lastPrice = Number(localStorage.getItem("lastPrice") || goldPrice);
 
