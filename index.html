@@ -408,6 +408,8 @@ if(marketText.includes("CLOSED")){
 }
 
 document.getElementById("status").innerHTML="🟡 Analyzing...";
+let closePrices = candles.map(candle => Number(candle.close));
+let ema20 = calculateEMA(closePrices, 20);
 
 // =====================
 // GoldAI Score Engine
