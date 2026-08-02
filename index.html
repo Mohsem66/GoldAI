@@ -149,7 +149,7 @@ if(!useRealPrice){
 
 try{
 
-const response = await fetch("https://api.gold-api.com/price/XAU");
+const response = await fetch("https://api.twelvedata.com/price?symbol=XAU/USD&apikey=3302af6a7da54960b1dcef8db0edf78b");
 
 if(!response.ok){
     throw new Error("API Error");
