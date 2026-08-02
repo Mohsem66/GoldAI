@@ -191,7 +191,9 @@ async function loadCandles(){
 
     candles = data.values.reverse();
 
-    console.log(candles);
+    let closePrices = candles.map(candle => Number(candle.close));
+
+    console.log(closePrices);
 
         }
 
