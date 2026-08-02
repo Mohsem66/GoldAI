@@ -206,6 +206,25 @@ async function loadCandles(){
 }
 let goldPrice=4035;
 let candles = [];
+function calculateEMA(prices, period){
+
+    if(prices.length < period){
+        return null;
+    }
+
+    let multiplier = 2 / (period + 1);
+
+    let ema = prices
+        .slice(0, period)
+        .reduce((sum, price) => sum + price, 0) / period;
+
+    for(let i = period; i < prices.length; i++){
+        ema = (prices[i] - ema) * multiplier + ema;
+    }
+
+    return ema;
+
+}
 if(localStorage.getItem("capital")){
     document.getElementById("capitalText").innerHTML =
     localStorage.getItem("capital");
