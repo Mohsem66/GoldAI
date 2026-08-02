@@ -173,6 +173,31 @@ console.log("Gold Price Error:",error);
 }
 
 }
+async function loadCandles(){
+
+    if(!useRealPrice){
+        return;
+    }
+
+    try{
+
+        const response = await fetch(
+        "https://api.twelvedata.com/time_series?symbol=XAU/USD&interval=1min&outputsize=20&apikey=3302af6a7da54960b1dcef8db0edf78b"
+        );
+
+        const data = await response.json();
+
+        if(data.values){
+            candles = data.values;
+        }
+
+    }catch(error){
+
+        console.log("Candles Error:", error);
+
+    }
+
+}
 let goldPrice=4035;
 let candles = [];
 if(localStorage.getItem("capital")){
