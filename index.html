@@ -188,7 +188,11 @@ async function loadCandles(){
         const data = await response.json();
 
         if(data.values){
-            candles = data.values;
+
+    candles = data.values.reverse();
+
+    console.log(candles);
+
         }
 
     }catch(error){
