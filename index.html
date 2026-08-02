@@ -209,6 +209,7 @@ console.log(closePrices);
 }
 let goldPrice=4035;
 let candles = [];
+let ema20 = null;
 function calculateEMA(prices, period){
 
     if(prices.length < period){
