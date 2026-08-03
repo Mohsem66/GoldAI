@@ -730,14 +730,16 @@ Market Condition: ادامه حرکت با احتیاط
 
     else{
 
-        reason=`
-Trend: صعودی ولی ضعیف ⚠️<br>
-Structure: EMA تایید شده اما قدرت کم است<br>
+        else{
+
+reason=`
+Trend: صعودی ولی نیازمند تایید ⚠️<br>
+Structure: EMA کامل تایید نشده<br>
 Momentum: مثبت ⚡<br>
-Market Condition: نیاز به تایید بیشتر
+Market Condition: ورود با احتیاط
 `;
 
-    }
+        }
 
 }
 if(signal.includes("SELL")){
