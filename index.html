@@ -442,7 +442,17 @@ if(ema20 !== null){
         sellScore += 2;
     }
 
+}
+
+if(ema50 !== null){
+
+    if(goldPrice > ema50){
+        buyScore += 2;
+    }else{
+        sellScore += 2;
     }
+
+}
 // شبیه‌سازی روند
 let lastPrice = Number(localStorage.getItem("lastPrice") || goldPrice);
 
