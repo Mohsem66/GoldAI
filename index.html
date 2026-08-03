@@ -662,14 +662,27 @@ if(strength >= 2){
 
 let signal;
 
-if(buyScore > sellScore){
+let scoreDiff = Math.abs(buyScore - sellScore);
+
+if(trendStrength < 1 && scoreDiff < 3){
+
+    signal = "WAIT 🟡";
+
+}
+else if(buyScore > sellScore){
+
     signal = "BUY 🟢";
+
 }
 else if(sellScore > buyScore){
+
     signal = "SELL 🔴";
+
 }
 else{
+
     signal = "WAIT 🟡";
+
 }
 let trendWarning = "";
 
