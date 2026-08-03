@@ -381,7 +381,13 @@ function analyzeRSIEngine(prices,rsiValues){
 
     }
 
+if(result.reason.length === 0){
 
+    result.reason.push(
+    "RSI Neutral Condition"
+    );
+
+}
 
     result.reason =
     result.reason.join(" + ");
