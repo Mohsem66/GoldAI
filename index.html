@@ -752,10 +752,31 @@ confidence=Math.floor(Math.random()*16)+65;
 }
 // Apply Trend Power Effect
 
-confidence += confidenceBonus;
+// Smart Confidence Limit
 
-if(confidence > 99){
-    confidence = 99;
+if(trendPower == "Strong" && 
+   (emaStatus == "🟢 Bullish" || emaStatus == "🔴 Bearish")){
+
+    if(confidence > 97){
+        confidence = 97;
+    }
+
+}
+
+else if(trendPower == "Medium"){
+
+    if(confidence > 90){
+        confidence = 90;
+    }
+
+}
+
+else if(trendPower == "Weak"){
+
+    if(confidence > 80){
+        confidence = 80;
+    }
+
 }
 
 if(confidence < 50){
