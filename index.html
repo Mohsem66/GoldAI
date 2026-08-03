@@ -680,7 +680,26 @@ if(strength >= 2){
         sellScore += 1;
     }
 }
+// =====================
+// Connect New Score Engine
+// =====================
 
+let engineResult = GoldAI_ScoreEngine({
+
+    priceMove:
+    goldPrice - lastPrice,
+
+    ema:{
+        buyScore: buyScore,
+        sellScore: sellScore,
+        reason:"EMA Analysis"
+    }
+
+});
+
+
+buyScore += engineResult.buyScore;
+sellScore += engineResult.sellScore;
 let signal;
 
 let scoreDiff = Math.abs(buyScore - sellScore);
