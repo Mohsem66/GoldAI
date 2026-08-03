@@ -827,6 +827,23 @@ else if(signal.includes("SELL") && emaStatus == "🟢 Bullish"){
 if(aiScore < 0){
     aiScore = 0;
 }
+// EMA Trend Bonus
+
+if(signal.includes("BUY") && emaStatus == "🟢 Bullish"){
+
+    aiScore += 3;
+
+}
+
+else if(signal.includes("SELL") && emaStatus == "🔴 Bearish"){
+
+    aiScore += 3;
+
+}
+
+if(aiScore > 100){
+    aiScore = 100;
+}
 let total = Number(localStorage.getItem("totalSignals") || 0);
 
 let buyPercent = total ? ((Number(localStorage.getItem("buySignals") || 0) / total) * 100).toFixed(1) : 0;
