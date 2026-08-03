@@ -442,6 +442,26 @@ let closePrices = candles.map(candle => Number(candle.close));
 //alert("Candles = " + candles.length);
 let ema20 = calculateEMA(closePrices, 20);
 let ema50 = calculateEMA(closePrices, 50);
+// EMA Trend Strength
+
+let emaStrength = 0;
+let trendPower = "Weak";
+
+if(ema20 !== null && ema50 !== null){
+
+    emaStrength = Math.abs(ema20 - ema50);
+
+    if(emaStrength >= 3){
+        trendPower = "Strong";
+    }
+    else if(emaStrength >= 1){
+        trendPower = "Medium";
+    }
+    else{
+        trendPower = "Weak";
+    }
+
+}
 // =====================
 // GoldAI Score Engine
 // =====================
