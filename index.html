@@ -197,15 +197,19 @@ let ema20 = calculateEMA(closePrices, 20);
 let ema50 = calculateEMA(closePrices, 50);
 let emaStatus = "-";
 
-if(ema20 !== null){
+if(ema20 !== null && ema50 !== null){
 
-    if(goldPrice > ema20){
+    if(goldPrice > ema20 && ema20 > ema50){
         emaStatus = "🟢 Bullish";
-    }else{
+    }
+    else if(goldPrice < ema20 && ema20 < ema50){
         emaStatus = "🔴 Bearish";
     }
-
+    else{
+        emaStatus = "🟡 Neutral";
     }
+
+}
 console.log("EMA20:", ema20);
 console.log(closePrices);
 
