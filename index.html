@@ -451,6 +451,19 @@ if(ema20 !== null && ema50 !== null){
     }
 
 }
+// Trend Power affects AI Confidence
+
+let confidenceBonus = 0;
+
+if(trendPower == "Strong"){
+    confidenceBonus = 5;
+}
+else if(trendPower == "Medium"){
+    confidenceBonus = 0;
+}
+else{
+    confidenceBonus = -7;
+    }
 // =====================
 // GoldAI Score Engine
 // =====================
