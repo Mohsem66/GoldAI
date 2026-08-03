@@ -195,7 +195,11 @@ async function loadCandles(){
 
 let ema20 = calculateEMA(closePrices, 20);
 let ema50 = calculateEMA(closePrices, 50);
+let trendStrength = 0;
 
+if(ema20 !== null && ema50 !== null){
+    trendStrength = Math.abs(ema20 - ema50);
+    }
 
 if(ema20 !== null && ema50 !== null){
 
