@@ -518,6 +518,30 @@ if(ema20 !== null && ema50 !== null){
     }
 
 }
+// Trend Power Score
+
+if(trendStrength >= 3){
+
+    if(ema20 > ema50){
+        buyScore += 2;
+    }
+
+    else if(ema20 < ema50){
+        sellScore += 2;
+    }
+
+}
+else if(trendStrength >= 1){
+
+    if(ema20 > ema50){
+        buyScore += 1;
+    }
+
+    else if(ema20 < ema50){
+        sellScore += 1;
+    }
+
+}
 // شبیه‌سازی روند
 let lastPrice = Number(localStorage.getItem("lastPrice") || goldPrice);
 
