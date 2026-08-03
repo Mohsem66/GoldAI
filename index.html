@@ -669,6 +669,17 @@ confidence=Math.floor(Math.random()*9)+88;
 if(signal.includes("WAIT")){
 confidence=Math.floor(Math.random()*16)+65;
 }
+// Apply Trend Power Effect
+
+confidence += confidenceBonus;
+
+if(confidence > 99){
+    confidence = 99;
+}
+
+if(confidence < 50){
+    confidence = 50;
+}
 let reason="";
 
 if(signal.includes("BUY")){
