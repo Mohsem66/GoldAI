@@ -492,7 +492,7 @@ let priceHistory = JSON.parse(localStorage.getItem("priceHistory") || "[]");
 
 priceHistory.push(Number(goldPrice));
 
-if(priceHistory.length > 10){
+if(priceHistory.length > 100){
     priceHistory.shift();
 }
 
