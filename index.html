@@ -520,6 +520,19 @@ if(ema20 !== null && ema50 !== null){
     }
 
 }
+// EMA Conflict Penalty
+
+if(ema20 !== null && ema50 !== null){
+
+    if(ema20 < ema50 && goldPrice > ema20){
+        buyScore -= 1;
+    }
+
+    if(ema20 > ema50 && goldPrice < ema20){
+        sellScore -= 1;
+    }
+
+}
 // Trend Power Score
 
 if(emaStrength >= 3){
