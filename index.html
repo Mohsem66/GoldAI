@@ -419,7 +419,7 @@ if(marketText.includes("CLOSED")){
 
 document.getElementById("status").innerHTML="🟡 Analyzing...";
 let closePrices = candles.map(candle => Number(candle.close));
-alert("Candles = " + candles.length);
+//alert("Candles = " + candles.length);
 let ema20 = calculateEMA(closePrices, 20);
 
 // =====================
