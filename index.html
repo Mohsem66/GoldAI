@@ -467,6 +467,24 @@ if(ema50 !== null){
     }
 
 }
+// EMA20 Distance Strength
+
+if(ema20 !== null){
+
+    let emaDistance = Math.abs(goldPrice - ema20);
+
+    if(emaDistance > 2){
+
+        if(goldPrice > ema20){
+            buyScore += 1;
+        }
+        else{
+            sellScore += 1;
+        }
+
+    }
+
+}
 // EMA Trend Confirmation
 
 if(ema20 !== null && ema50 !== null){
