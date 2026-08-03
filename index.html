@@ -431,6 +431,21 @@ let closePrices = candles.map(candle => Number(candle.close));
 //alert("Candles = " + candles.length);
 let ema20 = calculateEMA(closePrices, 20);
 let ema50 = calculateEMA(closePrices, 50);
+// Update EMA Trend
+
+if(ema20 !== null && ema50 !== null){
+
+    if(goldPrice > ema20 && ema20 > ema50){
+        emaStatus = "🟢 Bullish";
+    }
+    else if(goldPrice < ema20 && ema20 < ema50){
+        emaStatus = "🔴 Bearish";
+    }
+    else{
+        emaStatus = "🟡 Neutral";
+    }
+
+}
 // EMA Trend Strength
 
 let emaStrength = 0;
