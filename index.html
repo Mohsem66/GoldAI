@@ -578,6 +578,19 @@ else if(sellScore > buyScore){
 else{
     signal = "WAIT 🟡";
 }
+let trendWarning = "";
+
+if(signal.includes("BUY") && emaStatus == "🟢 Bullish"){
+    trendWarning = "✅ EMA Trend confirms BUY";
+}
+
+else if(signal.includes("SELL") && emaStatus == "🔴 Bearish"){
+    trendWarning = "✅ EMA Trend confirms SELL";
+}
+
+else if(signal.includes("BUY") || signal.includes("SELL")){
+    trendWarning = "⚠️ Signal without full EMA confirmation";
+}
 let signalColor="lime";
 
 if(signal.includes("SELL")){
@@ -845,6 +858,7 @@ ${lossPercent==0 ? "-" : "-"+lossPercent+"%"}
 <p><b>EMA20:</b> ${ema20 === null ? "Calculating..." : ema20.toFixed(2)}</p>
 <p><b>EMA50:</b> ${ema50 === null ? "Calculating..." : ema50.toFixed(2)}</p>
 <p><b>📊 EMA Trend:</b> ${emaStatus}</p>
+<p><b>⚠️ Trend Check:</b> ${trendWarning}</p>
 <p><b>🧠 AI Reason:</b></p>
 <p>${reason}</p>
 <div style="
