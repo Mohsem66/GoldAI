@@ -182,3 +182,4 @@ function GoldAIScoreEngine(data){
 
 window.GoldAI_ScoreEngine =
 GoldAIScoreEngine;
+alert("Score Engine Loaded");
