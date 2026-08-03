@@ -535,6 +535,25 @@ if(ema20 !== null && ema50 !== null){
     }
 
 }
+// EMA Trend Penalty
+
+if(ema20 !== null && ema50 !== null){
+
+    if(ema20 > ema50){
+
+        // روند صعودی است، فروش ضعیف می‌شود
+        sellScore -= 2;
+
+    }
+
+    else if(ema20 < ema50){
+
+        // روند نزولی است، خرید ضعیف می‌شود
+        buyScore -= 2;
+
+    }
+
+}
 // EMA Conflict Penalty
 
 if(ema20 !== null && ema50 !== null){
