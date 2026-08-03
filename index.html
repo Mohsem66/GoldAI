@@ -485,6 +485,27 @@ else{
 
 let buyScore = 0;
 let sellScore = 0;
+// Market Quality Score
+
+let marketQuality = 0;
+
+if(emaStatus == "🟢 Bullish" || emaStatus == "🔴 Bearish"){
+    marketQuality += 2;
+}
+
+if(trendPower == "Strong"){
+    marketQuality += 3;
+}
+else if(trendPower == "Medium"){
+    marketQuality += 2;
+}
+else{
+    marketQuality += 0;
+}
+
+if(emaStrength >= 1){
+    marketQuality += 1;
+    }
 if(ema20 !== null){
 
     if(goldPrice > ema20){
@@ -941,6 +962,13 @@ if(confidence >= 90){
     confidenceText = "🟡 متوسط";
 }
 let aiScore = confidence;
+// Apply Market Quality
+
+aiScore += marketQuality;
+
+if(aiScore > 100){
+    aiScore = 100;
+}
 // EMA Confirmation Adjustment
 
 if(emaStatus == "🟡 Neutral"){
