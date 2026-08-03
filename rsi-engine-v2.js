@@ -410,3 +410,4 @@ window.GoldAI_RSI_V2 = {
     analyzeRSIEngine
 
 };
+alert("RSI Engine Loaded");
