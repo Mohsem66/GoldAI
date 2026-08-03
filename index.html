@@ -626,30 +626,64 @@ confidence=Math.floor(Math.random()*16)+65;
 let reason="";
 
 if(signal.includes("BUY")){
-reason=`
-Trend: صعودی 📈<br>
-Structure: حمایت حفظ شده ✅<br>
+
+    if(emaStatus == "🟢 Bullish"){
+
+        reason=`
+Trend: صعودی قوی 📈<br>
+Structure: EMA تایید شده ✅<br>
 Momentum: مثبت ⚡<br>
 Market Condition: احتمال ادامه حرکت صعودی
 `;
+
+    }else{
+
+        reason=`
+Trend: صعودی ولی نیازمند تایید ⚠️<br>
+Structure: EMA هنوز خنثی است<br>
+Momentum: مثبت ⚡<br>
+Market Condition: ورود با احتیاط
+`;
+
+    }
+
 }
 
+
 if(signal.includes("SELL")){
-reason=`
-Trend: نزولی 📉<br>
-Structure: مقاومت حفظ شده ✅<br>
+
+    if(emaStatus == "🔴 Bearish"){
+
+        reason=`
+Trend: نزولی قوی 📉<br>
+Structure: EMA تایید شده ✅<br>
 Momentum: منفی ⚡<br>
 Market Condition: احتمال ادامه حرکت نزولی
 `;
+
+    }else{
+
+        reason=`
+Trend: نزولی ولی نیازمند تایید ⚠️<br>
+Structure: EMA هنوز خنثی است<br>
+Momentum: منفی ⚡<br>
+Market Condition: ورود با احتیاط
+`;
+
+    }
+
 }
 
+
 if(signal.includes("WAIT")){
+
 reason=`
 Trend: نامشخص ⚠️<br>
 Structure: نیاز به تایید بیشتر<br>
 Momentum: ضعیف<br>
 Market Condition: بهتر است صبر شود
 `;
+
 }
 let entry = Number(goldPrice).toFixed(2);
 
