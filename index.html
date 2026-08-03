@@ -210,6 +210,21 @@ if(ema20 !== null && ema50 !== null){
     }
 
 }
+
+
+if(ema20 !== null && ema50 !== null){
+
+    if(goldPrice > ema20 && ema20 > ema50){
+        emaStatus = "🟢 Bullish";
+    }
+    else if(goldPrice < ema20 && ema20 < ema50){
+        emaStatus = "🔴 Bearish";
+    }
+    else{
+        emaStatus = "🟡 Neutral";
+    }
+
+}
 console.log("EMA20:", ema20);
 console.log(closePrices);
 console.log("EMA50:", ema50);
