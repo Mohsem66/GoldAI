@@ -427,7 +427,7 @@ document.getElementById("status").innerHTML="🟡 Analyzing...";
 let closePrices = candles.map(candle => Number(candle.close));
 //alert("Candles = " + candles.length);
 let ema20 = calculateEMA(closePrices, 20);
-
+let ema50 = calculateEMA(closePrices, 50);
 // =====================
 // GoldAI Score Engine
 // =====================
