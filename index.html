@@ -697,29 +697,40 @@ let reason="";
 
 if(signal.includes("BUY")){
 
-    if(emaStatus == "🟢 Bullish"){
+    if(emaStatus == "🟢 Bullish" && trendPower == "Strong"){
 
         reason=`
 Trend: صعودی قوی 📈<br>
 Structure: EMA تایید شده ✅<br>
-Momentum: مثبت ⚡<br>
+Momentum: مثبت قوی ⚡<br>
 Market Condition: احتمال ادامه حرکت صعودی
 `;
 
-    }else{
+    }
 
-    reason=`
-Trend: صعودی ولی نیازمند تایید ⚠️<br>
-Structure: EMA هنوز خنثی است ⚪<br>
+    else if(emaStatus == "🟢 Bullish" && trendPower == "Medium"){
+
+        reason=`
+Trend: صعودی 📈<br>
+Structure: EMA تایید شده ✅<br>
 Momentum: مثبت ⚡<br>
-Market Condition: ورود با احتیاط
+Market Condition: ادامه حرکت با احتیاط
+`;
+
+    }
+
+    else{
+
+        reason=`
+Trend: صعودی ولی ضعیف ⚠️<br>
+Structure: EMA تایید شده اما قدرت کم است<br>
+Momentum: مثبت ⚡<br>
+Market Condition: نیاز به تایید بیشتر
 `;
 
     }
 
 }
-
-
 if(signal.includes("SELL")){
 
     if(emaStatus == "🔴 Bearish"){
