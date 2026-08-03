@@ -804,6 +804,29 @@ if(confidence >= 90){
     confidenceText = "🟡 متوسط";
 }
 let aiScore = confidence;
+// EMA Confirmation Adjustment
+
+if(emaStatus == "🟡 Neutral"){
+
+    aiScore -= 3;
+
+}
+
+else if(signal.includes("BUY") && emaStatus == "🔴 Bearish"){
+
+    aiScore -= 5;
+
+}
+
+else if(signal.includes("SELL") && emaStatus == "🟢 Bullish"){
+
+    aiScore -= 5;
+
+}
+
+if(aiScore < 0){
+    aiScore = 0;
+}
 let total = Number(localStorage.getItem("totalSignals") || 0);
 
 let buyPercent = total ? ((Number(localStorage.getItem("buySignals") || 0) / total) * 100).toFixed(1) : 0;
