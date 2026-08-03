@@ -416,7 +416,11 @@ alert("✅ Capital Updated");
 
 }
 function analyze(){
+let testAI = GoldAI_ScoreEngine({
+    priceMove: 1
+});
 
+console.log(testAI);
 let marketText =
 document.getElementById("marketStatus").innerText;
 
