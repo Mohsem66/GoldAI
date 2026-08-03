@@ -119,7 +119,23 @@ function GoldAIScoreEngine(data){
 
 
     let confidence =
-    Math.abs(buyScore - sellScore) * 10;
+Math.abs(buyScore - sellScore) * 10;
+
+
+// RSI Confidence Boost
+
+if(data.rsi){
+
+    confidence += data.rsi.confidence || 0;
+
+}
+
+
+if(confidence > 100){
+
+    confidence = 100;
+
+}
 
 
 
