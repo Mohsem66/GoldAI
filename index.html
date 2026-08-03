@@ -467,6 +467,19 @@ if(ema50 !== null){
     }
 
 }
+// EMA Trend Confirmation
+
+if(ema20 !== null && ema50 !== null){
+
+    if(ema20 > ema50){
+        buyScore += 2;
+    }
+
+    else if(ema20 < ema50){
+        sellScore += 2;
+    }
+
+}
 // شبیه‌سازی روند
 let lastPrice = Number(localStorage.getItem("lastPrice") || goldPrice);
 
