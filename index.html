@@ -684,6 +684,9 @@ if(strength >= 2){
 // Connect New Score Engine
 // =====================
 
+let rsiResult = GoldAI_RSI_V2.analyzeRSIEngine(priceHistory);
+
+
 let engineResult = GoldAI_ScoreEngine({
 
     priceMove:
@@ -693,6 +696,12 @@ let engineResult = GoldAI_ScoreEngine({
         buyScore: buyScore,
         sellScore: sellScore,
         reason:"EMA Analysis"
+    },
+
+    rsi:{
+        buyScore: rsiResult.buyScore,
+        sellScore: rsiResult.sellScore,
+        reason: rsiResult.reason
     }
 
 });
