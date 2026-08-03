@@ -693,6 +693,15 @@ if(confidence > 99){
 if(confidence < 50){
     confidence = 50;
 }
+// EMA Neutral Penalty
+
+if(emaStatus == "🟡 Neutral"){
+    confidence -= 5;
+}
+
+if(confidence < 50){
+    confidence = 50;
+}
 let reason="";
 
 if(signal.includes("BUY")){
