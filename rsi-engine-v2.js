@@ -134,11 +134,15 @@ function detectRSIZone(rsi){
         return "OVERBOUGHT";
 
 
-    if(rsi >= RSI_CONFIG.levels.middle)
-        return "BULLISH ZONE";
+    if(rsi >= 50)
+        return "BULLISH NEUTRAL";
 
 
-    return "BEARISH ZONE";
+    if(rsi >= 30)
+        return "NEUTRAL";
+
+
+    return "WEAK OVERSOLD";
 
 }
 // ======================================================
