@@ -233,6 +233,86 @@ if(data.marketStructure){
 
 }
 // =====================
+// RSI + STRUCTURE FILTER
+// =====================
+
+
+if(
+    data.marketStructure &&
+    data.rsi
+){
+
+
+    // Bullish structure but RSI too hot
+
+    if(
+        data.marketStructure.trend === "BULLISH" &&
+        data.rsi.rsiValue >= 70
+    ){
+
+        buyScore -= 1;
+
+        reasons.push(
+            "⚠️ Bullish Structure but RSI Overbought"
+        );
+
+    }
+
+
+
+    // Bearish structure but RSI too low
+
+    else if(
+        data.marketStructure.trend === "BEARISH" &&
+        data.rsi.rsiValue <= 30
+    ){
+
+        sellScore -= 1;
+
+        reasons.push(
+            "⚠️ Bearish Structure but RSI Oversold"
+        );
+
+    }
+
+
+
+    // Perfect bullish alignment
+
+    else if(
+        data.marketStructure.trend === "BULLISH" &&
+        data.rsi.rsiValue > 50 &&
+        data.rsi.rsiValue < 70
+    ){
+
+        buyScore += 1;
+
+        reasons.push(
+            "🔥 Structure + RSI Bullish Alignment"
+        );
+
+    }
+
+
+
+    // Perfect bearish alignment
+
+    else if(
+        data.marketStructure.trend === "BEARISH" &&
+        data.rsi.rsiValue < 50 &&
+        data.rsi.rsiValue > 30
+    ){
+
+        sellScore += 1;
+
+        reasons.push(
+            "🔥 Structure + RSI Bearish Alignment"
+        );
+
+    }
+
+}
+// =====================
 // MARKET STRUCTURE + EMA FILTER
 // =====================
 
