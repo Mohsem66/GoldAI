@@ -392,8 +392,7 @@ if(result.reason.length === 0){
     result.reason =
     result.reason.join(" + ");
 
-
-
+    result.rsiValue = Number(rsi.toFixed(2));
     return result;
 
 }
