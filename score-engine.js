@@ -29,9 +29,12 @@ function GoldAIScoreEngine(data){
 
     if(data.rsi.rsiValue !== undefined){
 
-        reasons.push(
-            "RSI(" + data.rsi.rsiValue + "): " + data.rsi.reason
-        );
+    reasons.push(
+        "RSI(" + data.rsi.rsiValue + ") Zone: " 
+        + data.rsi.zone 
+        + " | " 
+        + data.rsi.reason
+    );
 
     }
     else if(data.rsi.reason){
