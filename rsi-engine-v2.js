@@ -314,30 +314,77 @@ function analyzeRSIEngine(prices,rsiValues){
 
     // Zone scoring
 
-    if(rsi <= RSI_CONFIG.levels.oversold){
-
-        result.buyScore += RSI_CONFIG.weights.oversold;
-
-        result.reason.push(
-        "RSI Oversold Zone"
-        );
-
-    }
+    // =====================
+// RSI ZONE SCORING v2
+// =====================
 
 
+if(rsi <= RSI_CONFIG.levels.extremeLow){
 
-    if(rsi >= RSI_CONFIG.levels.overbought){
+    result.buyScore += 5;
 
-        result.sellScore += RSI_CONFIG.weights.overbought;
+    result.reason.push(
+    "RSI Extreme Oversold"
+    );
 
-        result.reason.push(
-        "RSI Overbought Zone"
-        );
-
-    }
-
+}
 
 
+else if(rsi <= RSI_CONFIG.levels.oversold){
+
+    result.buyScore += 3;
+
+    result.reason.push(
+    "RSI Oversold Zone"
+    );
+
+}
+
+
+
+else if(rsi >= RSI_CONFIG.levels.extremeHigh){
+
+    result.sellScore += 5;
+
+    result.reason.push(
+    "RSI Extreme Overbought"
+    );
+
+}
+
+
+else if(rsi >= RSI_CONFIG.levels.overbought){
+
+    result.sellScore += 3;
+
+    result.reason.push(
+    "RSI Overbought Zone"
+    );
+
+}
+
+
+
+else if(rsi >= 50){
+
+    result.buyScore += 1;
+
+    result.reason.push(
+    "RSI Above 50 Support BUY"
+    );
+
+}
+
+
+else if(rsi < 50){
+
+    result.sellScore += 1;
+
+    result.reason.push(
+    "RSI Below 50 Pressure SELL"
+    );
+
+}
     let trend =
     detectRSITrend(rsi);
 
