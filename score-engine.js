@@ -51,6 +51,10 @@ function GoldAIScoreEngine(data){
 // RSI DIVERGENCE
 // =====================
 
+// =====================
+// RSI DIVERGENCE BOOST
+// =====================
+
 if(data.divergence){
 
     buyScore += data.divergence.buyScore || 0;
@@ -60,9 +64,31 @@ if(data.divergence){
 
     if(data.divergence.type !== "NONE"){
 
+
         reasons.push(
             "Divergence: " + data.divergence.reason
         );
+
+
+        if(data.divergence.strength === "STRONG"){
+
+            data.divergence.confidence += 10;
+
+        }
+
+
+        else if(data.divergence.strength === "MEDIUM"){
+
+            data.divergence.confidence += 5;
+
+        }
+
+
+        else if(data.divergence.strength === "WEAK"){
+
+            data.divergence.confidence += 2;
+
+        }
 
     }
 
