@@ -184,7 +184,54 @@ if(data.divergence){
 
     }
 
+// =====================
+// MARKET STRUCTURE ENGINE
+// =====================
 
+
+if(data.marketStructure){
+
+
+    buyScore += 
+    data.marketStructure.buyScore || 0;
+
+
+    sellScore += 
+    data.marketStructure.sellScore || 0;
+
+
+
+    if(data.marketStructure.reason){
+
+        reasons.push(
+            "Structure: "
+            +
+            data.marketStructure.reason
+        );
+
+    }
+
+
+
+    if(data.marketStructure.bos){
+
+        reasons.push(
+            "🔥 BOS Confirmed"
+        );
+
+    }
+
+
+
+    if(data.marketStructure.choch){
+
+        reasons.push(
+            "⚠️ CHOCH Detected"
+        );
+
+    }
+
+}
 
     // =====================
     // Momentum
