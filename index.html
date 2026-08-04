@@ -958,7 +958,17 @@ let lot=0.01;   // حجم معامله
 
 let profitDollar=0;
 let lossDollar=0;
+// =====================
+// ATR TEST
+// =====================
 
+let atrRisk =
+GoldAI_ATR_Engine_V1.GoldAI_ATR_Analyze(
+    Number(entry),
+    signal,
+    priceHistory,
+    capital
+);
 if(signal.includes("BUY")){
     let profitDistance = Number(tp)-Number(entry);
     let lossDistance = Number(entry)-Number(sl);
