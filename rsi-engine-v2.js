@@ -445,8 +445,6 @@ if(result.reason.length === 0){
 
     result.rsiValue = Number(rsi.toFixed(2));
 
-    result.reason =
-"Zone: " + result.zone + " + " + result.reason;
     
     return result;
 
