@@ -962,6 +962,11 @@ let lossDollar=0;
 // ATR TEST
 // =====================
 
+// =====================
+// ATR TRADE CALCULATION
+// =====================
+
+
 let atrRisk =
 GoldAI_ATR_Engine_V1.GoldAI_ATR_Analyze(
     Number(entry),
@@ -969,53 +974,123 @@ GoldAI_ATR_Engine_V1.GoldAI_ATR_Analyze(
     priceHistory,
     capital
 );
-if(signal.includes("BUY")){
-    sl = Number(atrRisk.stopLoss).toFixed(2);
-tp = Number(atrRisk.takeProfit).toFixed(2);
 
-    riskReward = (profitDistance/lossDistance).toFixed(2);
 
-    profitDollar = ((profitDistance / Number(entry)) * capital * 100).toFixed(2);
-    lossDollar = ((lossDistance / Number(entry)) * capital * 100).toFixed(2);
+
+if(signal.includes("BUY") || signal.includes("SELL")){
+
+
+    sl =
+    Number(atrRisk.stopLoss).toFixed(2);
+
+
+    tp =
+    Number(atrRisk.takeProfit).toFixed(2);
+
+
+
+    if(signal.includes("BUY")){
+
+
+        profit =
+        (
+            Number(tp) -
+            Number(entry)
+        ).toFixed(2);
+
+
+
+        loss =
+        (
+            Number(entry) -
+            Number(sl)
+        ).toFixed(2);
+
+
+    }
+
+
+
+    else if(signal.includes("SELL")){
+
+
+        profit =
+        (
+            Number(entry) -
+            Number(tp)
+        ).toFixed(2);
+
+
+
+        loss =
+        (
+            Number(sl) -
+            Number(entry)
+        ).toFixed(2);
+
+
+    }
+
+
+
+    riskReward =
+    (
+        Number(profit) /
+        Number(loss)
+    ).toFixed(2);
+
+
+
+    rr =
+    "1:" + riskReward;
+
+
+
+    profitPercent =
+    (
+        Number(profit) /
+        Number(entry) *
+        100
+    ).toFixed(2);
+
+
+
+    lossPercent =
+    (
+        Number(loss) /
+        Number(entry) *
+        100
+    ).toFixed(2);
+
+
+
+    profitDollar =
+    (
+        Number(profit) /
+        Number(entry) *
+        capital *
+        100
+    ).toFixed(2);
+
+
+
+    lossDollar =
+    (
+        Number(loss) /
+        Number(entry) *
+        capital *
+        100
+    ).toFixed(2);
+
+
+
 }
 
-else if(signal.includes("SELL")){
-    let profitDistance = Number(entry)-Number(tp);
-    let lossDistance = Number(sl)-Number(entry);
 
-    riskReward = (profitDistance/lossDistance).toFixed(2);
-
-    profitDollar = ((profitDistance / Number(entry)) * capital * 100).toFixed(2);
-    lossDollar = ((lossDistance / Number(entry)) * capital * 100).toFixed(2);
-}
-if(signal.includes("BUY")){
-    sl=(Number(entry)-10).toFixed(2);
-    tp=(Number(entry)+20).toFixed(2);
-
-    profit=(Number(tp)-Number(entry)).toFixed(2);
-    loss=(Number(entry)-Number(sl)).toFixed(2);
-
-    rr="1:2";
-
-    profitPercent=((profit/Number(entry))*100).toFixed(2);
-    lossPercent=((loss/Number(entry))*100).toFixed(2);
-}
-
-else if(signal.includes("SELL")){
-    sl = Number(atrRisk.stopLoss).toFixed(2);
-
-tp = Number(atrRisk.takeProfit).toFixed(2);
-
-    profit=(Number(entry)-Number(tp)).toFixed(2);
-    loss=(Number(sl)-Number(entry)).toFixed(2);
-
-    rr="1:2";
-
-    profitPercent=((profit/Number(entry))*100).toFixed(2);
-    lossPercent=((loss/Number(entry))*100).toFixed(2);
-}
 
 else{
+
+
     sl="-";
     tp="-";
     profit=0;
@@ -1023,6 +1098,8 @@ else{
     profitPercent=0;
     lossPercent=0;
     rr="-";
+
+
 }
 history =
 `<hr>${date} ${time} - ${signal}<br>` + history;
