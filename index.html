@@ -1074,7 +1074,11 @@ else if(confidence >=75){
     riskLevel = "🟡 Medium Risk";
 }
 
+let finalReason = reason;
 
+if(engineResult.reason){
+    finalReason += "<br><br>📊 RSI Engine:<br>" + engineResult.reason;
+}
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
 <p>🕒 ${time}</p>
