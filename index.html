@@ -970,8 +970,8 @@ GoldAI_ATR_Engine_V1.GoldAI_ATR_Analyze(
     capital
 );
 if(signal.includes("BUY")){
-    let profitDistance = Number(tp)-Number(entry);
-    let lossDistance = Number(entry)-Number(sl);
+    sl = Number(atrRisk.stopLoss).toFixed(2);
+tp = Number(atrRisk.takeProfit).toFixed(2);
 
     riskReward = (profitDistance/lossDistance).toFixed(2);
 
@@ -1002,8 +1002,9 @@ if(signal.includes("BUY")){
 }
 
 else if(signal.includes("SELL")){
-    sl=(Number(entry)+10).toFixed(2);
-    tp=(Number(entry)-20).toFixed(2);
+    sl = Number(atrRisk.stopLoss).toFixed(2);
+
+tp = Number(atrRisk.takeProfit).toFixed(2);
 
     profit=(Number(entry)-Number(tp)).toFixed(2);
     loss=(Number(sl)-Number(entry)).toFixed(2);
