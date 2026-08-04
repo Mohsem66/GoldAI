@@ -23,18 +23,24 @@ function GoldAIScoreEngine(data){
 
     if(data.rsi){
 
-        buyScore += data.rsi.buyScore || 0;
+    buyScore += data.rsi.buyScore || 0;
 
-        sellScore += data.rsi.sellScore || 0;
+    sellScore += data.rsi.sellScore || 0;
 
+    if(data.rsi.rsiValue !== undefined){
 
-        if(data.rsi.reason){
+        reasons.push(
+            "RSI(" + data.rsi.rsiValue + "): " + data.rsi.reason
+        );
 
-            reasons.push(
-                "RSI: " + data.rsi.reason
-            );
+    }
+    else if(data.rsi.reason){
 
-        }
+        reasons.push(
+            "RSI: " + data.rsi.reason
+        );
+
+    }
 
     }
 
