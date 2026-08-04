@@ -421,9 +421,6 @@ if(confidence > 100){
 
     }
 
-
-
-
     return {
 
 
@@ -438,7 +435,7 @@ if(confidence > 100){
         entryQuality,
 
         reason:
-        reasons.join(" + ")
+        cleanAIReason(reasons);
 
 
     };
@@ -446,10 +443,27 @@ if(confidence > 100){
 
 }
 
+function cleanAIReason(reasons){
 
+    let unique = [];
 
+    reasons.forEach(item=>{
+
+        if(
+            item &&
+            !unique.includes(item)
+        ){
+
+            unique.push(item);
+
+        }
+
+    });
+
+    return unique.join(" + ");
+
+}
 // Export
-
 window.GoldAI_ScoreEngine =
 GoldAIScoreEngine;
 
