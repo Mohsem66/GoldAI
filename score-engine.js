@@ -46,7 +46,42 @@ function GoldAIScoreEngine(data){
     }
 
     }
+// =====================
+// RSI + EMA CONFLICT FILTER
+// =====================
 
+if(data.rsi && data.ema){
+
+    // RSI Overbought + EMA Bearish
+    if(
+        data.rsi.rsiValue >= 70 &&
+        data.ema.sellScore > data.ema.buyScore
+    ){
+
+        sellScore += 2;
+
+        reasons.push(
+            "RSI Overbought + EMA Bearish Conflict"
+        );
+
+    }
+
+
+    // RSI Oversold + EMA Bullish
+    if(
+        data.rsi.rsiValue <= 30 &&
+        data.ema.buyScore > data.ema.sellScore
+    ){
+
+        buyScore += 2;
+
+        reasons.push(
+            "RSI Oversold + EMA Bullish Reversal"
+        );
+
+    }
+
+}
 // =====================
 // RSI DIVERGENCE
 // =====================
