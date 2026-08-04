@@ -47,7 +47,26 @@ function GoldAIScoreEngine(data){
 
     }
 
+// =====================
+// RSI DIVERGENCE
+// =====================
 
+if(data.divergence){
+
+    buyScore += data.divergence.buyScore || 0;
+
+    sellScore += data.divergence.sellScore || 0;
+
+
+    if(data.divergence.type !== "NONE"){
+
+        reasons.push(
+            "Divergence: " + data.divergence.reason
+        );
+
+    }
+
+}
 
     if(data.ema){
 
