@@ -90,6 +90,10 @@ if(data.rsi && data.ema){
 // RSI DIVERGENCE BOOST
 // =====================
 
+// =====================
+// DIVERGENCE + EMA CONFIRMATION
+// =====================
+
 if(data.divergence){
 
     buyScore += data.divergence.buyScore || 0;
@@ -105,12 +109,13 @@ if(data.divergence){
         );
 
 
+        // Divergence Strength Boost
+
         if(data.divergence.strength === "STRONG"){
 
             data.divergence.confidence += 10;
 
         }
-
 
         else if(data.divergence.strength === "MEDIUM"){
 
@@ -118,10 +123,43 @@ if(data.divergence){
 
         }
 
-
         else if(data.divergence.strength === "WEAK"){
 
             data.divergence.confidence += 2;
+
+        }
+
+
+
+        // EMA Confirmation
+
+        if(
+            data.divergence.type.includes("BULLISH") &&
+            data.ema &&
+            data.ema.buyScore > data.ema.sellScore
+        ){
+
+            buyScore += 2;
+
+            reasons.push(
+                "Divergence confirmed by EMA Bullish"
+            );
+
+        }
+
+
+
+        if(
+            data.divergence.type.includes("BEARISH") &&
+            data.ema &&
+            data.ema.sellScore > data.ema.buyScore
+        ){
+
+            sellScore += 2;
+
+            reasons.push(
+                "Divergence confirmed by EMA Bearish"
+            );
 
         }
 
