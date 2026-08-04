@@ -1,7 +1,8 @@
 // ======================================================
 // GoldAI RSI Divergence Engine
-// Version 1.0
-// Regular + Hidden Divergence
+// Version 1.1
+// Advanced Regular + Hidden Divergence
+// Swing Detection + Strength System
 // ======================================================
 
 
@@ -11,278 +12,363 @@
 
 const DIVERGENCE_CONFIG = {
 
-    lookback: 5,
+    lookback:5,
 
     weights:{
-        regular:4,
+        regular:5,
         hidden:3
+    },
+
+    confidence:{
+        strong:25,
+        medium:15,
+        weak:8
     }
 
 };
 
 
 
-// =====================
-// REGULAR BULLISH
-// Price Lower Low
-// RSI Higher Low
-// =====================
-
-function detectRegularBullish(prices, rsiValues){
-
-    if(!prices || !rsiValues)
-        return false;
-
-
-    let priceOld = prices[prices.length - 5];
-    let priceNew = prices[prices.length - 1];
-
-    let rsiOld = rsiValues[rsiValues.length - 5];
-    let rsiNew = rsiValues[rsiValues.length - 1];
-
-
-    if(
-        priceNew < priceOld &&
-        rsiNew > rsiOld
-    ){
-
-        return true;
-
-    }
-
-
-    return false;
-
-}
-
-
-
-// =====================
-// REGULAR BEARISH
-// Price Higher High
-// RSI Lower High
-// =====================
-
-function detectRegularBearish(prices, rsiValues){
-
-    if(!prices || !rsiValues)
-        return false;
-
-
-    let priceOld = prices[prices.length - 5];
-    let priceNew = prices[prices.length - 1];
-
-    let rsiOld = rsiValues[rsiValues.length - 5];
-    let rsiNew = rsiValues[rsiValues.length - 1];
-
-
-    if(
-        priceNew > priceOld &&
-        rsiNew < rsiOld
-    ){
-
-        return true;
-
-    }
-
-
-    return false;
-
-}
-
-
-
-// =====================
-// HIDDEN BULLISH
-// Price Higher Low
-// RSI Lower Low
-// =====================
-
-function detectHiddenBullish(prices,rsiValues){
-
-    if(!prices || !rsiValues)
-        return false;
-
-
-    let priceOld = prices[prices.length - 5];
-    let priceNew = prices[prices.length - 1];
-
-    let rsiOld = rsiValues[rsiValues.length - 5];
-    let rsiNew = rsiValues[rsiValues.length - 1];
-
-
-    if(
-        priceNew > priceOld &&
-        rsiNew < rsiOld
-    ){
-
-        return true;
-
-    }
-
-
-    return false;
-
-}
-
-
-
-// =====================
-// HIDDEN BEARISH
-// Price Lower High
-// RSI Higher High
-// =====================
-
-function detectHiddenBearish(prices,rsiValues){
-
-    if(!prices || !rsiValues)
-        return false;
-
-
-    let priceOld = prices[prices.length - 5];
-    let priceNew = prices[prices.length - 1];
-
-    let rsiOld = rsiValues[rsiValues.length - 5];
-    let rsiNew = rsiValues[rsiValues.length - 1];
-
-
-    if(
-        priceNew < priceOld &&
-        rsiNew > rsiOld
-    ){
-
-        return true;
-
-    }
-
-
-    return false;
-
-}
-
-
-
-
 // ======================================================
-// MAIN DIVERGENCE ANALYSIS
+// SWING DETECTION
 // ======================================================
 
 
-function analyzeRSIDivergence(prices,rsiValues){
+function getSwingPoints(values){
 
 
-    let result = {
+    if(!values || values.length < 5)
+        return null;
 
-        type:"NONE",
 
-        buyScore:0,
+    let oldValue =
+    values[values.length-5];
 
-        sellScore:0,
 
-        confidence:0,
+    let newValue =
+    values[values.length-1];
 
-        reason:"No RSI Divergence"
+
+    return {
+
+        old:oldValue,
+
+        new:newValue
 
     };
 
-
-
-    if(detectRegularBullish(prices,rsiValues)){
-
-
-        result.type =
-        "REGULAR BULLISH";
-
-
-        result.buyScore =
-        DIVERGENCE_CONFIG.weights.regular;
-
-
-        result.confidence = 15;
-
-
-        result.reason =
-        "RSI Regular Bullish Divergence";
-
-
-        return result;
-
-    }
+}
 
 
 
-    if(detectRegularBearish(prices,rsiValues)){
+// ======================================================
+// STRENGTH CALCULATION
+// ======================================================
 
 
-        result.type =
-        "REGULAR BEARISH";
+function calculateStrength(
+priceOld,
+priceNew,
+rsiOld,
+rsiNew
+){
 
 
-        result.sellScore =
-        DIVERGENCE_CONFIG.weights.regular;
+    let priceDiff =
+    Math.abs(priceNew-priceOld);
 
 
-        result.confidence = 15;
+    let rsiDiff =
+    Math.abs(rsiNew-rsiOld);
 
 
-        result.reason =
-        "RSI Regular Bearish Divergence";
 
+    if(priceDiff >= 1.5 && rsiDiff >= 10){
 
-        return result;
+        return "STRONG";
 
     }
 
 
 
+    if(priceDiff >= 0.7 && rsiDiff >= 5){
 
-    if(detectHiddenBullish(prices,rsiValues)){
-
-
-        result.type =
-        "HIDDEN BULLISH";
-
-
-        result.buyScore =
-        DIVERGENCE_CONFIG.weights.hidden;
-
-
-        result.confidence = 10;
-
-
-        result.reason =
-        "RSI Hidden Bullish Divergence";
-
-
-        return result;
+        return "MEDIUM";
 
     }
 
 
 
+    return "WEAK";
 
-    if(detectHiddenBearish(prices,rsiValues)){
-
-
-        result.type =
-        "HIDDEN BEARISH";
+}
 
 
-        result.sellScore =
-        DIVERGENCE_CONFIG.weights.hidden;
+
+// ======================================================
+// REGULAR BULLISH
+// Price Lower Low
+// RSI Higher Low
+// ======================================================
 
 
-        result.confidence = 10;
+function detectRegularBullish(prices,rsiValues){
 
 
-        result.reason =
-        "RSI Hidden Bearish Divergence";
+    let price =
+    getSwingPoints(prices);
 
 
-        return result;
+    let rsi =
+    getSwingPoints(rsiValues);
+
+
+
+    if(!price || !rsi)
+        return null;
+
+
+
+    if(
+        price.new < price.old &&
+        rsi.new > rsi.old
+    ){
+
+        return {
+
+            strength:
+            calculateStrength(
+                price.old,
+                price.new,
+                rsi.old,
+                rsi.new
+            )
+
+        };
 
     }
 
+
+    return null;
+
+}
+
+
+
+// ======================================================
+// REGULAR BEARISH
+// Price Higher High
+// RSI Lower High
+// ======================================================
+
+
+function detectRegularBearish(prices,rsiValues){
+
+
+    let price =
+    getSwingPoints(prices);
+
+
+    let rsi =
+    getSwingPoints(rsiValues);
+
+
+
+    if(!price || !rsi)
+        return null;
+
+
+
+    if(
+        price.new > price.old &&
+        rsi.new < rsi.old
+    ){
+
+        return {
+
+            strength:
+            calculateStrength(
+                price.old,
+                price.new,
+                rsi.old,
+                rsi.new
+            )
+
+        };
+
+    }
+
+
+    return null;
+
+}
+
+
+
+// ======================================================
+// HIDDEN BULLISH
+// Price Higher Low
+// RSI Lower Low
+// ======================================================
+
+
+function detectHiddenBullish(prices,rsiValues){
+
+
+    let price =
+    getSwingPoints(prices);
+
+
+    let rsi =
+    getSwingPoints(rsiValues);
+
+
+
+    if(!price || !rsi)
+        return null;
+
+
+
+    if(
+        price.new > price.old &&
+        rsi.new < rsi.old
+    ){
+
+        return {
+
+            strength:
+            calculateStrength(
+                price.old,
+                price.new,
+                rsi.old,
+                rsi.new
+            )
+
+        };
+
+    }
+
+
+    return null;
+
+}
+
+
+
+// ======================================================
+// HIDDEN BEARISH
+// Price Lower High
+// RSI Higher High
+// ======================================================
+
+
+function detectHiddenBearish(prices,rsiValues){
+
+
+    let price =
+    getSwingPoints(prices);
+
+
+    let rsi =
+    getSwingPoints(rsiValues);
+
+
+
+    if(!price || !rsi)
+        return null;
+
+
+
+    if(
+        price.new < price.old &&
+        rsi.new > rsi.old
+    ){
+
+        return {
+
+            strength:
+            calculateStrength(
+                price.old,
+                price.new,
+                rsi.old,
+                rsi.new
+            )
+
+        };
+
+    }
+
+
+    return null;
+
+}
+
+
+
+// ======================================================
+// MAIN ANALYSIS
+// ======================================================
+
+
+function analyzeRSIDivergence(
+prices,
+rsiValues
+){
+
+
+let result={
+
+
+    type:"NONE",
+
+    strength:"NONE",
+
+    buyScore:0,
+
+    sellScore:0,
+
+    confidence:0,
+
+    reason:"No RSI Divergence"
+
+
+};
+
+
+
+// Regular Bullish
+
+let regularBull =
+detectRegularBullish(
+prices,
+rsiValues
+);
+
+
+if(regularBull){
+
+
+    result.type=
+    "REGULAR BULLISH";
+
+
+    result.strength=
+    regularBull.strength;
+
+
+    result.buyScore=
+    DIVERGENCE_CONFIG.weights.regular;
+
+
+    result.confidence=
+    DIVERGENCE_CONFIG.confidence[
+        regularBull.strength.toLowerCase()
+    ];
+
+
+    result.reason=
+    "RSI Regular Bullish Divergence | Strength: "
+    + regularBull.strength;
 
 
     return result;
@@ -292,12 +378,144 @@ function analyzeRSIDivergence(prices,rsiValues){
 
 
 
+// Regular Bearish
+
+let regularBear =
+detectRegularBearish(
+prices,
+rsiValues
+);
+
+
+if(regularBear){
+
+
+    result.type=
+    "REGULAR BEARISH";
+
+
+    result.strength=
+    regularBear.strength;
+
+
+    result.sellScore=
+    DIVERGENCE_CONFIG.weights.regular;
+
+
+    result.confidence=
+    DIVERGENCE_CONFIG.confidence[
+        regularBear.strength.toLowerCase()
+    ];
+
+
+    result.reason=
+    "RSI Regular Bearish Divergence | Strength: "
+    + regularBear.strength;
+
+
+    return result;
+
+}
+
+
+
+
+// Hidden Bullish
+
+let hiddenBull =
+detectHiddenBullish(
+prices,
+rsiValues
+);
+
+
+if(hiddenBull){
+
+
+    result.type=
+    "HIDDEN BULLISH";
+
+
+    result.strength=
+    hiddenBull.strength;
+
+
+    result.buyScore=
+    DIVERGENCE_CONFIG.weights.hidden;
+
+
+    result.confidence=
+    DIVERGENCE_CONFIG.confidence[
+        hiddenBull.strength.toLowerCase()
+    ];
+
+
+    result.reason=
+    "RSI Hidden Bullish Divergence | Strength: "
+    + hiddenBull.strength;
+
+
+    return result;
+
+}
+
+
+
+
+// Hidden Bearish
+
+let hiddenBear =
+detectHiddenBearish(
+prices,
+rsiValues
+);
+
+
+if(hiddenBear){
+
+
+    result.type=
+    "HIDDEN BEARISH";
+
+
+    result.strength=
+    hiddenBear.strength;
+
+
+    result.sellScore=
+    DIVERGENCE_CONFIG.weights.hidden;
+
+
+    result.confidence=
+    DIVERGENCE_CONFIG.confidence[
+        hiddenBear.strength.toLowerCase()
+    ];
+
+
+    result.reason=
+    "RSI Hidden Bearish Divergence | Strength: "
+    + hiddenBear.strength;
+
+
+    return result;
+
+}
+
+
+
+return result;
+
+}
+
+
+
 // ======================================================
 // EXPORT
 // ======================================================
 
 
 window.GoldAI_RSI_Divergence_V1 = {
+
 
     analyzeRSIDivergence,
 
