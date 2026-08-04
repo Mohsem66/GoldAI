@@ -1112,6 +1112,18 @@ let finalReason = reason;
 if(engineResult.reason){
     finalReason += "<br><br>📊 RSI Engine:<br>" + engineResult.reason;
 }
+
+if(engineResult.divergence){
+
+    if(engineResult.divergence.type !== "NONE"){
+
+        finalReason +=
+        "<br>🔥 Divergence: "
+        + engineResult.divergence.reason;
+
+    }
+
+}
 document.getElementById("result").innerHTML=`
 <p>📅 ${date}</p>
 <p>🕒 ${time}</p>
