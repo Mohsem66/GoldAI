@@ -732,7 +732,11 @@ let engineResult = GoldAI_ScoreEngine({
     zone: rsiResult.zone,
     reason: rsiResult.reason
     }
-
+divergence:
+GoldAI_RSI_Divergence_V1.analyzeRSIDivergence(
+priceHistory,
+rsiHistory
+)
 });
 
 
