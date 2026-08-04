@@ -515,20 +515,7 @@ if(confidence > 100){
         entryQuality,
 
         reason:
-formatAIReasonV2({
-
-    marketStructure:
-    data.marketStructure,
-
-    ema:
-    data.ema,
-
-    rsi:
-    data.rsi
-
-})
-
-
+cleanAIReason(reasons)
     };
 
 
