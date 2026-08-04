@@ -686,7 +686,33 @@ if(strength >= 2){
 
 let rsiResult = GoldAI_RSI_V2.analyzeRSIEngine(priceHistory);
 
-    
+// =====================
+// RSI History Storage
+// =====================
+
+let rsiHistory = JSON.parse(
+localStorage.getItem("rsiHistory") || "[]"
+);
+
+
+if(rsiResult && rsiResult.rsiValue){
+
+    rsiHistory.push(rsiResult.rsiValue);
+
+}
+
+
+if(rsiHistory.length > 50){
+
+    rsiHistory.shift();
+
+}
+
+
+localStorage.setItem(
+"rsiHistory",
+JSON.stringify(rsiHistory)
+);   
 let engineResult = GoldAI_ScoreEngine({
 
     priceMove:
