@@ -232,7 +232,71 @@ if(data.marketStructure){
     }
 
 }
+// =====================
+// MARKET STRUCTURE + EMA FILTER
+// =====================
 
+if(data.marketStructure && data.ema){
+
+
+    if(
+        data.marketStructure.trend === "BULLISH" &&
+        data.ema.buyScore > data.ema.sellScore
+    ){
+
+        buyScore += 2;
+
+        reasons.push(
+            "Structure + EMA Bullish Confirmation ✅"
+        );
+
+    }
+
+
+    else if(
+        data.marketStructure.trend === "BEARISH" &&
+        data.ema.sellScore > data.ema.buyScore
+    ){
+
+        sellScore += 2;
+
+        reasons.push(
+            "Structure + EMA Bearish Confirmation ✅"
+        );
+
+    }
+
+
+
+    else if(
+        data.marketStructure.trend === "BULLISH" &&
+        data.ema.sellScore > data.ema.buyScore
+    ){
+
+        buyScore -= 1;
+
+        reasons.push(
+            "Bullish Structure but EMA Conflict ⚠️"
+        );
+
+    }
+
+
+
+    else if(
+        data.marketStructure.trend === "BEARISH" &&
+        data.ema.buyScore > data.ema.sellScore
+    ){
+
+        sellScore -= 1;
+
+        reasons.push(
+            "Bearish Structure but EMA Conflict ⚠️"
+        );
+
+    }
+
+}
     // =====================
     // Momentum
     // =====================
