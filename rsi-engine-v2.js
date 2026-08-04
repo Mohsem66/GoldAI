@@ -421,7 +421,44 @@ else if(rsi >= 30){
     result.confidence =
     Math.min(total*5,20);
 
+// =====================
+// RSI ZONE CONFIDENCE BOOST
+// =====================
 
+
+if(result.zone === "EXTREME OVERSOLD"){
+
+    result.confidence += 10;
+
+}
+
+
+else if(result.zone === "OVERSOLD"){
+
+    result.confidence += 5;
+
+}
+
+
+else if(result.zone === "EXTREME OVERBOUGHT"){
+
+    result.confidence += 10;
+
+}
+
+
+else if(result.zone === "OVERBOUGHT"){
+
+    result.confidence += 5;
+
+}
+
+
+if(result.confidence > 20){
+
+    result.confidence = 20;
+
+}
 
     if(total >=4){
 
