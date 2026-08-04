@@ -318,13 +318,17 @@ function analyzeRSIEngine(prices,rsiValues){
 // RSI ZONE SCORING v2
 // =====================
 
+// =====================
+// RSI ZONE SCORING v3
+// =====================
+
 
 if(rsi <= RSI_CONFIG.levels.extremeLow){
 
     result.buyScore += 5;
 
     result.reason.push(
-    "RSI Extreme Oversold"
+    "RSI Extreme Oversold Strong BUY"
     );
 
 }
@@ -335,11 +339,10 @@ else if(rsi <= RSI_CONFIG.levels.oversold){
     result.buyScore += 3;
 
     result.reason.push(
-    "RSI Oversold Zone"
+    "RSI Oversold BUY Zone"
     );
 
 }
-
 
 
 else if(rsi >= RSI_CONFIG.levels.extremeHigh){
@@ -347,7 +350,7 @@ else if(rsi >= RSI_CONFIG.levels.extremeHigh){
     result.sellScore += 5;
 
     result.reason.push(
-    "RSI Extreme Overbought"
+    "RSI Extreme Overbought SELL"
     );
 
 }
@@ -358,11 +361,10 @@ else if(rsi >= RSI_CONFIG.levels.overbought){
     result.sellScore += 3;
 
     result.reason.push(
-    "RSI Overbought Zone"
+    "RSI Overbought Warning"
     );
 
 }
-
 
 
 else if(rsi >= 50){
@@ -370,21 +372,22 @@ else if(rsi >= 50){
     result.buyScore += 1;
 
     result.reason.push(
-    "RSI Above 50 Support BUY"
+    "RSI Bullish Momentum"
     );
 
 }
 
 
-else if(rsi < 50){
+else if(rsi >= 30){
 
     result.sellScore += 1;
 
     result.reason.push(
-    "RSI Below 50 Pressure SELL"
+    "RSI Bearish Pressure"
     );
 
 }
+
     let trend =
     detectRSITrend(rsi);
 
