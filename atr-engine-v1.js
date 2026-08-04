@@ -538,8 +538,7 @@ function GoldAI_ATR_Analyze(
 // EXPORT
 // =====================
 
-
-window.GoldAI_ATR_Engine_V2 = {
+window.GoldAI_ATR_Engine_V1 = {
 
 
     calculateATR,
@@ -552,7 +551,8 @@ window.GoldAI_ATR_Engine_V2 = {
 
     calculateSuggestedLot,
 
-    generateRiskReport
+    generateRiskReport,
 
+    GoldAI_ATR_Analyze
 
 };
