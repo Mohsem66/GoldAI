@@ -478,6 +478,63 @@ function generateRiskReport(
 
 }
 // =====================
+// GOLD AI RISK ADAPTER
+// =====================
+
+
+function GoldAI_ATR_Analyze(
+    entry,
+    signal,
+    prices,
+    capital
+){
+
+
+    let result =
+    calculateDynamicRisk(
+        entry,
+        signal,
+        prices
+    );
+
+
+    let risk =
+    calculateRiskAmount(
+        capital,
+        ATR_ENGINE_CONFIG.riskPercent
+    );
+
+
+    return {
+
+
+        stopLoss:
+        result.stopLoss,
+
+
+        takeProfit:
+        result.takeProfit,
+
+
+        atr:
+        result.atr,
+
+
+        volatility:
+        result.volatility,
+
+
+        riskReward:
+        result.riskReward,
+
+
+        riskMoney:
+        risk
+
+    };
+
+}
+// =====================
 // EXPORT
 // =====================
 
