@@ -516,6 +516,58 @@ if(rsi <= RSI_CONFIG.levels.extremeLow){
     }
 
    }
+// =====================
+// RSI COOLING DETECTION
+// =====================
+
+
+if(rsiValues && rsiValues.length >= 3){
+
+    let rsiPrev =
+    rsiValues[rsiValues.length-2];
+
+
+    let rsiPrev2 =
+    rsiValues[rsiValues.length-3];
+
+
+    // RSI در منطقه بالا ولی در حال کاهش
+
+    if(
+        rsi >= 70 &&
+        rsi < rsiPrev &&
+        rsiPrev < rsiPrev2
+    ){
+
+        result.reason.push(
+            "RSI Cooling From Overbought"
+        );
+
+
+        result.sellScore += 1;
+
+    }
+
+
+
+    // RSI در منطقه پایین ولی در حال افزایش
+
+    if(
+        rsi <= 30 &&
+        rsi > rsiPrev &&
+        rsiPrev > rsiPrev2
+    ){
+
+        result.reason.push(
+            "RSI Recovery From Oversold"
+        );
+
+
+        result.buyScore += 1;
+
+    }
+
+}
     result.reason =
     result.reason.join(" + ");
 
