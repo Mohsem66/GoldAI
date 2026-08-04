@@ -138,6 +138,22 @@ if(confidence > 100){
 }
 
 
+// RSI Confidence Boost
+
+if(data.rsi){
+
+    confidence += data.rsi.confidence || 0;
+
+}
+
+
+if(confidence > 100){
+
+    confidence = 100;
+
+}
+
+
 
     if(confidence > 100){
 
