@@ -732,6 +732,25 @@ let engineResult = GoldAI_ScoreEngine({
     zone: rsiResult.zone,
     reason: rsiResult.reason
     },
+    marketStructure:
+
+GoldAI_MarketStructure_V1.analyze(
+
+    priceHistory,
+
+    {
+
+        ema:{
+            buyScore:buyScore,
+            sellScore:sellScore
+        },
+
+
+        rsi:rsiResult
+
+    }
+
+),
 divergence:
 GoldAI_RSI_Divergence_V1.analyzeRSIDivergence(
 priceHistory,
