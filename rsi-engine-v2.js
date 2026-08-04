@@ -479,7 +479,43 @@ if(result.reason.length === 0){
     );
 
 }
+// =====================
+// RSI EXTREME WARNING FILTER
+// =====================
 
+if(rsi >= RSI_CONFIG.levels.extremeHigh){
+
+    result.reason.push(
+        "RSI Extreme Overbought Warning"
+    );
+
+
+    // کاهش قدرت خرید در سقف
+    if(result.buyScore > 0){
+
+        result.buyScore -= 1;
+
+    }
+
+
+}
+
+
+if(rsi <= RSI_CONFIG.levels.extremeLow){
+
+    result.reason.push(
+        "RSI Extreme Oversold Reversal Zone"
+    );
+
+
+    // کاهش قدرت فروش در کف
+    if(result.sellScore > 0){
+
+        result.sellScore -= 1;
+
+    }
+
+   }
     result.reason =
     result.reason.join(" + ");
 
