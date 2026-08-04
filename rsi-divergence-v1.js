@@ -12,7 +12,7 @@
 
 const DIVERGENCE_CONFIG = {
 
-    lookback:5,
+    lookback:10,
 
     weights:{
         regular:5,
@@ -37,7 +37,7 @@ const DIVERGENCE_CONFIG = {
 function getSwingPoints(values){
 
 
-    if(!values || values.length < 5)
+    if(!values || values.length < 10)
         return null;
 
 
