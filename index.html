@@ -699,9 +699,11 @@ let engineResult = GoldAI_ScoreEngine({
     },
 
     rsi:{
-        buyScore: rsiResult.buyScore,
-        sellScore: rsiResult.sellScore,
-        reason: rsiResult.reason
+    buyScore: rsiResult.buyScore,
+    sellScore: rsiResult.sellScore,
+    confidence: rsiResult.confidence,
+    rsiValue: rsiResult.rsiValue,
+    reason: rsiResult.reason
     }
 
 });
