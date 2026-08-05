@@ -847,26 +847,49 @@ if(conflictResult){
 }
 let signal;
 
-let scoreDiff = Math.abs(buyScore - sellScore);
 
-if(emaStrength < 1 && scoreDiff < 3){
+// =====================
+// FINAL CONFLICT DECISION
+// =====================
 
-    signal = "WAIT 🟡";
 
-}
-else if(buyScore > sellScore){
+if(conflictResult && conflictResult.signal){
 
-    signal = "BUY 🟢";
 
-}
-else if(sellScore > buyScore){
+    signal = conflictResult.signal;
 
-    signal = "SELL 🔴";
 
 }
+
 else{
 
-    signal = "WAIT 🟡";
+
+    let scoreDiff = Math.abs(buyScore - sellScore);
+
+
+    if(emaStrength < 1 && scoreDiff < 3){
+
+        signal = "WAIT 🟡";
+
+    }
+
+    else if(buyScore > sellScore){
+
+        signal = "BUY 🟢";
+
+    }
+
+    else if(sellScore > buyScore){
+
+        signal = "SELL 🔴";
+
+    }
+
+    else{
+
+        signal = "WAIT 🟡";
+
+    }
 
 }
 let trendWarning = "";
