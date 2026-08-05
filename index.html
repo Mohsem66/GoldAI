@@ -1192,6 +1192,60 @@ if(confidence >= 90){
 }else if(confidence >= 75){
     confidenceText = "🟡 متوسط";
 }
+// =====================
+// Conflict Filter Check
+// =====================
+
+if(window.GoldAI_Conflict_Filter_V1){
+
+let filterResult =
+GoldAI_Conflict_Filter_V1.runConflictFilter({
+
+ema:{
+trend:
+emaStatus.includes("Bullish")
+?
+"Bullish"
+:
+emaStatus.includes("Bearish")
+?
+"Bearish"
+:
+"Neutral"
+},
+
+rsi:{
+rsiValue:Number(rsiResult.rsiValue || 50)
+},
+
+momentum:
+goldPrice > lastPrice
+?
+"UP"
+:
+"DOWN"
+
+});
+
+
+if(filterResult){
+
+    if(filterResult.signal){
+
+        signal = filterResult.signal;
+
+    }
+
+
+    if(filterResult.confidence){
+
+        confidence = filterResult.confidence;
+
+    }
+
+}
+
+}
 let aiScore = confidence;
 // Apply Market Quality
 
