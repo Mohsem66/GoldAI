@@ -1125,14 +1125,47 @@ memory.confidence =
 
 Math.round(confidence);
 
+// ======================================
+// EXTREME RSI + WEAK TREND FILTER
+// ======================================
 
+
+if(
+data &&
+data.rsi &&
+data.rsi.rsiValue > 85
+&&
+data.ema &&
+data.ema.trend == "Bullish"
+&&
+memory.buyScore > memory.sellScore
+){
+
+
+memory.conflictScore +=15;
+
+
+memory.confidence -=10;
+
+
+memory.warnings.push(
+
+"RSI Extreme + Weak Confirmation"
+
+);
+
+
+
+if(memory.confidence < 70){
+
+memory.confidence = 70;
 
 }
 
 
+}
 
-
-
+}
 
 
 // ======================================
