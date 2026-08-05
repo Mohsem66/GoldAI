@@ -1063,7 +1063,7 @@ memory.warnings.push(
 // ======================================
 
 
-function calculateConfidence(memory){
+function calculateConfidence(data,memory){
 
 
 let total =
@@ -1153,14 +1153,6 @@ memory.warnings.push(
 "RSI Extreme + Weak Confirmation"
 
 );
-
-
-
-if(memory.confidence < 70){
-
-memory.confidence = 70;
-
-}
 
 
 }
