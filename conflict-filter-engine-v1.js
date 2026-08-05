@@ -1391,13 +1391,10 @@ memory
 
 // Confidence
 
-
 calculateConfidence(
+data,
 memory
 );
-
-
-
 
 
 // Decision
