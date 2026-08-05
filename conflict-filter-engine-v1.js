@@ -490,14 +490,7 @@ memory.warnings.push(
 
 );
 
-
-
 }
-
-
-
-
-
 if(
 value <20
 ){
@@ -505,34 +498,24 @@ value <20
 
 memory.buyScore +=
 
-15;
+25;
 
 
+memory.conflictScore +=20;
 
-memory.conflictScore +=10;
 
+memory.confidence -=15;
 
 
 memory.warnings.push(
 
-"RSI Extreme Oversold"
+"RSI Extreme Oversold - SELL Risk Warning"
 
 );
 
-
-
 }
 
-
-
-
 }
-
-
-
-
-
-
 
 
 // ======================================
