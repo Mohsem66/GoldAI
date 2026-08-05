@@ -1053,10 +1053,53 @@ memory.warnings.push(
 
 }
 
+// ======================================
+// RSI + MOMENTUM + EMA NEUTRAL FILTER
+// ======================================
 
 
+if(
+
+data.rsi &&
+data.ema &&
+data.momentum &&
+
+data.ema.trend === "Neutral"
+
+){
+
+    if(
+    data.rsi.rsiValue >70 &&
+    data.momentum === "DOWN"
+    ){
+
+        memory.conflictScore +=10;
+
+        memory.confidence -=5;
+
+        memory.warnings.push(
+        "RSI Overbought + Momentum Down + EMA Neutral"
+        );
+
+    }
 
 
+    if(
+    data.rsi.rsiValue <30 &&
+    data.momentum === "UP"
+    ){
+
+        memory.conflictScore +=10;
+
+        memory.confidence -=5;
+
+        memory.warnings.push(
+        "RSI Oversold + Momentum Up + EMA Neutral"
+        );
+
+    }
+
+}
 }
 // ======================================
 // CONFIDENCE ENGINE
