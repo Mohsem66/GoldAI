@@ -761,7 +761,44 @@ rsiHistory
 
 buyScore += engineResult.buyScore;
 sellScore += engineResult.sellScore;
+// =====================
+// Conflict Filter Safe Check
+// =====================
 
+let conflictResult = null;
+
+if(window.GoldAI_Conflict_Filter_V1){
+
+    conflictResult =
+    GoldAI_Conflict_Filter_V1.runConflictFilter({
+
+        ema:{
+            trend:
+            emaStatus.includes("Bullish")
+            ?
+            "Bullish"
+            :
+            emaStatus.includes("Bearish")
+            ?
+            "Bearish"
+            :
+            "Neutral"
+        },
+
+        rsi:{
+            rsiValue:Number(rsiResult.rsiValue || 50)
+        },
+
+        momentum:
+        goldPrice > lastPrice
+        ?
+        "UP"
+        :
+        "DOWN"
+
+    });
+
+        }
 let signal;
 
 let scoreDiff = Math.abs(buyScore - sellScore);
