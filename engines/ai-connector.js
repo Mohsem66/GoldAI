@@ -1,189 +1,182 @@
 // =====================================
 // GoldAI Pro V2
-// AI Connector
-// Connect V1 Engines
+// V1 Engine Connector
 // =====================================
 
 
 const GoldAI_AI = {
 
 
-    analyze(data){
+analyze(data){
 
 
-        let result = {
+let result = {
 
-            buyScore:0,
+signal:"WAIT",
 
-            sellScore:0,
+buyScore:0,
 
-            confidence:0,
+sellScore:0,
 
-            reason:[],
+confidence:50,
 
-            details:{}
+details:{},
 
-        };
+reason:[]
 
+};
 
 
-        // =====================
-        // RSI Engine
-        // =====================
 
-        if(window.GoldAI_RSI_V2){
+// =====================
+// RSI ENGINE V2
+// =====================
 
+if(window.GoldAI_RSI_V2){
 
-            let rsi =
-            GoldAI_RSI_V2.analyzeRSIEngine(
-                data.priceHistory
-            );
 
+let rsiResult =
+GoldAI_RSI_V2.analyzeRSIEngine(
+data.priceHistory
+);
 
-            result.buyScore +=
-            rsi.buyScore || 0;
 
+result.buyScore +=
+rsiResult.buyScore || 0;
 
-            result.sellScore +=
-            rsi.sellScore || 0;
 
+result.sellScore +=
+rsiResult.sellScore || 0;
 
 
-            result.details.rsi =
-            rsi.rsiValue;
+result.details.rsi =
+rsiResult.rsiValue;
 
 
-            result.reason.push(
-            rsi.reason
-            );
+result.reason.push(
+rsiResult.reason
+);
 
 
-        }
+}
 
 
 
+// =====================
+// RSI DIVERGENCE
+// =====================
 
+if(window.GoldAI_RSI_Divergence_V1){
 
-        // =====================
-        // Divergence
-        // =====================
 
-        if(window.GoldAI_RSI_Divergence_V1){
+let divergence =
+GoldAI_RSI_Divergence_V1
+.analyzeRSIDivergence(
+data.priceHistory,
+data.rsiHistory
+);
 
 
-            let div =
-            GoldAI_RSI_Divergence_V1
-            .analyzeRSIDivergence(
-                data.priceHistory,
-                data.rsiHistory
-            );
 
+result.details.divergence =
+divergence.type || "NONE";
 
-            result.details.divergence =
-            div.signal || "NONE";
 
 
-            if(div.type==="BULLISH"){
+if(divergence.type==="BULLISH"){
 
-                result.buyScore += 3;
+result.buyScore += 3;
 
-            }
+}
 
 
-            if(div.type==="BEARISH"){
 
-                result.sellScore += 3;
+if(divergence.type==="BEARISH"){
 
-            }
+result.sellScore += 3;
 
+}
 
-        }
 
+}
 
 
 
 
-        // =====================
-        // Score Engine
-        // =====================
+// =====================
+// SCORE ENGINE
+// =====================
 
-        if(window.GoldAI_Score_Engine){
+if(window.GoldAI_Score_Engine){
 
 
-            let score =
-            GoldAI_Score_Engine(
-                data
-            );
+let score =
+GoldAI_Score_Engine(data);
 
 
-            result.buyScore +=
-            score.buyScore || 0;
 
+result.buyScore +=
+score.buyScore || 0;
 
-            result.sellScore +=
-            score.sellScore || 0;
 
+result.sellScore +=
+score.sellScore || 0;
 
-        }
 
+}
 
 
 
 
-        // =====================
-        // Final Decision
-        // =====================
+// =====================
+// FINAL SIGNAL
+// =====================
 
 
-        let diff =
-        Math.abs(
-        result.buyScore -
-        result.sellScore
-        );
+let difference =
+result.buyScore -
+result.sellScore;
 
 
-        result.confidence =
-        Math.min(
-        95,
-        50 + diff*10
-        );
 
+if(difference >= 2){
 
 
-        if(result.buyScore >
-           result.sellScore){
+result.signal="BUY";
 
 
-            result.signal="BUY";
+}
 
+else if(difference <= -2){
 
-        }
-        else if(
-        result.sellScore >
-        result.buyScore
-        ){
 
+result.signal="SELL";
 
-            result.signal="SELL";
 
+}
 
-        }
-        else{
+else{
 
 
-            result.signal="WAIT";
+result.signal="WAIT";
 
 
-        }
+}
 
 
 
+result.confidence =
+Math.min(
+95,
+50 + Math.abs(difference)*10
+);
 
-        return result;
 
 
-    }
+return result;
 
+
+}
 
 
 };
