@@ -121,37 +121,49 @@ console.log("Score Error",e);
 
 }
 
-
-
-// Structure
+// Market Structure
 
 try{
 
-if(window.GoldAI_MarketStructure_V1?.analyze){
+if(
+window.GoldAI_MarketStructure_V1?.analyze
+){
 
 structure =
 window.GoldAI_MarketStructure_V1.analyze(marketData);
 
+
+structureTrend =
+structure?.trend ??
+structure?.direction ??
+structure?.market ??
+null;
+
 }
 
 }catch(e){}
-
-
 
 // ATR
 
 try{
 
-if(window.GoldAI_ATR_Engine_V1?.GoldAI_ATR_Analyze){
+if(
+window.GoldAI_ATR_Engine_V1?.GoldAI_ATR_Analyze
+){
 
 atr =
 window.GoldAI_ATR_Engine_V1.GoldAI_ATR_Analyze(marketData);
 
+
+atrValue =
+atr?.value ??
+atr?.atr ??
+atr?.ATR ??
+null;
+
 }
 
 }catch(e){}
-
-
 
 // Conflict
 
