@@ -48,40 +48,36 @@ function startGoldAIAnalysis(){
     // ===============================
     // AI Connector
     // ===============================
-
-    if(!window.GoldAI_Connector){
-
-
-        alert(
-            "AI Connector Not Loaded"
-        );
+if(!window.GoldAI_V1_Connector){
 
 
-        return;
-
-    }
-
-
-
-    let result =
-    window.GoldAI_Connector.analyze();
+    alert(
+        "V1 Connector Not Loaded"
+    );
 
 
-    if(!result){
+    return;
 
-
-        alert(
-            "AI Analysis Failed"
-        );
-
-
-        return;
-
-    }
+}
 
 
 
+let result =
+window.GoldAI_V1_Connector.getOutput();
 
+
+
+if(!result){
+
+
+    alert(
+        "V1 Data Not Found"
+    );
+
+
+    return;
+
+}
     // ===============================
     // Dashboard Update
     // ===============================
@@ -90,7 +86,7 @@ function startGoldAIAnalysis(){
     if(window.GoldAI_Dashboard){
 
 
-        GoldAI_Dashboard.update(result);
+    GoldAI_Dashboard.render();
 
 
     }
