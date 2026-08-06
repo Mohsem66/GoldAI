@@ -1030,7 +1030,35 @@ GoldAI_Trade_Management_V1.createTradePlan({
 
 });
 
+// ======================================
+// GoldAI Pro V2 OUTPUT BRIDGE
+// ======================================
 
+window.GoldAI_Last_Result = {
+
+    signal: signal,
+
+    confidence: confidence,
+
+    entry: Number(entry),
+
+    stopLoss: Number(tradePlan.stopLoss),
+
+    takeProfit: Number(tradePlan.finalTP),
+
+    riskReward: rr,
+
+    buyScore: buyScore,
+
+    sellScore: sellScore,
+
+    score: Math.abs(
+        buyScore - sellScore
+    ),
+
+    reason: reason
+
+};
 
 sl =
 Number(tradePlan.stopLoss).toFixed(2);
