@@ -1482,6 +1482,29 @@ ${history}
 console.log(window.GoldAI_ScoreEngine);
 console.log("RSI Engine:", window.GoldAI_RSI_V2);
 document.getElementById("status").innerHTML="🟢 Analysis Complete";
+window.GoldAI_V1_Result = {
+
+    signal: signal,
+
+    confidence: confidence,
+
+    entry: Number(entry),
+
+    stopLoss: Number(sl),
+
+    takeProfit: Number(tp),
+
+    riskReward: rr,
+
+    buyScore: buyScore,
+
+    sellScore: sellScore,
+
+    score: Math.abs(buyScore - sellScore),
+
+    reason: reason
+
+};
 }
 function copySignal(){
 
