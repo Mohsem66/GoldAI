@@ -72,9 +72,16 @@ if(window.GoldAI_RSI_V2?.analyzeRSIEngine){
 rsi =
 window.GoldAI_RSI_V2.analyzeRSIEngine();
 
+
+rsiValue =
+rsi?.value ??
+rsi?.rsi ??
+rsi?.RSI ??
+null;
+
 }
 
-}catch(e){
+}catch(e){}
 
 console.log("RSI Error",e);
 
