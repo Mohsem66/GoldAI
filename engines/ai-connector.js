@@ -2,7 +2,7 @@
 // GoldAI Pro V2
 // AI Connector V2 Fixed
 // =====================================
-
+alert("AI CONNECTOR FILE LOADED");
 window.GoldAI_Connector = {
 
 
