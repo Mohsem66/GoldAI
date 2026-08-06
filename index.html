@@ -2101,40 +2101,6 @@ document.getElementById(
 
 
 <script src="modules/dashboard.js"></script>
-<script>
-
-function startGoldAIAnalysis(){
-
-if(window.GoldAI_V1_Result){
-
-document.getElementById("signal").innerHTML =
-window.GoldAI_V1_Result.signal;
-
-document.getElementById("confidence").innerHTML =
-window.GoldAI_V1_Result.confidence + "%";
-
-document.getElementById("entry").innerHTML =
-window.GoldAI_V1_Result.entry;
-
-document.getElementById("sl").innerHTML =
-window.GoldAI_V1_Result.stopLoss;
-
-document.getElementById("tp1").innerHTML =
-window.GoldAI_V1_Result.takeProfit;
-
-document.getElementById("rr").innerHTML =
-window.GoldAI_V1_Result.riskReward;
-
-}
-else{
-
-alert("هنوز V1 Analysis اجرا نشده");
-
-}
-
-}
-
-</script>
 
 <script src="app.js"></script>
 
