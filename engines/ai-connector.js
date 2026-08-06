@@ -292,20 +292,17 @@ Conflict:${conflict?.status || "-"}
 
 details:{
 
-rsi,
+rsi:rsiValue,
 
-divergence,
+divergence:divergence,
 
-structure,
+structure:structureTrend,
 
-atr,
+atr:atrValue,
 
-score,
-
-conflict
+conflict:conflict
 
 }
-
 
 };
 
