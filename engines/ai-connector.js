@@ -102,20 +102,27 @@ analyzeRSIDivergence(marketData);
 
 }catch(e){}
 
-
-
 // Score
 
 try{
 
-if(typeof window.GoldAI_ScoreEngine==="function"){
+if(
+window.GoldAI_ScoreEngine
+){
 
 score =
 window.GoldAI_ScoreEngine(marketData);
 
+
+console.log(score);
+
 }
 
 }catch(e){
+
+console.log("Score Error",e);
+
+}
 
 console.log("Score Error",e);
 
