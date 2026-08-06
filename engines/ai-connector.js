@@ -11,77 +11,74 @@ analyze:function(){
 
 let marketData = {
 
-
 priceHistory:
 window.priceHistory || [],
-
 
 rsiHistory:
 window.rsiHistory || [],
 
-
 goldPrice:
 Number(window.goldPrice || 0),
-
 
 ema20:
 window.ema20 || null,
 
-
 ema50:
 window.ema50 || null,
-
 
 ema200:
 window.ema200 || null,
 
-
 candles:
 window.candles || [],
 
-
 timeframe:
 window.timeframe || "M5"
-
 
 };
 
 
 
-let rsi=null;
-let divergence=null;
-let score=null;
-let structure=null;
-let atr=null;
-let trade=null;
-let conflict=null;
+let rsi = null;
+let divergence = null;
+let score = null;
+let structure = null;
+let atr = null;
+let trade = null;
+let conflict = null;
 
-// Normalize Engine Outputs
+
 
 let rsiValue = null;
 let atrValue = null;
-let structureTrend = null
-  ;
+let structureTrend = null;
 
+
+
+// =====================
 // RSI
+// =====================
 
 try{
 
-if(window.GoldAI_RSI_V2?.analyzeRSIEngine){
+if(
+window.GoldAI_RSI_V2 &&
+typeof window.GoldAI_RSI_V2.analyzeRSIEngine === "function"
+){
 
 rsi =
-window.GoldAI_RSI_V2.analyzeRSIEngine();
+window.GoldAI_RSI_V2.analyzeRSIEngine(marketData);
 
 
 rsiValue =
 rsi?.value ??
+rsi?.rsiValue ??
 rsi?.rsi ??
-rsi?.RSI ??
 null;
 
 }
 
-}catch(e){}
+}catch(e){
 
 console.log("RSI Error",e);
 
@@ -89,11 +86,15 @@ console.log("RSI Error",e);
 
 
 
+// =====================
 // Divergence
+// =====================
 
 try{
 
-if(typeof analyzeRSIDivergence==="function"){
+if(
+typeof analyzeRSIDivergence === "function"
+){
 
 divergence =
 analyzeRSIDivergence(marketData);
@@ -102,13 +103,44 @@ analyzeRSIDivergence(marketData);
 
 }catch(e){}
 
-// Score
+
+
+// =====================
+// Market Structure
+// =====================
 
 try{
 
 if(
-window.GoldAI_ScoreEngine
+window.GoldAI_MarketStructure_V1 &&
+typeof window.GoldAI_MarketStructure_V1.analyze === "function"
 ){
+
+structure =
+window.GoldAI_MarketStructure_V1.analyze(marketData);
+
+
+structureTrend =
+structure?.trend ??
+structure?.direction ??
+null;
+
+}
+
+}catch(e){}
+
+
+
+// =====================
+// Score
+// =====================
+
+try{
+
+if(
+typeof window.GoldAI_ScoreEngine === "function"
+){
+
 score =
 window.GoldAI_ScoreEngine({
 
@@ -122,8 +154,6 @@ marketStructure:structure
 
 });
 
-console.log(score);
-
 }
 
 }catch(e){
@@ -132,38 +162,17 @@ console.log("Score Error",e);
 
 }
 
-console.log("Score Error",e);
-
-}
-
-// Market Structure
-
-try{
-
-if(
-window.GoldAI_MarketStructure_V1?.analyze
-){
-
-structure =
-window.GoldAI_MarketStructure_V1.analyze(marketData);
 
 
-structureTrend =
-structure?.trend ??
-structure?.direction ??
-structure?.market ??
-null;
-
-}
-
-}catch(e){}
-
+// =====================
 // ATR
+// =====================
 
 try{
 
 if(
-window.GoldAI_ATR_Engine_V1?.GoldAI_ATR_Analyze
+window.GoldAI_ATR_Engine_V1 &&
+typeof window.GoldAI_ATR_Engine_V1.GoldAI_ATR_Analyze === "function"
 ){
 
 atr =
@@ -173,18 +182,24 @@ window.GoldAI_ATR_Engine_V1.GoldAI_ATR_Analyze(marketData);
 atrValue =
 atr?.value ??
 atr?.atr ??
-atr?.ATR ??
 null;
 
 }
 
 }catch(e){}
 
+
+
+// =====================
 // Conflict
+// =====================
 
 try{
 
-if(window.GoldAI_Conflict_Filter_V1?.runConflictFilter){
+if(
+window.GoldAI_Conflict_Filter_V1 &&
+typeof window.GoldAI_Conflict_Filter_V1.runConflictFilter === "function"
+){
 
 conflict =
 window.GoldAI_Conflict_Filter_V1.runConflictFilter(marketData);
@@ -195,20 +210,27 @@ window.GoldAI_Conflict_Filter_V1.runConflictFilter(marketData);
 
 
 
+// =====================
 // Trade Plan
+// =====================
 
 try{
 
-if(window.GoldAI_Trade_Management_V1?.createTradePlan){
+if(
+window.GoldAI_Trade_Management_V1 &&
+typeof window.GoldAI_Trade_Management_V1.createTradePlan === "function"
+){
 
 trade =
 window.GoldAI_Trade_Management_V1.createTradePlan({
 
 ...marketData,
 
-score,
-atr,
-structure
+score:score,
+
+atr:atr,
+
+structure:structure
 
 });
 
@@ -218,12 +240,13 @@ structure
 
 
 
+// =====================
+// FINAL
+// =====================
 
-// FINAL SIGNAL
+let finalSignal = "WAIT 🟡";
 
-let finalSignal="WAIT";
-
-let confidence=0;
+let confidence = 0;
 
 
 if(score?.signal){
@@ -240,28 +263,14 @@ confidence = score.confidence;
 }
 
 
-if(score?.score){
 
-confidence = Math.min(
-95,
-Math.max(
-confidence,
-score.score
-)
-);
-
-}
-
-
-
-
-return{
+return {
 
 
 signal:finalSignal,
 
 
-confidence,
+confidence:confidence,
 
 
 entry:
@@ -289,23 +298,17 @@ trade?.riskReward || "1:2",
 
 
 aiScore:
-score?.score || 0,
+score?.buyScore - score?.sellScore || 0,
 
 
 reason:
 
-`
-RSI:${rsi?.value || "-"}
-|
-Structure:${structure?.trend || "-"}
-|
-ATR:${atr?.value || "-"}
-|
-Conflict:${conflict?.status || "-"}
-`,
+"RSI + Score + Market Structure + ATR + Risk Management",
+
 
 
 details:{
+
 
 rsi:rsiValue,
 
@@ -315,12 +318,14 @@ structure:structureTrend,
 
 atr:atrValue,
 
-conflict:conflict
+conflict:conflict,
+
+score:score
 
 }
 
-};
 
+};
 
 
 }
