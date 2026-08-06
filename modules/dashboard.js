@@ -113,11 +113,16 @@ this.setConfidence(result.confidence || 0);
 this.setTrade({
 
 entry:result.entry,
-sl:result.sl,
+
+sl:result.stopLoss,
+
 tp1:result.tp1,
+
 tp2:result.tp2,
+
 tp3:result.tp3,
-rr:result.rr
+
+rr:result.riskReward
 
 });
 
