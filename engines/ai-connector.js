@@ -176,7 +176,101 @@ analyze(data){
 
 
 
+// =====================
+// MARKET STRUCTURE V1
+// =====================
 
+if(window.GoldAI_MarketStructure){
+
+
+    let structure =
+    GoldAI_MarketStructure.analyze(
+        data.priceHistory
+    );
+
+
+    result.details.structure =
+    structure.signal || "NONE";
+
+
+    if(structure.signal==="BULLISH"){
+
+        result.buyScore += 2;
+
+        result.reason.push(
+        "Bullish Market Structure"
+        );
+
+    }
+
+
+    if(structure.signal==="BEARISH"){
+
+        result.sellScore += 2;
+
+        result.reason.push(
+        "Bearish Market Structure"
+        );
+
+    }
+
+}
+
+
+
+
+// =====================
+// ATR ENGINE V1
+// =====================
+
+if(window.GoldAI_ATR){
+
+
+    let atr =
+    GoldAI_ATR.calculate(
+        data.priceHistory
+    );
+
+
+    result.details.atr =
+    atr;
+
+
+    data.atr = atr;
+
+
+}
+
+
+
+// =====================
+// CONFLICT FILTER V1
+// =====================
+
+if(window.GoldAI_ConflictFilter){
+
+
+    let filter =
+    GoldAI_ConflictFilter.check(
+        result
+    );
+
+
+    if(filter==="BLOCK"){
+
+
+        result.signal="WAIT";
+
+
+        result.reason.push(
+        "Conflict Filter Block"
+        );
+
+
+    }
+
+
+}
 
     // =====================
     // FINAL DECISION
