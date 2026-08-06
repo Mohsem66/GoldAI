@@ -1482,6 +1482,11 @@ console.log(window.GoldAI_ScoreEngine);
 console.log("RSI Engine:", window.GoldAI_RSI_V2);
 document.getElementById("status").innerHTML="🟢 Analysis Complete";
 
+
+// ======================================
+// SAVE V1 RESULT FOR GOLD AI PRO V2
+// ======================================
+
 window.GoldAI_V1_Result = {
 
     signal: signal,
@@ -1500,66 +1505,265 @@ window.GoldAI_V1_Result = {
 
     sellScore: sellScore,
 
-    score: Math.abs(buyScore - sellScore),
+    score: Math.abs(
+        buyScore - sellScore
+    ),
 
-    reason: reason
+    reason: reason,
+
+    ema20: ema20,
+
+    ema50: ema50,
+
+    rsi: rsiResult ? rsiResult.rsiValue : null,
+
+    atr: atrRisk ? atrRisk.atr : null,
+
+    time: new Date().toLocaleString()
 
 };
-console.log("V1 RESULT SAVED", window.GoldAI_V1_Result);
+
+
+console.log(
+"✅ GoldAI V1 RESULT SAVED",
+window.GoldAI_V1_Result
+);
+
+
+
+// ======================================
+// GOLD AI PRO V2 CONNECTOR
+// ======================================
+
+function startGoldAIAnalysis(){
+
+
+    if(!window.GoldAI_V1_Result){
+
+
+        alert(
+        "No V1 Data. Please run V1 Analysis first."
+        );
+
+
+        return;
+
+    }
+
+
+
+    let data =
+    window.GoldAI_V1_Result;
+
+
+
+    document.getElementById("signal").innerHTML =
+    data.signal;
+
+
+
+    document.getElementById("confidence").innerHTML =
+    data.confidence + "%";
+
+
+
+    document.getElementById("entry").innerHTML =
+    data.entry.toFixed(2);
+
+
+
+    document.getElementById("sl").innerHTML =
+    data.stopLoss.toFixed(2);
+
+
+
+    document.getElementById("tp1").innerHTML =
+    data.takeProfit.toFixed(2);
+
+
+
+    document.getElementById("rr").innerHTML =
+    data.riskReward;
+
+
+
+    document.getElementById("capital").innerHTML =
+    "$" +
+    (localStorage.getItem("capital") || 97);
+
+
+
+    document.getElementById("lot").innerHTML =
+    "0.01";
+
+
+
+    document.getElementById("risk").innerHTML =
+    "2%";
+
+
+
+    document.getElementById("signal").style.color =
+    data.signal.includes("BUY")
+    ?
+    "lime"
+    :
+    data.signal.includes("SELL")
+    ?
+    "red"
+    :
+    "gold";
+
+
+
+    document.getElementById("details-content").innerHTML =
+
+    `
+    <h3>📊 AI Analysis Details</h3>
+
+    <p>EMA20:
+    ${data.ema20 ? data.ema20.toFixed(2) : "-"}</p>
+
+    <p>EMA50:
+    ${data.ema50 ? data.ema50.toFixed(2) : "-"}</p>
+
+    <p>RSI:
+    ${data.rsi || "-"}</p>
+
+    <p>ATR:
+    ${data.atr || "-"}</p>
+
+    <p>AI Reason:</p>
+
+    <p>
+    ${data.reason}
+    </p>
+    `;
+
+
+
+    console.log(
+    "✅ V2 Dashboard Updated",
+    data
+    );
+
+
 }
+
+
+
+// ======================================
+// COPY SIGNAL
+// ======================================
+
 function copySignal(){
 
+
 let text =
+
 `📈 GoldAI Signal
 
-${document.querySelector("#result p:nth-of-type(3)").innerText}
-${document.querySelector("#result p:nth-of-type(4)").innerText}
-${document.querySelector("#result p:nth-of-type(5)").innerText}
-${document.querySelector("#result p:nth-of-type(6)").innerText}
-${document.querySelector("#result p:nth-of-type(7)").innerText}
-${document.querySelector("#result p:nth-of-type(8)").innerText}
-${document.querySelector("#result p:nth-of-type(9)").innerText}
-${document.querySelector("#result p:nth-of-type(10)").innerText}`;
+Signal:
+${window.GoldAI_V1_Result.signal}
+
+Entry:
+${window.GoldAI_V1_Result.entry}
+
+SL:
+${window.GoldAI_V1_Result.stopLoss}
+
+TP:
+${window.GoldAI_V1_Result.takeProfit}
+
+RR:
+${window.GoldAI_V1_Result.riskReward}
+
+Confidence:
+${window.GoldAI_V1_Result.confidence}%`;
+
 
 navigator.clipboard.writeText(text);
 
-alert("✅ Signal Copied");
+
+alert(
+"✅ Signal Copied"
+);
+
 
 }
-    
+
+
+
+// ======================================
+// SHARE SIGNAL
+// ======================================
+
 function shareSignal(){
 
-let text =
-`📈 GoldAI Signal
 
-${document.querySelector("#result p:nth-of-type(3)").innerText}
-${document.querySelector("#result p:nth-of-type(4)").innerText}
-${document.querySelector("#result p:nth-of-type(5)").innerText}
-${document.querySelector("#result p:nth-of-type(6)").innerText}
-${document.querySelector("#result p:nth-of-type(7)").innerText}
-${document.querySelector("#result p:nth-of-type(8)").innerText}
-${document.querySelector("#result p:nth-of-type(9)").innerText}
-${document.querySelector("#result p:nth-of-type(10)").innerText}`;
+let text =
+`
+📈 GoldAI Signal
+
+${window.GoldAI_V1_Result.signal}
+
+Entry:
+${window.GoldAI_V1_Result.entry}
+
+SL:
+${window.GoldAI_V1_Result.stopLoss}
+
+TP:
+${window.GoldAI_V1_Result.takeProfit}
+
+RR:
+${window.GoldAI_V1_Result.riskReward}
+
+Confidence:
+${window.GoldAI_V1_Result.confidence}%
+
+`;
+
+
 
 if(navigator.share){
 
+
 navigator.share({
+
 title:"GoldAI Signal",
+
 text:text
+
 });
 
-}else{
+
+}
+
+else{
+
 
 navigator.clipboard.writeText(text);
 
-alert("📋 Share not supported - Signal Copied");
+
+alert(
+"📋 Signal Copied"
+);
+
 
 }
 
-}
+
+    }
 loadGoldPrice();
 loadCandles();
+
 </script>
+
+
+<!-- ======================================
+ GOLD AI ENGINE FILES
+====================================== -->
 
 <script src="rsi-engine-v2.js"></script>
 <script src="rsi-divergence-v1.js"></script>
@@ -1569,87 +1773,322 @@ loadCandles();
 <script src="trade-management-engine-v1.js"></script>
 <script src="conflict-filter-engine-v1.js"></script>
 
+
+
+<!-- ======================================
+ GOLD AI PRO V2 DASHBOARD
+====================================== -->
+
+
 <div id="goldai-v2-dashboard">
 
+
 <div class="goldai-header">
-<h1>🥇 GoldAI Pro</h1>
-<p>Version 2 | XAUUSD</p>
+
+<h1>
+🥇 GoldAI Pro
+</h1>
+
+<p>
+Version 2 | XAUUSD
+</p>
+
 </div>
+
 
 
 <div class="market-status">
-🟢 Market Status: OPEN
+
+🟢 Market Status:
+<span id="v2MarketStatus">
+OPEN
+</span>
+
 </div>
+
+
 
 
 <div class="signal-card">
 
-<h2 id="signal">WAIT 🟡</h2>
+
+<h2 id="signal">
+WAIT 🟡
+</h2>
+
 
 
 <div class="confidence">
+
 AI Confidence:
-<span id="confidence">0%</span>
+
+<span id="confidence">
+0%
+</span>
+
 </div>
+
 
 
 <div class="trade-info">
 
-<p>Entry: <span id="entry">---</span></p>
 
-<p>Stop Loss: <span id="sl">---</span></p>
+<p>
+Entry:
+<span id="entry">
+---
+</span>
+</p>
 
-<p>TP1: <span id="tp1">---</span></p>
 
-<p>TP2: <span id="tp2">---</span></p>
 
-<p>TP3: <span id="tp3">---</span></p>
+<p>
+Stop Loss:
+<span id="sl">
+---
+</span>
+</p>
 
-<p>Risk Reward: <span id="rr">---</span></p>
+
+
+<p>
+TP1:
+<span id="tp1">
+---
+</span>
+</p>
+
+
+
+<p>
+TP2:
+<span id="tp2">
+---
+</span>
+</p>
+
+
+
+<p>
+TP3:
+<span id="tp3">
+---
+</span>
+</p>
+
+
+
+<p>
+Risk Reward:
+<span id="rr">
+---
+</span>
+</p>
+
 
 </div>
 
 </div>
+
+
+
 
 
 <div class="risk-card">
 
-<h3>Risk</h3>
 
-<p>Capital: <span id="capital">---</span></p>
+<h3>
+Risk
+</h3>
 
-<p>Lot: <span id="lot">---</span></p>
 
-<p>Risk %: <span id="risk">---</span></p>
+<p>
+Capital:
+<span id="capital">
+---
+</span>
+</p>
+
+
+<p>
+Lot:
+<span id="lot">
+---
+</span>
+</p>
+
+
+<p>
+Risk %:
+<span id="risk">
+---
+</span>
+</p>
+
 
 </div>
 
 
+
+
+
 <button onclick="startGoldAIAnalysis()">
+
 🚀 Start Analysis
+
 </button>
+
+
+
+
+
+<div id="details-content">
+
+
+<h3>
+📊 AI Analysis Details
+</h3>
+
+
+<p>
+Waiting for analysis
+</p>
+
+
+</div>
+
+
+
+
 
 
 <div class="menu-buttons">
 
-<button>📊 Details</button>
 
-<button>📜 History</button>
+<button onclick="showDetails()">
 
-<button>⚙️ Settings</button>
+📊 Details
+
+</button>
+
+
+<button onclick="showHistory()">
+
+📜 History
+
+</button>
+
+
+<button onclick="showSettings()">
+
+⚙️ Settings
+
+</button>
+
 
 </div>
 
 
+
 </div>
+
+
+
 
 
 <div id="settings-content"></div>
 
 <div id="history-content"></div>
 
-<div id="details-content"></div>
 
+
+
+
+<script>
+
+
+// ======================================
+// V2 MENU FUNCTIONS
+// ======================================
+
+
+function showDetails(){
+
+
+document.getElementById(
+"details-content"
+).style.display="block";
+
+
+document.getElementById(
+"history-content"
+).style.display="none";
+
+
+document.getElementById(
+"settings-content"
+).style.display="none";
+
+
+}
+
+
+
+
+function showHistory(){
+
+
+document.getElementById(
+"history-content"
+).style.display="block";
+
+
+document.getElementById(
+"details-content"
+).style.display="none";
+
+
+document.getElementById(
+"settings-content"
+).style.display="none";
+
+
+}
+
+
+
+
+function showSettings(){
+
+
+document.getElementById(
+"settings-content"
+).style.display="block";
+
+
+document.getElementById(
+"details-content"
+).style.display="none";
+
+
+document.getElementById(
+"history-content"
+).style.display="none";
+
+
+}
+
+
+
+</script>
+
+
+
+
+
+<!-- ======================================
+ MODULES
+====================================== -->
 
 
 <script src="modules/storage.js"></script>
@@ -1659,9 +2098,18 @@ AI Confidence:
 <script src="modules/history.js"></script>
 
 <script src="modules/settings.js"></script>
+
+
 <script src="engines/ai-connector.js"></script>
+
+
 <script src="modules/dashboard.js"></script>
+
+
 <script src="app.js"></script>
 
+
+
 </body>
+
 </html>
