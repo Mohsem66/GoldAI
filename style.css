@@ -1,1 +1,179 @@
-/* GoldAI Pro V2 Style */
+*{
+box-sizing:border-box;
+}
+
+body{
+margin:0;
+padding:15px;
+font-family:Arial,sans-serif;
+background:#0b0f14;
+color:#ffffff;
+direction:rtl;
+}
+
+#goldai-v2-dashboard{
+max-width:500px;
+margin:auto;
+}
+
+.goldai-header{
+text-align:center;
+padding:20px;
+background:#121820;
+border-radius:18px;
+margin-bottom:15px;
+border:1px solid #263241;
+}
+
+.goldai-header h1{
+margin:0;
+font-size:26px;
+color:#f5c542;
+}
+
+.goldai-header p{
+margin:8px 0 0;
+color:#aaa;
+font-size:14px;
+}
+
+.market-status{
+text-align:center;
+background:#101820;
+padding:12px;
+border-radius:14px;
+margin-bottom:15px;
+font-size:16px;
+}
+
+.signal-card{
+background:#121820;
+border-radius:20px;
+padding:20px;
+text-align:center;
+border:1px solid #263241;
+margin-bottom:15px;
+}
+
+#signal{
+font-size:32px;
+margin:10px 0;
+font-weight:bold;
+}
+
+.confidence{
+background:#0b0f14;
+padding:15px;
+border-radius:12px;
+font-size:18px;
+margin-bottom:15px;
+}
+
+#confidence{
+color:#42d392;
+font-weight:bold;
+}
+
+.trade-info{
+text-align:right;
+background:#0b0f14;
+padding:15px;
+border-radius:15px;
+}
+
+.trade-info p{
+margin:10px 0;
+font-size:16px;
+}
+
+.trade-info span{
+color:#f5c542;
+font-weight:bold;
+}
+
+.risk-card{
+background:#121820;
+border-radius:18px;
+padding:15px;
+margin-bottom:15px;
+border:1px solid #263241;
+}
+
+.risk-card h3{
+margin-top:0;
+color:#f5c542;
+}
+
+.risk-card p{
+margin:8px 0;
+}
+
+.risk-card span{
+color:#42d392;
+font-weight:bold;
+}
+
+#start-analysis{
+width:100%;
+padding:16px;
+border:none;
+border-radius:15px;
+background:#f5c542;
+color:#000;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+margin-bottom:15px;
+}
+
+.menu-buttons{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+}
+
+.menu-buttons button{
+padding:12px 5px;
+border:none;
+border-radius:14px;
+background:#18222d;
+color:white;
+font-size:14px;
+cursor:pointer;
+}
+
+.menu-buttons button:hover{
+background:#263241;
+}
+
+.buy{
+color:#42d392!important;
+}
+
+.sell{
+color:#ff5c5c!important;
+}
+
+.wait{
+color:#f5c542!important;
+}
+
+@media(max-width:400px){
+
+body{
+padding:10px;
+}
+
+.goldai-header h1{
+font-size:22px;
+}
+
+#signal{
+font-size:26px;
+}
+
+.menu-buttons button{
+font-size:12px;
+}
+
+}
