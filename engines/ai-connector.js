@@ -56,7 +56,12 @@ let atr=null;
 let trade=null;
 let conflict=null;
 
+// Normalize Engine Outputs
 
+let rsiValue = null;
+let atrValue = null;
+let structureTrend = null
+  ;
 
 // RSI
 
