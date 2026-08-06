@@ -136,7 +136,10 @@ function(){
         "GoldAI Pro V2 Ready"
     );
 
-
+alert(
+"Connector: " + 
+(window.GoldAI_V1_Connector ? "YES" : "NO")
+);
     if(window.GoldAI_V1_Connector){
 
         window.GoldAI_V1_Connector.update();
