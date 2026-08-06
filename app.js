@@ -49,7 +49,10 @@ function startGoldAIAnalysis(){
     // AI Connector
     // ===============================
 
-
+console.log(window.GoldAI_Connector);
+    alert(
+typeof window.GoldAI_Connector
+);
     if(!window.GoldAI_Connector){
 
 
@@ -65,8 +68,7 @@ function startGoldAIAnalysis(){
 
 
     let result =
-        GoldAI_Connector.analyze();
-
+    window.GoldAI_Connector.analyze();
 
 
     if(!result){
