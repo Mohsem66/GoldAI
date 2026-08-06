@@ -122,27 +122,25 @@ catch(e){
 
         // Market Structure
 
-        try{
 
-            if(
-            window.GoldAI_MarketStructure_V1 &&
-            typeof window.GoldAI_MarketStructure_V1.analyze === "function"
-            ){
+try{
 
-                structure =
-                window.GoldAI_MarketStructure_V1.analyze();
+    if(
+    window.GoldAI_MarketStructure_V1 &&
+    typeof window.GoldAI_MarketStructure_V1.analyze === "function"
+    ){
 
-            }
+        structure =
+        window.GoldAI_MarketStructure_V1.analyze(marketData);
 
-        }
-        catch(e){
+    }
 
-            errors.push("Structure Error");
+}
+catch(e){
 
-        }
+    errors.push("Structure Error");
 
-
-
+}
 
 
         // ATR
