@@ -53,18 +53,22 @@ let marketData = {
 
         try{
 
-            if(typeof analyzeRSIEngine === "function"){
+    if(
+    window.GoldAI_RSI_V2 &&
+    typeof window.GoldAI_RSI_V2.analyzeRSIEngine === "function"
+    ){
 
-                rsi = analyzeRSIEngine();
+        rsi =
+        window.GoldAI_RSI_V2.analyzeRSIEngine(marketData);
 
-            }
+    }
 
-        }
-        catch(e){
+}
+catch(e){
 
-            errors.push("RSI Error");
+    errors.push("RSI Error");
 
-        }
+}
 
 
 
