@@ -124,61 +124,24 @@ function startGoldAIAnalysis(){
 
 
 }
-
-
-
-
-
 // ======================================
 // GoldAI Pro V2 STARTUP
 // ======================================
 
-
 document.addEventListener(
 "DOMContentLoaded",
 function(){
-
 
     console.log(
         "GoldAI Pro V2 Ready"
     );
 
 
-
-    if(window.GoldAI_V1_Connector){
-
-
-        window.GoldAI_V1_Connector.update();
-
-
-    }
-
-
-
-
-    if(window.GoldAI_Dashboard){
-
-
-        window.GoldAI_Dashboard.start();
-
-
-    }
-
-// ======================================
-// GoldAI Pro V2 Startup
-// ======================================
-
-document.addEventListener(
-"DOMContentLoaded",
-function(){
-
-
     if(window.GoldAI_V1_Connector){
 
         window.GoldAI_V1_Connector.update();
 
     }
-
 
 
     if(window.GoldAI_Dashboard){
@@ -187,7 +150,5 @@ function(){
 
     }
 
-
-});
 
 });
