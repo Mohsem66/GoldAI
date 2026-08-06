@@ -147,18 +147,22 @@ catch(e){
 
         try{
 
-            if(typeof GoldAI_ATR_Analyze === "function"){
+    if(
+    window.GoldAI_ATR_Engine_V1 &&
+    typeof window.GoldAI_ATR_Engine_V1.GoldAI_ATR_Analyze === "function"
+    ){
 
-                atr = GoldAI_ATR_Analyze();
+        atr =
+        window.GoldAI_ATR_Engine_V1.GoldAI_ATR_Analyze(marketData);
 
-            }
+    }
 
-        }
-        catch(e){
+}
+catch(e){
 
-            errors.push("ATR Error");
+    errors.push("ATR Error");
 
-        }
+}
 
 
 
