@@ -49,8 +49,6 @@ function startGoldAIAnalysis(){
     // AI Connector
     // ===============================
 
-console.log(window.GoldAI_Connector);
-
     if(!window.GoldAI_Connector){
 
 
