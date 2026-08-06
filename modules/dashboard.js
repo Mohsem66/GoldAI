@@ -110,6 +110,7 @@ this.setSignal(result.signal || "WAIT");
 
 this.setConfidence(result.confidence || 0);
 
+
 this.setTrade({
 
 entry:result.entry,
@@ -126,7 +127,25 @@ rr:result.riskReward
 
 });
 
+
+}GoldAI_Dashboard.runAI=function(){
+
+if(!window.GoldAI_Connector){
+console.log("AI Connector not loaded");
+return;
 }
+
+
+let result=GoldAI_Connector.analyze();
+
+
+console.log("GoldAI Result:",result);
+
+
+GoldAI_Dashboard.update(result);
+
+
+};
 
 };
 
