@@ -50,9 +50,7 @@ function startGoldAIAnalysis(){
     // ===============================
 
 console.log(window.GoldAI_Connector);
-    alert(
-typeof window.GoldAI_Connector
-);
+
     if(!window.GoldAI_Connector){
 
 
