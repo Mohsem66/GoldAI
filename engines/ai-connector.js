@@ -97,7 +97,7 @@ let marketData = {
 
             if(typeof GoldAIScoreEngine === "function"){
 
-                score = GoldAIScoreEngine({});
+                score = GoldAIScoreEngine(marketData);
 
             }
 
