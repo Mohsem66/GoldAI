@@ -99,18 +99,22 @@ catch(e){
 
         try{
 
-            if(typeof GoldAIScoreEngine === "function"){
+    if(
+    window.GoldAI_ScoreEngine &&
+    typeof window.GoldAI_ScoreEngine === "function"
+    ){
 
-                score = GoldAIScoreEngine(marketData);
+        score =
+        window.GoldAI_ScoreEngine(marketData);
 
-            }
+    }
 
-        }
-        catch(e){
+}
+catch(e){
 
-            errors.push("Score Error");
+    errors.push("Score Error");
 
-        }
+}
 
 
 
