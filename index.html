@@ -1481,7 +1481,7 @@ ${history}
 console.log(window.GoldAI_ScoreEngine);
 console.log("RSI Engine:", window.GoldAI_RSI_V2);
 document.getElementById("status").innerHTML="🟢 Analysis Complete";
-console.log("V1 RESULT SAVED", window.GoldAI_V1_Result);
+
 window.GoldAI_V1_Result = {
 
     signal: signal,
@@ -1505,6 +1505,7 @@ window.GoldAI_V1_Result = {
     reason: reason
 
 };
+console.log("V1 RESULT SAVED", window.GoldAI_V1_Result);
 }
 function copySignal(){
 
