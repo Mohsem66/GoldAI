@@ -22,7 +22,32 @@ window.GoldAI_Connector = {
 
         let errors = [];
 
+let marketData = {
 
+    priceHistory:
+    window.priceHistory || [],
+
+
+    rsiHistory:
+    window.rsiHistory || [],
+
+
+    goldPrice:
+    window.goldPrice || 0,
+
+
+    ema20:
+    window.ema20 || null,
+
+
+    ema50:
+    window.ema50 || null,
+
+
+    ema200:
+    window.ema200 || null
+
+};
 
         // RSI
 
