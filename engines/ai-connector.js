@@ -317,3 +317,111 @@ return result;
 
 
 window.GoldAI_AI = GoldAI_AI;
+window.GoldAI_Connector = {
+
+    analyze(){
+
+        let rsi = null;
+        let divergence = null;
+        let score = null;
+        let structure = null;
+        let atr = null;
+        let trade = null;
+        let conflict = null;
+
+
+        try{
+            rsi = analyzeRSIEngine();
+        }catch(e){}
+
+
+        try{
+            divergence = analyzeRSIDivergence();
+        }catch(e){}
+
+
+        try{
+            score = GoldAIScoreEngine({});
+        }catch(e){}
+
+
+        try{
+            structure = window.GoldAI_MarketStructure_V1.analyze();
+        }catch(e){}
+
+
+        try{
+            atr = GoldAI_ATR_Analyze();
+        }catch(e){}
+
+
+        try{
+            trade = createTradePlan();
+        }catch(e){}
+
+
+        try{
+            conflict = runConflictFilter();
+        }catch(e){}
+
+
+
+        return {
+
+            signal:
+                score?.signal ||
+                trade?.signal ||
+                "WAIT",
+
+
+            confidence:
+                score?.confidence ||
+                50,
+
+
+            entry:
+                trade?.entry || 0,
+
+
+            stopLoss:
+                trade?.stopLoss || 0,
+
+
+            tp1:
+                trade?.tp1 || 0,
+
+
+            tp2:
+                trade?.tp2 || 0,
+
+
+            tp3:
+                trade?.tp3 || 0,
+
+
+            riskReward:
+                trade?.riskReward || "1:2",
+
+
+            aiScore:
+                score?.score || 0,
+
+
+            reason:
+
+                "RSI + Structure + Score + ATR Analysis",
+
+
+            details:{
+                rsi,
+                divergence,
+                structure,
+                atr,
+                conflict
+            }
+
+        };
+
+    }
+
+};
