@@ -1516,7 +1516,54 @@ loadCandles();
 <script src="trade-management-engine-v1.js"></script>
 <script src="conflict-filter-engine-v1.js"></script>
 </div>
-<div id="goldai-v2-dashboard"></div>
+<div id="goldai-v2-dashboard">
+
+<div class="goldai-header">
+<h1>🥇 GoldAI Pro</h1>
+<p>Version 2 | XAUUSD</p>
+</div>
+
+<div class="market-status">
+🟢 Market Status: OPEN
+</div>
+
+<div class="signal-card">
+<h2 id="signal">WAIT 🟡</h2>
+
+<div class="confidence">
+AI Confidence:
+<span id="confidence">0%</span>
+</div>
+
+<div class="trade-info">
+<p>Entry: <span id="entry">---</span></p>
+<p>Stop Loss: <span id="sl">---</span></p>
+<p>TP1: <span id="tp1">---</span></p>
+<p>TP2: <span id="tp2">---</span></p>
+<p>TP3: <span id="tp3">---</span></p>
+<p>Risk Reward: <span id="rr">---</span></p>
+</div>
+
+</div>
+
+<div class="risk-card">
+<h3>Risk</h3>
+<p>Capital: <span id="capital">---</span></p>
+<p>Lot: <span id="lot">---</span></p>
+<p>Risk %: <span id="risk">---</span></p>
+</div>
+
+<button id="start-analysis">
+START ANALYSIS
+</button>
+
+<div class="menu-buttons">
+<button>📊 Details</button>
+<button>📜 History</button>
+<button>⚙️ Settings</button>
+</div>
+
+</div>
 <script src="modules/dashboard.js"></script>
 <script src="modules/details.js"></script>
 <script src="modules/history.js"></script>
