@@ -163,14 +163,4 @@ function startGoldAIAnalysis(){
     }
 
 
-
-
-
-    console.log(
-        "GoldAI V2 Result:",
-        result
-    );
-
-
-
 }
