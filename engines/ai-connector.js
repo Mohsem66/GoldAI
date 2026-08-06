@@ -109,10 +109,18 @@ try{
 if(
 window.GoldAI_ScoreEngine
 ){
-
 score =
-window.GoldAI_ScoreEngine(marketData);
+window.GoldAI_ScoreEngine({
 
+...marketData,
+
+rsi:rsi,
+
+divergence:divergence,
+
+marketStructure:structure
+
+});
 
 console.log(score);
 
