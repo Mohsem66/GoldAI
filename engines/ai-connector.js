@@ -108,3 +108,4 @@ console.log(
 
 
 };
+console.log("CONNECTOR LOADED");
