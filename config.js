@@ -5,7 +5,7 @@
 window.GoldAI_Config = {
 
   // Twelve Data API key
-  API_KEY: "YOUR_TWELVE_DATA_API_KEY",
+  API_KEY: "3302af6a7da54960b1dcef8db0edf78b",
 
   SYMBOL: "XAU/USD",
 
