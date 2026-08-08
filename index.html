@@ -1,0 +1,3185 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GoldAI Pro V2</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div id="app">
+
+<header class="app-header">
+    <div>
+        <h1>GoldAI PRO</h1>
+        <p>AI Gold Trading Assistant</p>
+    </div>
+
+    <div id="headerStatus" class="header-status">
+        🟢 ONLINE
+    </div>
+</header>
+
+
+<main>
+
+<!-- ============================= -->
+<!-- DASHBOARD -->
+<!-- ============================= -->
+
+<section id="dashboardSection" class="page-section active">
+
+<div class="card price-card">
+
+    <div class="card-title">
+        <span>🥇 XAUUSD</span>
+        <span id="marketStatus">Checking...</span>
+    </div>
+
+    <div id="goldPrice" class="live-price">
+        Loading...
+    </div>
+
+    <div id="marketSession" class="muted-text">
+        Session: --
+    </div>
+
+    <div id="marketCountdown" class="muted-text">
+        Next Change: --
+    </div>
+
+</div>
+
+
+<!-- SIGNAL CARD -->
+
+<div class="card signal-card">
+
+    <div class="section-title">
+        🤖 AI SIGNAL
+    </div>
+
+    <div id="signalValue" class="signal-value">
+        WAIT 🟡
+    </div>
+
+    <div id="confidenceContainer">
+
+        <div class="confidence-label">
+            <span>AI Confidence</span>
+            <span id="confidenceValue">--%</span>
+        </div>
+
+        <div class="confidence-bar">
+            <div id="confidenceBar"></div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- TRADE LEVELS -->
+
+<div class="card">
+
+    <div class="section-title">
+        📊 TRADE LEVELS
+    </div>
+
+    <div class="data-grid">
+
+        <div class="data-item">
+            <span>Entry</span>
+            <strong id="entryValue">--</strong>
+        </div>
+
+        <div class="data-item">
+            <span>Stop Loss</span>
+            <strong id="slValue">--</strong>
+        </div>
+
+        <div class="data-item">
+            <span>TP1</span>
+            <strong id="tp1Value">--</strong>
+        </div>
+
+        <div class="data-item">
+            <span>TP2</span>
+            <strong id="tp2Value">--</strong>
+        </div>
+
+        <div class="data-item">
+            <span>TP3</span>
+            <strong id="tp3Value">--</strong>
+        </div>
+
+        <div class="data-item">
+            <span>Risk / Reward</span>
+            <strong id="rrValue">--</strong>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- TRADE STATUS -->
+
+<div class="card">
+
+    <div class="section-title">
+        🚦 TRADE STATUS
+    </div>
+
+    <div id="tradeStatus">
+        🟢 SAFE TO TRADE
+    </div>
+
+    <p id="tradeReason">
+        Market conditions are acceptable.
+    </p>
+
+</div>
+
+
+<!-- ANALYZE -->
+
+<div class="card analyze-card">
+
+    <button
+        id="analyzeBtn"
+        type="button"
+        onclick="analyze()">
+
+        🚀 START AI ANALYSIS
+
+    </button>
+
+    <div id="status">
+        🟢 Ready
+    </div>
+
+</div>
+
+
+<div id="result"></div>
+
+
+<!-- BOTTOM NAV -->
+
+<nav class="bottom-nav">
+
+    <button
+        type="button"
+        onclick="showSection('detailsSection')">
+
+        📊
+        <span>Details</span>
+
+    </button>
+
+    <button
+        type="button"
+        onclick="showSection('historySection')">
+
+        📜
+        <span>History</span>
+
+    </button>
+
+    <button
+        type="button"
+        onclick="showSection('settingsSection')">
+
+        ⚙️
+        <span>Settings</span>
+
+    </button>
+
+</nav>
+
+</section>
+
+
+
+<!-- ============================= -->
+<!-- DETAILS -->
+<!-- ============================= -->
+
+<section
+    id="detailsSection"
+    class="page-section">
+
+<div class="page-header">
+
+    <button
+        type="button"
+        onclick="showSection('dashboardSection')">
+
+        ←
+    </button>
+
+    <h2>📊 Details</h2>
+
+</div>
+
+
+<div class="card">
+
+    <div class="section-title">
+        Technical Indicators
+    </div>
+
+    <div class="indicator-row">
+        <span>EMA20</span>
+        <strong id="detailsEMA20">--</strong>
+    </div>
+
+    <div class="indicator-row">
+        <span>EMA50</span>
+        <strong id="detailsEMA50">--</strong>
+    </div>
+
+    <div class="indicator-row">
+        <span>EMA Trend</span>
+        <strong id="detailsEMATrend">--</strong>
+    </div>
+
+    <div class="indicator-row">
+        <span>Trend Power</span>
+        <strong id="detailsTrendPower">--</strong>
+    </div>
+
+    <div class="indicator-row">
+        <span>RSI</span>
+        <strong id="detailsRSI">--</strong>
+    </div>
+
+    <div class="indicator-row">
+        <span>RSI Zone</span>
+        <strong id="detailsRSIZone">--</strong>
+    </div>
+
+    <div class="indicator-row">
+        <span>MACD</span>
+        <strong id="detailsMACD">--</strong>
+    </div>
+
+    <div class="indicator-row">
+        <span>ATR</span>
+        <strong id="detailsATR">--</strong>
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <div class="section-title">
+        Market Structure
+    </div>
+
+    <div class="indicator-row">
+        <span>Support</span>
+        <strong id="detailsSupport">--</strong>
+    </div>
+
+    <div class="indicator-row">
+        <span>Resistance</span>
+        <strong id="detailsResistance">--</strong>
+    </div>
+
+    <div class="indicator-row">
+        <span>BOS</span>
+        <strong id="detailsBOS">--</strong>
+    </div>
+
+    <div class="indicator-row">
+        <span>CHoCH</span>
+        <strong id="detailsCHoCH">--</strong>
+    </div>
+
+    <div class="indicator-row">
+        <span>Candle Confirmation</span>
+        <strong id="detailsCandle">--</strong>
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <div class="section-title">
+        🧠 AI Reason
+    </div>
+
+    <div id="aiReason">
+        Waiting for analysis...
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <div class="section-title">
+        ⭐ Indicator Scores
+    </div>
+
+    <div class="score-row">
+        <span>EMA</span>
+        <strong id="emaScore">--</strong>
+    </div>
+
+    <div class="score-row">
+        <span>RSI</span>
+        <strong id="rsiScore">--</strong>
+    </div>
+
+    <div class="score-row">
+        <span>Market Structure</span>
+        <strong id="structureScore">--</strong>
+    </div>
+
+    <div class="score-row">
+        <span>Divergence</span>
+        <strong id="divergenceScore">--</strong>
+    </div>
+
+    <div class="score-row total-score">
+        <span>Total AI Score</span>
+        <strong id="totalScore">--</strong>
+    </div>
+
+</div>
+
+
+<nav class="bottom-nav">
+
+    <button
+        type="button"
+        onclick="showSection('dashboardSection')">
+
+        🏠
+        <span>Dashboard</span>
+
+    </button>
+
+    <button
+        type="button"
+        onclick="showSection('historySection')">
+
+        📜
+        <span>History</span>
+
+    </button>
+
+    <button
+        type="button"
+        onclick="showSection('settingsSection')">
+
+        ⚙️
+        <span>Settings</span>
+
+    </button>
+
+</nav>
+
+</section>
+
+
+
+<!-- ============================= -->
+<!-- HISTORY -->
+<!-- ============================= -->
+
+<section
+    id="historySection"
+    class="page-section">
+
+<div class="page-header">
+
+    <button
+        type="button"
+        onclick="showSection('dashboardSection')">
+
+        ←
+
+    </button>
+
+    <h2>📜 History</h2>
+
+</div>
+
+
+<div class="card statistics-card">
+
+    <div class="section-title">
+        AI Statistics
+    </div>
+
+    <div class="stats-grid">
+
+        <div class="stat-item">
+            <span>Total</span>
+            <strong id="totalSignals">0</strong>
+        </div>
+
+        <div class="stat-item">
+            <span>BUY</span>
+            <strong id="buySignals">0</strong>
+        </div>
+
+        <div class="stat-item">
+            <span>SELL</span>
+            <strong id="sellSignals">0</strong>
+        </div>
+
+        <div class="stat-item">
+            <span>WAIT</span>
+            <strong id="waitSignals">0</strong>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <div class="section-title">
+        Signal History
+    </div>
+
+    <div id="historyList">
+
+        <div class="empty-state">
+            No signals yet.
+        </div>
+
+    </div>
+
+</div>
+
+
+<nav class="bottom-nav">
+
+    <button
+        type="button"
+        onclick="showSection('dashboardSection')">
+
+        🏠
+        <span>Dashboard</span>
+
+    </button>
+
+    <button
+        type="button"
+        onclick="showSection('detailsSection')">
+
+        📊
+        <span>Details</span>
+
+    </button>
+
+    <button
+        type="button"
+        onclick="showSection('settingsSection')">
+
+        ⚙️
+        <span>Settings</span>
+
+    </button>
+
+</nav>
+
+</section>
+
+
+
+<!-- ============================= -->
+<!-- SETTINGS -->
+<!-- ============================= -->
+
+<section
+    id="settingsSection"
+    class="page-section">
+
+<div class="page-header">
+
+    <button
+        type="button"
+        onclick="showSection('dashboardSection')">
+
+        ←
+
+    </button>
+
+    <h2>⚙️ Settings</h2>
+
+</div>
+
+
+<div class="card">
+
+    <div class="section-title">
+        💰 Account
+    </div>
+
+    <label>
+        Capital ($)
+    </label>
+
+    <input
+        id="capitalInput"
+        type="number"
+        min="1"
+        step="0.01"
+        value="97">
+
+    <button
+        type="button"
+        onclick="saveCapital()">
+
+        Save Capital
+
+    </button>
+
+</div>
+
+
+<div class="card">
+
+    <div class="section-title">
+        📊 Risk Management
+    </div>
+
+    <div class="setting-row">
+
+        <span>Risk %</span>
+
+        <input
+            id="riskInput"
+            type="number"
+            min="0.1"
+            max="10"
+            step="0.1"
+            value="2">
+
+    </div>
+
+    <div class="setting-row">
+
+        <span>Lot Size</span>
+
+        <input
+            id="lotInput"
+            type="number"
+            min="0.01"
+            step="0.01"
+            value="0.01">
+
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <div class="section-title">
+        💵 Price Source
+    </div>
+
+    <div class="setting-row">
+
+        <span>Live Price</span>
+
+        <input
+            id="livePriceToggle"
+            type="checkbox"
+            checked>
+
+    </div>
+
+    <label>
+        Manual Entry
+    </label>
+
+    <input
+        id="manualPriceInput"
+        type="number"
+        step="0.01"
+        placeholder="Enter manual price">
+
+    <button
+        type="button"
+        onclick="applyManualPrice()">
+
+        Apply Manual Price
+
+    </button>
+
+</div>
+
+
+<div class="card">
+
+    <div class="section-title">
+        🔔 Notifications
+    </div>
+
+    <div class="setting-row">
+
+        <span>Alert Sound</span>
+
+        <input
+            id="soundToggle"
+            type="checkbox">
+
+    </div>
+
+    <div class="setting-row">
+
+        <span>Notification</span>
+
+        <input
+            id="notificationToggle"
+            type="checkbox">
+
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <div class="section-title">
+        🌓 Appearance
+    </div>
+
+    <div class="setting-row">
+
+        <span>Dark Mode</span>
+
+        <input
+            id="darkModeToggle"
+            type="checkbox"
+            checked>
+
+    </div>
+
+</div>
+
+
+<div class="card danger-card">
+
+    <div class="section-title">
+        ⚠️ Statistics
+    </div>
+
+    <button
+        type="button"
+        onclick="resetStatistics()">
+
+        Reset Statistics
+
+    </button>
+
+</div>
+
+
+<nav class="bottom-nav">
+
+    <button
+        type="button"
+        onclick="showSection('dashboardSection')">
+
+        🏠
+        <span>Dashboard</span>
+
+    </button>
+
+    <button
+        type="button"
+        onclick="showSection('detailsSection')">
+
+        📊
+        <span>Details</span>
+
+    </button>
+
+    <button
+        type="button"
+        onclick="showSection('historySection')">
+
+        📜
+        <span>History</span>
+
+    </button>
+
+</nav>
+
+</section>
+
+</main>
+
+</div>
+
+
+<!-- ========================================== -->
+<!-- CORE VARIABLES -->
+<!-- ========================================== -->
+
+<script>
+
+"use strict";
+
+const GOLD_AI_VERSION = "2.0";
+
+let useRealPrice = true;
+
+let goldPrice = 4035;
+
+let candles = [];
+
+let emaStatus = "-";
+
+let currentCapital =
+    Number(localStorage.getItem("capital") || 97);
+
+let riskPercent =
+    Number(localStorage.getItem("riskPercent") || 2);
+
+let lotSize =
+    Number(localStorage.getItem("lotSize") || 0.01);
+
+let manualPrice =
+    Number(localStorage.getItem("manualPrice") || 0);
+
+let lastAnalysisResult = null;
+
+let priceHistory =
+    JSON.parse(
+        localStorage.getItem("priceHistory") || "[]"
+    );
+
+
+/* ==========================================
+   STORAGE HELPERS
+========================================== */
+
+function getStorageNumber(key, fallback){
+
+    const value =
+        Number(localStorage.getItem(key));
+
+    return Number.isFinite(value)
+        ? value
+        : fallback;
+
+}
+
+
+function setStorageNumber(key, value){
+
+    localStorage.setItem(
+        key,
+        String(value)
+    );
+
+}
+
+
+/* ==========================================
+   NAVIGATION
+========================================== */
+
+function showSection(sectionId){
+
+    document
+        .querySelectorAll(".page-section")
+        .forEach(section => {
+
+            section.classList.remove("active");
+
+        });
+
+
+    const target =
+        document.getElementById(sectionId);
+
+
+    if(target){
+
+        target.classList.add("active");
+
+        window.scrollTo({
+            top:0,
+            behavior:"smooth"
+        });
+
+    }
+
+
+    if(sectionId === "historySection"){
+
+        renderHistory();
+
+    }
+
+
+    if(sectionId === "settingsSection"){
+
+        loadSettingsUI();
+
+    }
+
+}
+
+
+/* ==========================================
+   EMA ENGINE
+========================================== */
+
+function calculateEMA(prices, period){
+
+    if(
+        !Array.isArray(prices) ||
+        prices.length < period
+    ){
+
+        return null;
+
+    }
+
+
+    const multiplier =
+        2 / (period + 1);
+
+
+    let ema =
+        prices
+            .slice(0, period)
+            .reduce(
+                (sum, price) =>
+                    sum + Number(price),
+                0
+            ) / period;
+
+
+    for(
+        let i = period;
+        i < prices.length;
+        i++
+    ){
+
+        ema =
+            (
+                Number(prices[i]) - ema
+            ) * multiplier + ema;
+
+    }
+
+
+    return ema;
+
+}
+
+
+/* ==========================================
+   GOLD PRICE
+========================================== */
+
+async function loadGoldPrice(){
+
+    if(!useRealPrice){
+
+        if(manualPrice > 0){
+
+            goldPrice = manualPrice;
+
+        }
+
+        return;
+
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                "https://api.twelvedata.com/price?symbol=XAU/USD&apikey=3302af6a7da54960b1dcef8db0edf78b"
+            );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "Gold price API error"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if(
+            data &&
+            data.price &&
+            Number.isFinite(
+                Number(data.price)
+            )
+        ){
+
+            goldPrice =
+                Number(data.price);
+
+        }
+
+
+        updatePriceUI();
+
+
+    }catch(error){
+
+        console.log(
+            "Gold Price Error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   CANDLE DATA
+========================================== */
+
+async function loadCandles(){
+
+    if(!useRealPrice){
+
+        return;
+
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                "https://api.twelvedata.com/time_series?symbol=XAU/USD&interval=1min&outputsize=100&apikey=3302af6a7da54960b1dcef8db0edf78b"
+            );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "Candle API error"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if(
+            data &&
+            Array.isArray(data.values)
+        ){
+
+            candles =
+                data.values
+                    .slice()
+                    .reverse();
+
+
+            updateEMATrend();
+
+        }
+
+
+    }catch(error){
+
+        console.log(
+            "Candles Error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   PRICE UI
+========================================== */
+
+function updatePriceUI(){
+
+    const element =
+        document.getElementById(
+            "goldPrice"
+        );
+
+
+    if(!element){
+
+        return;
+
+    }
+
+
+    element.innerHTML =
+        "🥇 " +
+        Number(goldPrice).toFixed(2);
+
+}
+
+
+/* ==========================================
+   EMA TREND
+========================================== */
+
+function updateEMATrend(){
+
+    const closePrices =
+        candles.map(
+            candle =>
+                Number(candle.close)
+        );
+
+
+    const ema20 =
+        calculateEMA(
+            closePrices,
+            20
+        );
+
+
+    const ema50 =
+        calculateEMA(
+            closePrices,
+            50
+        );
+
+
+    if(
+        ema20 !== null &&
+        ema50 !== null
+    ){
+
+        if(
+            goldPrice > ema20 &&
+            ema20 > ema50
+        ){
+
+            emaStatus =
+                "🟢 Bullish";
+
+        }
+
+        else if(
+            goldPrice < ema20 &&
+            ema20 < ema50
+        ){
+
+            emaStatus =
+                "🔴 Bearish";
+
+        }
+
+        else{
+
+            emaStatus =
+                "🟡 Neutral";
+
+        }
+
+    }
+
+
+    const ema20Element =
+        document.getElementById(
+            "detailsEMA20"
+        );
+
+
+    const ema50Element =
+        document.getElementById(
+            "detailsEMA50"
+        );
+
+
+    const trendElement =
+        document.getElementById(
+            "detailsEMATrend"
+        );
+
+
+    if(ema20Element){
+
+        ema20Element.innerText =
+            ema20 === null
+                ? "--"
+                : ema20.toFixed(2);
+
+    }
+
+
+    if(ema50Element){
+
+        ema50Element.innerText =
+            ema50 === null
+                ? "--"
+                : ema50.toFixed(2);
+
+    }
+
+
+    if(trendElement){
+
+        trendElement.innerText =
+            emaStatus;
+
+    }
+
+}
+
+
+/* ==========================================
+   CAPITAL
+========================================== */
+
+function saveCapital(){
+
+    const input =
+        document.getElementById(
+            "capitalInput"
+        );
+
+
+    const value =
+        Number(input.value);
+
+
+    if(
+        !Number.isFinite(value) ||
+        value <= 0
+    ){
+
+        alert(
+            "Please enter a valid capital."
+        );
+
+        return;
+
+    }
+
+
+    currentCapital = value;
+
+    setStorageNumber(
+        "capital",
+        value
+    );
+
+
+    updateRiskDisplay();
+
+}
+
+
+/* ==========================================
+   RISK DISPLAY
+========================================== */
+
+function updateRiskDisplay(){
+
+    const maxLoss =
+        (
+            currentCapital *
+            riskPercent
+        ) / 100;
+
+
+    const capitalInput =
+        document.getElementById(
+            "capitalInput"
+        );
+
+
+    const riskInput =
+        document.getElementById(
+            "riskInput"
+        );
+
+
+    const lotInput =
+        document.getElementById(
+            "lotInput"
+        );
+
+
+    if(capitalInput){
+
+        capitalInput.value =
+            currentCapital;
+
+    }
+
+
+    if(riskInput){
+
+        riskInput.value =
+            riskPercent;
+
+    }
+
+
+    if(lotInput){
+
+        lotInput.value =
+            lotSize;
+
+    }
+
+
+    console.log(
+        "Risk Manager:",
+        {
+            capital:currentCapital,
+            riskPercent,
+            maxLoss,
+            lotSize
+        }
+    );
+
+}
+
+
+/* ==========================================
+   MARKET STATUS
+========================================== */
+
+function updateMarketStatus(){
+
+    const now =
+        new Date();
+
+
+    const day =
+        now.getUTCDay();
+
+
+    const hour =
+        now.getUTCHours();
+
+
+    const minute =
+        now.getUTCMinutes();
+
+
+    const second =
+        now.getUTCSeconds();
+
+
+    let marketOpen = true;
+
+    let session = "Sydney";
+
+
+    if(day 
+    <script>
+
+/* ==========================================
+   PRICE HISTORY
+========================================== */
+
+function pushPriceHistory(price){
+
+    const value = Number(price);
+
+    if(!Number.isFinite(value)){
+        return;
+    }
+
+    priceHistory.push(value);
+
+    if(priceHistory.length > 100){
+        priceHistory =
+            priceHistory.slice(-100);
+    }
+
+    localStorage.setItem(
+        "priceHistory",
+        JSON.stringify(priceHistory)
+    );
+}
+
+
+/* ==========================================
+   RSI ENGINE
+========================================== */
+
+function calculateRSI(prices, period = 14){
+
+    if(
+        !Array.isArray(prices) ||
+        prices.length <= period
+    ){
+        return null;
+    }
+
+    let gains = 0;
+    let losses = 0;
+
+    for(
+        let i = 1;
+        i <= period;
+        i++
+    ){
+
+        const change =
+            Number(prices[i]) -
+            Number(prices[i - 1]);
+
+        if(change >= 0){
+            gains += change;
+        }
+        else{
+            losses += Math.abs(change);
+        }
+    }
+
+    let averageGain =
+        gains / period;
+
+    let averageLoss =
+        losses / period;
+
+    for(
+        let i = period + 1;
+        i < prices.length;
+        i++
+    ){
+
+        const change =
+            Number(prices[i]) -
+            Number(prices[i - 1]);
+
+        const gain =
+            change > 0
+                ? change
+                : 0;
+
+        const loss =
+            change < 0
+                ? Math.abs(change)
+                : 0;
+
+        averageGain =
+            (
+                averageGain *
+                (period - 1) +
+                gain
+            ) / period;
+
+        averageLoss =
+            (
+                averageLoss *
+                (period - 1) +
+                loss
+            ) / period;
+    }
+
+    if(averageLoss === 0){
+        return 100;
+    }
+
+    const relativeStrength =
+        averageGain /
+        averageLoss;
+
+    return 100 -
+        (
+            100 /
+            (1 + relativeStrength)
+        );
+}
+
+
+/* ==========================================
+   RSI ZONE
+========================================== */
+
+function getRSIZone(rsi){
+
+    if(!Number.isFinite(rsi)){
+        return "UNKNOWN";
+    }
+
+    if(rsi <= 20){
+        return "EXTREME OVERSOLD";
+    }
+
+    if(rsi < 30){
+        return "OVERSOLD";
+    }
+
+    if(rsi >= 80){
+        return "EXTREME OVERBOUGHT";
+    }
+
+    if(rsi > 70){
+        return "OVERBOUGHT";
+    }
+
+    if(rsi >= 50){
+        return "BULLISH";
+    }
+
+    return "BEARISH";
+}
+
+
+/* ==========================================
+   RSI SCORE
+========================================== */
+
+function getRSIScore(rsi){
+
+    let buyScore = 0;
+    let sellScore = 0;
+
+    if(!Number.isFinite(rsi)){
+        return {
+            buyScore: 0,
+            sellScore: 0
+        };
+    }
+
+    if(rsi <= 20){
+        buyScore += 4;
+    }
+    else if(rsi < 30){
+        buyScore += 3;
+    }
+    else if(rsi >= 80){
+        sellScore += 4;
+    }
+    else if(rsi > 70){
+        sellScore += 3;
+    }
+    else if(rsi >= 50){
+        buyScore += 1;
+    }
+    else{
+        sellScore += 1;
+    }
+
+    return {
+        buyScore,
+        sellScore
+    };
+}
+
+
+/* ==========================================
+   RSI DIVERGENCE
+========================================== */
+
+function detectRSIDivergence(
+    prices,
+    rsiValues
+){
+
+    if(
+        !Array.isArray(prices) ||
+        !Array.isArray(rsiValues) ||
+        prices.length < 10 ||
+        rsiValues.length < 10
+    ){
+
+        return {
+            type: "NONE",
+            buyScore: 0,
+            sellScore: 0
+        };
+
+    }
+
+
+    const p1 =
+        Number(
+            prices[prices.length - 6]
+        );
+
+    const p2 =
+        Number(
+            prices[prices.length - 1]
+        );
+
+    const r1 =
+        Number(
+            rsiValues[rsiValues.length - 6]
+        );
+
+    const r2 =
+        Number(
+            rsiValues[rsiValues.length - 1]
+        );
+
+
+    if(
+        !Number.isFinite(p1) ||
+        !Number.isFinite(p2) ||
+        !Number.isFinite(r1) ||
+        !Number.isFinite(r2)
+    ){
+
+        return {
+            type: "NONE",
+            buyScore: 0,
+            sellScore: 0
+        };
+
+    }
+
+
+    /*
+       Bullish divergence:
+       Price lower
+       RSI higher
+    */
+
+    if(
+        p2 < p1 &&
+        r2 > r1
+    ){
+
+        return {
+            type: "BULLISH",
+            buyScore: 4,
+            sellScore: 0
+        };
+
+    }
+
+
+    /*
+       Bearish divergence:
+       Price higher
+       RSI lower
+    */
+
+    if(
+        p2 > p1 &&
+        r2 < r1
+    ){
+
+        return {
+            type: "BEARISH",
+            buyScore: 0,
+            sellScore: 4
+        };
+
+    }
+
+
+    return {
+        type: "NONE",
+        buyScore: 0,
+        sellScore: 0
+    };
+
+}
+
+
+/* ==========================================
+   EMA SCORE
+========================================== */
+
+function getEMAScore(){
+
+    let buyScore = 0;
+    let sellScore = 0;
+
+    if(emaStatus === "🟢 Bullish"){
+        buyScore += 2;
+    }
+    else if(emaStatus === "🔴 Bearish"){
+        sellScore += 2;
+    }
+
+    return {
+        buyScore,
+        sellScore
+    };
+}
+
+
+/* ==========================================
+   PRICE MOMENTUM SCORE
+========================================== */
+
+function getPriceMomentumScore(){
+
+    if(priceHistory.length < 2){
+
+        return {
+            buyScore: 0,
+            sellScore: 0
+        };
+
+    }
+
+    const lastPrice =
+        Number(
+            priceHistory[
+                priceHistory.length - 2
+            ]
+        );
+
+    const currentPrice =
+        Number(goldPrice);
+
+    const diff =
+        currentPrice -
+        lastPrice;
+
+
+    let buyScore = 0;
+    let sellScore = 0;
+
+
+    if(diff > 0.5){
+        buyScore += 2;
+    }
+    else if(diff < -0.5){
+        sellScore += 2;
+    }
+
+
+    const priceMove =
+        Math.abs(diff);
+
+
+    if(priceMove > 1){
+
+        if(currentPrice > lastPrice){
+            buyScore += 1;
+        }
+        else{
+            sellScore += 1;
+        }
+
+    }
+
+
+    return {
+        buyScore,
+        sellScore
+    };
+
+}
+
+
+/* ==========================================
+   MARKET STRUCTURE
+========================================== */
+
+function analyzeMarketStructure(){
+
+    if(
+        !Array.isArray(candles) ||
+        candles.length < 10
+    ){
+
+        return {
+            signal: "NEUTRAL",
+            buyScore: 0,
+            sellScore: 0,
+            bos: "NONE",
+            choch: "NONE",
+            support: null,
+            resistance: null
+        };
+
+    }
+
+
+    const recent =
+        candles.slice(-10);
+
+
+    const highs =
+        recent.map(
+            candle =>
+                Number(candle.high)
+        ).filter(
+            Number.isFinite
+        );
+
+
+    const lows =
+        recent.map(
+            candle =>
+                Number(candle.low)
+        ).filter(
+            Number.isFinite
+        );
+
+
+    if(
+        highs.length === 0 ||
+        lows.length === 0
+    ){
+
+        return {
+            signal: "NEUTRAL",
+            buyScore: 0,
+            sellScore: 0,
+            bos: "NONE",
+            choch: "NONE",
+            support: null,
+            resistance: null
+        };
+
+    }
+
+
+    const resistance =
+        Math.max(...highs);
+
+    const support =
+        Math.min(...lows);
+
+
+    let buyScore = 0;
+    let sellScore = 0;
+
+    let bos = "NONE";
+    let choch = "NONE";
+    let signal = "NEUTRAL";
+
+
+    if(goldPrice > resistance){
+
+        buyScore += 2;
+        bos = "BULLISH";
+        signal = "BULLISH";
+
+    }
+    else if(goldPrice < support){
+
+        sellScore += 2;
+        bos = "BEARISH";
+        signal = "BEARISH";
+
+    }
+    else if(
+        goldPrice >
+        Number(
+            recent[recent.length - 2].close
+        )
+    ){
+
+        buyScore += 1;
+
+    }
+    else{
+
+        sellScore += 1;
+
+    }
+
+
+    return {
+        signal,
+        buyScore,
+        sellScore,
+        bos,
+        choch,
+        support,
+        resistance
+    };
+
+}
+
+
+/* ==========================================
+   CANDLE CONFIRMATION
+========================================== */
+
+function getCandleConfirmation(){
+
+    if(
+        !Array.isArray(candles) ||
+        candles.length < 2
+    ){
+
+        return {
+            text: "NONE",
+            buyScore: 0,
+            sellScore: 0
+        };
+
+    }
+
+
+    const candle =
+        candles[
+            candles.length - 1
+        ];
+
+
+    const open =
+        Number(candle.open);
+
+    const close =
+        Number(candle.close);
+
+    const high =
+        Number(candle.high);
+
+    const low =
+        Number(candle.low);
+
+
+    if(
+        ![
+            open,
+            close,
+            high,
+            low
+        ].every(Number.isFinite)
+    ){
+
+        return {
+            text: "NONE",
+            buyScore: 0,
+            sellScore: 0
+        };
+
+    }
+
+
+    if(close > open){
+
+        return {
+            text: "🟢 Bullish Candle",
+            buyScore: 1,
+            sellScore: 0
+        };
+
+    }
+
+
+    if(close < open){
+
+        return {
+            text: "🔴 Bearish Candle",
+            buyScore: 0,
+            sellScore: 1
+        };
+
+    }
+
+
+    return {
+        text: "🟡 Neutral Candle",
+        buyScore: 0,
+        sellScore: 0
+    };
+
+}
+
+
+/* ==========================================
+   TRADE LEVEL CALCULATION
+========================================== */
+
+function calculateTradeLevels(
+    signal,
+    entry
+){
+
+    const price =
+        Number(entry);
+
+
+    if(
+        !Number.isFinite(price)
+    ){
+
+        return {
+            entry: price,
+            sl: null,
+            tp1: null,
+            tp2: null,
+            tp3: null,
+            rr: null
+        };
+
+    }
+
+
+    /*
+       Default V1-compatible
+       GoldAI trade distances.
+    */
+
+    const stopDistance = 10;
+
+    const tp1Distance = 10;
+    const tp2Distance = 20;
+    const tp3Distance = 30;
+
+
+    if(signal === "BUY"){
+
+        return {
+
+            entry: price,
+
+            sl:
+                price -
+                stopDistance,
+
+            tp1:
+                price +
+                tp1Distance,
+
+            tp2:
+                price +
+                tp2Distance,
+
+            tp3:
+                price +
+                tp3Distance,
+
+            rr: "1:1 / 1:2 / 1:3"
+
+        };
+
+    }
+
+
+    if(signal === "SELL"){
+
+        return {
+
+            entry: price,
+
+            sl:
+                price +
+                stopDistance,
+
+            tp1:
+                price -
+                tp1Distance,
+
+            tp2:
+                price -
+                tp2Distance,
+
+            tp3:
+                price -
+                tp3Distance,
+
+            rr: "1:1 / 1:2 / 1:3"
+
+        };
+
+    }
+
+
+    return {
+
+        entry: price,
+
+        sl: null,
+        tp1: null,
+        tp2: null,
+        tp3: null,
+        rr: "--"
+
+    };
+
+}
+
+
+/* ==========================================
+   CONFIDENCE
+========================================== */
+
+function calculateConfidence(
+    buyScore,
+    sellScore
+){
+
+    const total =
+        buyScore +
+        sellScore;
+
+
+    if(total <= 0){
+        return 50;
+    }
+
+
+    const difference =
+        Math.abs(
+            buyScore -
+            sellScore
+        );
+
+
+    let confidence =
+        50 +
+        (
+            difference /
+            total
+        ) * 50;
+
+
+    confidence =
+        Math.round(
+            Math.min(
+                99,
+                Math.max(
+                    50,
+                    confidence
+                )
+            )
+        );
+
+
+    return confidence;
+
+}
+
+
+/* ==========================================
+   CONFIDENCE UI
+========================================== */
+
+function updateConfidence(
+    confidence
+){
+
+    const valueElement =
+        document.getElementById(
+            "confidenceValue"
+        );
+
+    const barElement =
+        document.getElementById(
+            "confidenceBar"
+        );
+
+
+    if(valueElement){
+
+        valueElement.innerText =
+            confidence + "%";
+
+    }
+
+
+    if(barElement){
+
+        barElement.style.width =
+            confidence + "%";
+
+        barElement.classList.remove(
+            "high",
+            "medium",
+            "low"
+        );
+
+
+        if(confidence >= 90){
+
+            barElement.classList.add(
+                "high"
+            );
+
+        }
+        else if(confidence >= 75){
+
+            barElement.classList.add(
+                "medium"
+            );
+
+        }
+        else{
+
+            barElement.classList.add(
+                "low"
+            );
+
+        }
+
+    }
+
+}
+
+
+/* ==========================================
+   SIGNAL UI
+========================================== */
+
+function updateSignalUI(
+    signal,
+    confidence
+){
+
+    const signalElement =
+        document.getElementById(
+            "signalValue"
+        );
+
+
+    if(!signalElement){
+        return;
+    }
+
+
+    if(signal === "BUY"){
+
+        signalElement.innerText =
+            "BUY 🟢";
+
+        signalElement.className =
+            "signal-value buy";
+
+    }
+    else if(signal === "SELL"){
+
+        signalElement.innerText =
+            "SELL 🔴";
+
+        signalElement.className =
+            "signal-value sell";
+
+    }
+    else{
+
+        signalElement.innerText =
+            "WAIT 🟡";
+
+        signalElement.className =
+            "signal-value wait";
+
+    }
+
+
+    updateConfidence(
+        confidence
+    );
+
+}
+
+
+/* ==========================================
+   TRADE UI
+========================================== */
+
+function updateTradeUI(
+    levels
+){
+
+    const fields = {
+
+        entryValue: levels.entry,
+
+        slValue: levels.sl,
+
+        tp1Value: levels.tp1,
+
+        tp2Value: levels.tp2,
+
+        tp3Value: levels.tp3,
+
+        rrValue: levels.rr
+
+    };
+
+
+    Object.keys(fields)
+        .forEach(id => {
+
+            const element =
+                document.getElementById(id);
+
+            if(!element){
+                return;
+            }
+
+
+            const value =
+                fields[id];
+
+
+            if(
+                value === null ||
+                value === undefined
+            ){
+
+                element.innerText =
+                    "--";
+
+            }
+            else if(
+                typeof value === "number"
+            ){
+
+                element.innerText =
+                    value.toFixed(2);
+
+            }
+            else{
+
+                element.innerText =
+                    value;
+
+            }
+
+        });
+
+}
+
+
+/* ==========================================
+   DETAILS UI
+========================================== */
+
+function updateDetailsUI(
+    data
+){
+
+    const setText =
+        (
+            id,
+            value
+        ) => {
+
+            const element =
+                document.getElementById(id);
+
+            if(element){
+
+                element.innerText =
+                    value === undefined ||
+                    value === null ||
+                    value === ""
+                        ? "--"
+                        : value;
+
+            }
+
+        };
+
+
+    setText(
+        "detailsEMATrend",
+        emaStatus
+    );
+
+
+    setText(
+        "detailsTrendPower",
+        data.trendPower
+    );
+
+
+    setText(
+        "detailsRSI",
+        Number.isFinite(data.rsi)
+            ? data.rsi.toFixed(2)
+            : "--"
+    );
+
+
+    setText(
+        "detailsRSIZone",
+        data.rsiZone
+    );
+
+
+    setText(
+        "detailsMACD",
+        data.macd
+    );
+
+
+    setText(
+        "detailsATR",
+        data.atr
+    );
+
+
+    setText(
+        "detailsSupport",
+        Number.isFinite(data.support)
+            ? data.support.toFixed(2)
+            : "--"
+    );
+
+
+    setText(
+        "detailsResistance",
+        Number.isFinite(data.resistance)
+            ? data.resistance.toFixed(2)
+            : "--"
+    );
+
+
+    setText(
+        "detailsBOS",
+        data.bos
+    );
+
+
+    setText(
+        "detailsCHoCH",
+        data.choch
+    );
+
+
+    setText(
+        "detailsCandle",
+        data.candle
+    );
+
+
+    setText(
+        "emaScore",
+        data.emaScore
+    );
+
+
+    setText(
+        "rsiScore",
+        data.rsiScore
+    );
+
+
+    setText(
+        "structureScore",
+        data.structureScore
+    );
+
+
+    setText(
+        "divergenceScore",
+        data.divergenceScore
+    );
+
+
+    setText(
+        "totalScore",
+        data.totalScore
+    );
+
+
+    setText(
+        "aiReason",
+        data.reason
+    );
+
+}
+
+
+/* ==========================================
+   AI REASON
+========================================== */
+
+function buildAIReason(
+    signal,
+    data
+){
+
+    if(signal === "BUY"){
+
+        return (
+            "GoldAI detected bullish conditions. " +
+            "EMA trend: " +
+            emaStatus +
+            ". RSI zone: " +
+            data.rsiZone +
+            ". " +
+            "Combined technical score favors BUY."
+        );
+
+    }
+
+
+    if(signal === "SELL"){
+
+        return (
+            "GoldAI detected bearish conditions. " +
+            "EMA trend: " +
+            emaStatus +
+            ". RSI zone: " +
+            data.rsiZone +
+            ". " +
+            "Combined technical score favors SELL."
+        );
+
+    }
+
+
+    return (
+        "GoldAI does not detect enough confirmation " +
+        "between the active indicators. " +
+        "Waiting for stronger market confirmation."
+    );
+
+}
+
+
+/* ==========================================
+   TRADE STATUS
+========================================== */
+
+function updateTradeStatus(
+    signal,
+    confidence
+){
+
+    const statusElement =
+        document.getElementById(
+            "tradeStatus"
+        );
+
+    const reasonElement =
+        document.getElementById(
+            "tradeReason"
+        );
+
+
+    if(!statusElement){
+        return;
+    }
+
+
+    if(signal === "WAIT"){
+
+        statusElement.innerText =
+            "🟡 WAIT";
+
+        if(reasonElement){
+
+            reasonElement.innerText =
+                "Waiting for stronger confirmation.";
+
+        }
+
+        return;
+
+    }
+
+
+    if(confidence >= 75){
+
+        statusElement.innerText =
+            "🟢 SAFE TO TRADE";
+
+        if(reasonElement){
+
+            reasonElement.innerText =
+                "Signal confirmation is acceptable.";
+
+        }
+
+    }
+    else{
+
+        statusElement.innerText =
+            "🟡 CAUTION";
+
+        if(reasonElement){
+
+            reasonElement.innerText =
+                "Signal exists but confirmation is limited.";
+
+        }
+
+    }
+
+}
+
+
+/* ==========================================
+   BUILD RESULT
+========================================== */
+
+function buildAnalysisResult(){
+
+    const prices =
+        priceHistory.slice();
+
+
+    const rsiValues = [];
+
+
+    for(
+        let i = 0;
+        i < prices.length;
+        i++
+    ){
+
+        const subset =
+            prices.slice(
+                0,
+                i + 1
+            );
+
+
+        const value =
+            calculateRSI(
+                subset,
+                14
+            );
+
+
+        if(value !== null){
+
+            rsiValues.push(value);
+
+        }
+
+    }
+
+
+    const rsi =
+        calculateRSI(
+            prices,
+            14
+        );
+
+
+    const rsiZone =
+        getRSIZone(rsi);
+
+
+    const rsiScore =
+        getRSIScore(rsi);
+
+
+    const divergence =
+        detectRSIDivergence(
+            prices,
+            rsiValues
+        );
+
+
+    const emaScore =
+        getEMAScore();
+
+
+    const momentumScore =
+        getPriceMomentumScore();
+
+
+    const structure =
+        analyzeMarketStructure();
+
+
+    const candle =
+        getCandleConfirmation();
+
+
+    let buyScore =
+        emaScore.buyScore +
+        rsiScore.buyScore +
+        divergence.buyScore +
+        momentumScore.buyScore +
+        structure.buyScore +
+        candle.buyScore;
+
+
+    let sellScore =
+        emaScore.sellScore +
+        rsiScore.sellScore +
+        divergence.sellScore +
+        momentumScore.sellScore +
+        structure.sellScore +
+        candle.sellScore;
+
+
+    let signal = "WAIT";
+
+
+    /*
+       V1-style  
+  <!-- ==========================================
+     GOLD AI V2 MODULES
+========================================== -->
+
+<script src="modules/storage.js"></script>
+
+<script src="modules/history.js"></script>
+
+<script src="modules/settings.js"></script>
+
+<script src="modules/dashboard.js"></script>
+
+<script src="modules/details.js"></script>
+
+
+<!-- ==========================================
+     V1 / V2 ENGINES
+========================================== -->
+
+<script src="market-structure-v1.js"></script>
+
+<script src="rsi-engine-v1.js"></script>
+
+<script src="rsi-divergence-v1.js"></script>
+
+<script src="score-engine.js"></script>
+
+
+<!-- ==========================================
+     V2 ENGINES DIRECTORY
+========================================== -->
+
+<script src="engines/rsi-engine-v2.js"></script>
+
+
+<!-- ==========================================
+     APP.JS
+========================================== -->
+
+<script src="app.js"></script>
+
+
+<!-- ==========================================
+     GOLD AI COMPATIBILITY LAYER
+========================================== -->
+
+<script>
+
+(function(){
+
+    "use strict";
+
+
+    /*
+     * GoldAI Pro V2 Compatibility Layer
+     *
+     * V1 remains the primary signal engine.
+     * V2 modules consume the V1 result.
+     */
+
+
+    window.GoldAI_Pro_V2 = {
+
+        version: "2.0",
+
+        initialized: false,
+
+        v1Result: null,
+
+        v2Result: null
+
+    };
+
+
+    /* ==========================================
+       V1 RESULT ACCESS
+    ========================================== */
+
+    function getV1Result(){
+
+        return (
+            window.GoldAI_V1_Result ||
+            window.GoldAI_Result ||
+            null
+        );
+
+    }
+
+
+    /* ==========================================
+       V2 SUPPLEMENTAL RSI
+    ========================================== */
+
+    function runRSIV2(){
+
+        try{
+
+            if(
+                window.GoldAI_RSI_V2 &&
+                typeof
+                window.GoldAI_RSI_V2.analyzeRSIEngine ===
+                "function"
+            ){
+
+                const result =
+                    window.GoldAI_RSI_V2
+                        .analyzeRSIEngine(
+                            window.priceHistory ||
+                            []
+                        );
+
+
+                window.GoldAI_Pro_V2.v2Result =
+                    result;
+
+
+                return result;
+
+            }
+
+        }
+        catch(error){
+
+            console.warn(
+                "GoldAI RSI V2:",
+                error
+            );
+
+        }
+
+
+        return null;
+
+    }
+
+
+    /* ==========================================
+       UPDATE V2 DETAILS ONLY
+    ========================================== */
+
+    function updateSupplementalDetails(){
+
+        const v1 =
+            getV1Result();
+
+
+        if(!v1){
+            return;
+        }
+
+
+        window.GoldAI_Pro_V2.v1Result =
+            v1;
+
+
+        const rsiV2 =
+            runRSIV2();
+
+
+        if(
+            rsiV2 &&
+            Number.isFinite(
+                Number(
+                    rsiV2.rsiValue
+                )
+            )
+        ){
+
+            const rsiElement =
+                document.getElementById(
+                    "detailsRSI"
+                );
+
+
+            const zoneElement =
+                document.getElementById(
+                    "detailsRSIZone"
+                );
+
+
+            if(rsiElement){
+
+                rsiElement.innerText =
+                    Number(
+                        rsiV2.rsiValue
+                    ).toFixed(2);
+
+            }
+
+
+            if(zoneElement){
+
+                zoneElement.innerText =
+                    rsiV2.zone ||
+                    "--";
+
+            }
+
+        }
+
+    }
+
+
+    /* ==========================================
+       APP.JS CALLBACK
+    ========================================== */
+
+    window.GoldAI_V2_OnV1Result =
+        function(result){
+
+            window.GoldAI_Pro_V2.v1Result =
+                result;
+
+
+            /*
+             * Important:
+             * Do NOT change BUY / SELL / WAIT here.
+             *
+             * V1 remains the primary signal.
+             */
+
+            updateSupplementalDetails();
+
+        };
+
+
+    /* ==========================================
+       INITIALIZATION
+    ========================================== */
+
+    function initialize(){
+
+        if(
+            window.GoldAI_Pro_V2.initialized
+        ){
+
+            return;
+
+        }
+
+
+        window.GoldAI_Pro_V2.initialized =
+            true;
+
+
+        updateSupplementalDetails();
+
+
+        console.log(
+            "✅ GoldAI Pro V2 Compatibility Layer Loaded"
+        );
+
+    }
+
+
+    /*
+     * Give external modules a chance
+     * to finish loading before initialization.
+     */
+
+    if(
+        document.readyState ===
+        "loading"
+    ){
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            initialize
+        );
+
+    }
+    else{
+
+        initialize();
+
+    }
+
+
+})();
+
+</script>
+
+
+<!-- ==========================================
+     FINAL APP INTEGRATION
+========================================== -->
+
+<script>
+
+(function(){
+
+    "use strict";
+
+
+    /*
+     * Preserve any existing app.js
+     * functionality.
+     */
+
+    const originalAnalyze =
+        window.analyze;
+
+
+    if(
+        typeof originalAnalyze ===
+        "function"
+    ){
+
+        window.analyze =
+            async function(){
+
+                const result =
+                    await originalAnalyze.apply(
+                        this,
+                        arguments
+                    );
+
+
+                try{
+
+                    if(
+                        window.GoldAI_V2_OnV1Result &&
+                        window.GoldAI_V1_Result
+                    ){
+
+                        window.GoldAI_V2_OnV1Result(
+                            window.GoldAI_V1_Result
+                        );
+
+                    }
+
+                }
+                catch(error){
+
+                    console.warn(
+                        "V2 integration:",
+                        error
+                    );
+
+                }
+
+
+                return result;
+
+            };
+
+    }
+
+
+    /*
+     * Keep the V1 result available
+     * for app.js and external modules.
+     */
+
+    window.getGoldAIV1Result =
+        function(){
+
+            return (
+                window.GoldAI_V1_Result ||
+                null
+            );
+
+        };
+
+
+    /*
+     * Keep the current GoldAI price
+     * available globally.
+     */
+
+    window.getGoldAIPrice =
+        function(){
+
+            return Number(
+                window.goldPrice ||
+                0
+            );
+
+        };
+
+
+    console.log(
+        "✅ GoldAI V1 → V2 integration ready"
+    );
+
+
+})();
+
+</script>
+
+
+<!-- ==========================================
+     FINAL STARTUP
+========================================== -->
+
+<script>
+
+(function(){
+
+    "use strict";
+
+
+    function finalStartup(){
+
+        try{
+
+            /*
+             * Restore settings.
+             */
+
+            if(
+                typeof loadSettingsUI ===
+                "function"
+            ){
+
+                loadSettingsUI();
+
+            }
+
+
+            /*
+             * Restore history.
+             */
+
+            if(
+                typeof renderHistory ===
+                "function"
+            ){
+
+                renderHistory();
+
+            }
+
+
+            /*
+             * Restore market state.
+             */
+
+            if(
+                typeof updateMarketStatus ===
+                "function"
+            ){
+
+                updateMarketStatus();
+
+            }
+
+
+            /*
+             * Restore current price.
+             */
+
+            if(
+                typeof updatePriceUI ===
+                "function"
+            ){
+
+                updatePriceUI();
+
+            }
+
+
+            /*
+             * Initialize V2.
+             */
+
+            if(
+                window.GoldAI_V2_OnV1Result &&
+                window.GoldAI_V1_Result
+            ){
+
+                window.GoldAI_V2_OnV1Result(
+                    window.GoldAI_V1_Result
+                );
+
+            }
+
+
+            console.log(
+                "🚀 GoldAI Pro V2 Started"
+            );
+
+        }
+        catch(error){
+
+            console.error(
+                "GoldAI Startup Error:",
+                error
+            );
+
+        }
+
+    }
+
+
+    if(
+        document.readyState ===
+        "loading"
+    ){
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            finalStartup
+        );
+
+    }
+    else{
+
+        finalStartup();
+
+    }
+
+
+})();
+
+</script>
+
+
+<!-- ==========================================
+     GLOBAL ERROR PROTECTION
+========================================== -->
+
+<script>
+
+window.addEventListener(
+    "error",
+    function(event){
+
+        console.error(
+            "GoldAI Runtime Error:",
+            event.error ||
+            event.message
+        );
+
+    }
+);
+
+
+window.addEventListener(
+    "unhandledrejection",
+    function(event){
+
+        console.error(
+            "GoldAI Promise Error:",
+            event.reason
+        );
+
+    }
+);
+
+</script>
+
+
+</body>
+</html>
