@@ -1173,6 +1173,7 @@ ${history}
 document.getElementById("status").innerHTML="🟢 Analysis Complete";
 
 }
+```html
 function copySignal(){
 
 let text =
@@ -1192,7 +1193,7 @@ navigator.clipboard.writeText(text);
 alert("✅ Signal Copied");
 
 }
-    
+
 function shareSignal(){
 
 let text =
@@ -1223,11 +1224,71 @@ alert("📋 Share not supported - Signal Copied");
 }
 
 }
+
+
+/* =====================================
+   GOLD AI V1 → V2 BRIDGE
+   ===================================== */
+
+window.GoldAI_V1_Result = {
+
+    signal: signal,
+
+    confidence: confidence,
+
+    entry: entry,
+
+    stopLoss: sl,
+
+    takeProfit: tp,
+
+    riskReward: rr,
+
+    score: aiScore,
+
+    buyScore: buyScore,
+
+    sellScore: sellScore,
+
+    reason: reason,
+
+    ema20: ema20,
+
+    ema50: ema50,
+
+    emaStatus: emaStatus,
+
+    trendPower: trendPower,
+
+    emaStrength: emaStrength
+
+};
+
+
+/* =====================================
+   SEND RESULT TO V2
+   ===================================== */
+
+if(window.startGoldAIAnalysis){
+
+    startGoldAIAnalysis();
+
+}
+
+
+/* =====================================
+   V1 STARTUP
+   ===================================== */
+
 loadGoldPrice();
+
 loadCandles();
+
 </script>
+```
 
 </div>
 
 </body>
 </html>
+
