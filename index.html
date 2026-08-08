@@ -1,1 +1,603 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>GoldAI</title>
+
+<style>
+body{
+margin:0;
+padding:20px;
+font-family:Arial,sans-serif;
+background:#111;
+color:white;
+text-align:center;
+}
+
+h1{
+color:#FFD700;
+}
+
+.box{
+background:#222;
+margin:20px auto;
+padding:20px;
+border-radius:15px;
+max-width:400px;
+}
+
+button{
+background:#FFD700;
+color:#000;
+border:none;
+padding:15px 30px;
+font-size:18px;
+border-radius:12px;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:#ffea4d;
+}
+
+#result{
+margin-top:20px;
+font-size:18px;
+line-height:1.8;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>GoldAI</h1>
+<p style="color:#999;font-size:14px;">
+Version 1.1 | by Mohsen
+</p>
+<div class="box">
+<h2>🥇 XAUUSD</h2>
+<p id="goldPrice" style="font-size:24px;color:#FFD700;">
+🥇 XAUUSD : Loading...
+</p>
+</div>
+<div class="box">
+
+<h2>💰 Risk Calculator</h2>
+
+<p>
+Capital :
+<span id="capitalText">97</span> $
+</p>
+
+<p>Risk : 2%</p>
+
+<p style="color:#00ff66;">
+Max Loss :
+<span id="maxLossText">1.94</span> $
+</p>
+
+<p style="color:#FFD700;">
+Suggested Lot :
+<span id="lotText">0.01</span>
+</p>
+
+<button onclick="changeCapital()">
+⚙️ Change Capital
+</button>
+
+</div>
+<div class="box">
+<h2>🤖 AI STATUS</h2>
+<p id="status">🟢 Ready</p>
+</div>
+<div class="box">
+
+<h2>🌍 MARKET STATUS</h2>
+
+<p id="marketStatus">Checking...</p>
+
+<p id="marketSession">Session: --</p>
+
+<p id="marketCountdown">Next Change: --</p>
+
+</div>
+<div class="box">
+
+<h2>🚦 TRADE STATUS</h2>
+
+<h1 id="tradeStatus"
+style="color:lime;">
+🟢 SAFE TO TRADE
+</h1>
+
+<p id="tradeReason">
+Market conditions are acceptable.
+</p>
+
+</div>
+<div class="box">
+<h2>XAUUSD</h2>
+<p>AI Gold Analysis</p>
+<p>Timeframe: M1 + M5</p>
+<p>M15 Trend Filter: Active</p>
+</div>
+
+<div class="box">
+<h2>Risk Manager</h2>
+<p>Small Account Mode: ON</p>
+<p>Max Trades: 3 / Day</p>
+</div>
+
+<div class="box">
+
+<button id="analyzeBtn" onclick="analyze()">
+Start AI Analysis
+</button>
+
+<div id="result"></div>
+<script>
+let useRealPrice = true;
+async function loadGoldPrice(){
+
+if(!useRealPrice){
+    return;
+}
+
+try{
+
+const response = await fetch("https://api.twelvedata.com/price?symbol=XAU/USD&apikey=3302af6a7da54960b1dcef8db0edf78b");
+
+if(!response.ok){
+    throw new Error("API Error");
+}
+
+const data = await response.json();
+
+if(data.price){
+
+goldPrice = Number(data.price);
+
+document.getElementById("goldPrice").innerHTML =
+"🥇 XAUUSD : " + goldPrice.toFixed(2);
+
+}
+
+}catch(error){
+
+console.log("Gold Price Error:",error);
+
+}
+
+}
+async function loadCandles(){
+
+    if(!useRealPrice){
+        return;
+    }
+
+    try{
+
+        const response = await fetch(
+        "https://api.twelvedata.com/time_series?symbol=XAU/USD&interval=1min&outputsize=100&apikey=3302af6a7da54960b1dcef8db0edf78b"
+        );
+
+        const data = await response.json();
+
+        if(data.values){
+
+    candles = data.values.reverse();
+
+    let closePrices = candles.map(candle => Number(candle.close));
+
+let ema20 = calculateEMA(closePrices, 20);
+let ema50 = calculateEMA(closePrices, 50);
+let trendStrength = 0;
+
+if(ema20 !== null && ema50 !== null){
+    trendStrength = Math.abs(ema20 - ema50);
+    }
+
+if(ema20 !== null && ema50 !== null){
+
+    if(goldPrice > ema20 && ema20 > ema50){
+        emaStatus = "🟢 Bullish";
+    }
+    else if(goldPrice < ema20 && ema20 < ema50){
+        emaStatus = "🔴 Bearish";
+    }
+    else{
+        emaStatus = "🟡 Neutral";
+    }
+
+}
+console.log("EMA20:", ema20);
+console.log(closePrices);
+console.log("EMA50:", ema50);
+        }
+
+    }catch(error){
+
+        console.log("Candles Error:", error);
+
+    }
+
+}
+let goldPrice=4035;
+let candles = [];
+let emaStatus = "-";
+function calculateEMA(prices, period){
+
+    if(prices.length < period){
+        return null;
+    }
+
+    let multiplier = 2 / (period + 1);
+
+    let ema = prices
+        .slice(0, period)
+        .reduce((sum, price) => sum + price, 0) / period;
+
+    for(let i = period; i < prices.length; i++){
+        ema = (prices[i] - ema) * multiplier + ema;
+    }
+
+    return ema;
+
+}
+if(localStorage.getItem("capital")){
+    document.getElementById("capitalText").innerHTML =
+    localStorage.getItem("capital");
+    }
+let riskPercent = 2;
+
+let currentCapital =
+Number(localStorage.getItem("capital") || 97);
+
+document.getElementById("maxLossText").innerHTML =
+((currentCapital * riskPercent) / 100).toFixed(2);
+let suggestedLot = (currentCapital / 10000).toFixed(2);
+
+if(suggestedLot < 0.01){
+    suggestedLot = 0.01;
+}
+
+document.getElementById("lotText").innerHTML = suggestedLot;
+setInterval(function(){
+
+loadGoldPrice();
+
+if(!useRealPrice){
+goldPrice=(4030 + Math.random()*10);
+}
+
+document.getElementById("goldPrice").innerHTML =
+"🥇 XAUUSD : " + goldPrice.toFixed(2);
+
+},10000);
+function updateMarketStatus(){
+
+let now = new Date();
+
+let day = now.getUTCDay();
+let hour = now.getUTCHours();
+let minute = now.getUTCMinutes();
+let second = now.getUTCSeconds();
+
+let marketOpen = true;
+let session = "Sydney";
+
+if(day == 6){
+    marketOpen = false;
+}
+else if(day == 0 && hour < 22){
+    marketOpen = false;
+}
+else if(day == 5 && hour >= 22){
+    marketOpen = false;
+}
+
+if(hour >= 0 && hour < 7){
+    session = "Sydney";
+}
+else if(hour >= 7 && hour < 12){
+    session = "Tokyo";
+}
+else if(hour >= 12 && hour < 17){
+    session = "London";
+}
+else{
+    session = "New York";
+}
+
+let countdown = "";
+
+if(marketOpen){
+
+    let remainHours = 21 - hour;
+    let remainMinutes = 59 - minute;
+    let remainSeconds = 59 - second;
+
+    if(remainSeconds < 0){
+        remainSeconds += 60;
+        remainMinutes--;
+    }
+
+    if(remainMinutes < 0){
+        remainMinutes += 60;
+        remainHours--;
+    }
+
+    countdown =
+    remainHours + "h " +
+    remainMinutes + "m " +
+    remainSeconds + "s";
+
+    document.getElementById("marketStatus").innerHTML =
+    "🟢 Gold Market: OPEN";
+
+    document.getElementById("marketSession").innerHTML =
+    "🕒 Session: " + session;
+
+    document.getElementById("marketCountdown").innerHTML =
+    "⏳ Next Close: " + countdown;
+
+    
+document.getElementById("tradeStatus").innerHTML =
+"🟢 SAFE TO TRADE";
+
+document.getElementById("tradeStatus").style.color =
+"lime";
+
+document.getElementById("tradeReason").innerHTML =
+"Market is open and trading is allowed.";
+}
+else{
+
+    document.getElementById("marketStatus").innerHTML =
+    "🔴 Gold Market: CLOSED";
+
+    document.getElementById("marketSession").innerHTML =
+    "📅 Weekend";
+
+    document.getElementById("marketCountdown").innerHTML =
+    "⏳ Waiting for Market Open";
+
+
+document.getElementById("tradeStatus").innerHTML =
+"🔴 DO NOT TRADE";
+
+document.getElementById("tradeStatus").style.color =
+"red";
+
+document.getElementById("tradeReason").innerHTML =
+"Market is closed. Trading is not allowed.";
+}
+
+}
+
+updateMarketStatus();
+
+setInterval(updateMarketStatus,1000);
+function changeCapital(){
+
+let newCapital = prompt("Enter your capital ($)", localStorage.getItem("capital") || "97");
+
+if(newCapital===null){
+    return;
+}
+
+newCapital = Number(newCapital);
+
+if(isNaN(newCapital) || newCapital<=0){
+
+    alert("Please enter a valid number.");
+
+    return;
+
+}
+
+localStorage.setItem("capital", newCapital);
+
+document.getElementById("capitalText").innerHTML = newCapital;
+document.getElementById("maxLossText").innerHTML =
+((newCapital * 2) / 100).toFixed(2);
+let suggestedLot = (newCapital / 10000).toFixed(2);
+
+if(suggestedLot < 0.01){
+    suggestedLot = 0.01;
+}
+
+document.getElementById("lotText").innerHTML = suggestedLot;
+alert("✅ Capital Updated");
+
+}
+function analyze(){
+
+let marketText =
+document.getElementById("marketStatus").innerText;
+
+if(marketText.includes("CLOSED")){
+
+    alert("⚠️ Gold Market is CLOSED.\n\nThe analysis is for educational purposes only because the market is currently closed.");
+
+}
+
+document.getElementById("status").innerHTML="🟡 Analyzing...";
+let closePrices = candles.map(candle => Number(candle.close));
+//alert("Candles = " + candles.length);
+let ema20 = calculateEMA(closePrices, 20);
+let ema50 = calculateEMA(closePrices, 50);
+// Update EMA Trend
+
+if(ema20 !== null && ema50 !== null){
+
+    if(goldPrice > ema20 && ema20 > ema50){
+        emaStatus = "🟢 Bullish";
+    }
+    else if(goldPrice < ema20 && ema20 < ema50){
+        emaStatus = "🔴 Bearish";
+    }
+    else{
+        emaStatus = "🟡 Neutral";
+    }
+
+}
+// EMA Trend Strength
+
+let emaStrength = 0;
+let trendPower = "Weak";
+
+if(ema20 !== null && ema50 !== null){
+
+    emaStrength = Math.abs(ema20 - ema50);
+
+    if(emaStrength >= 3){
+        trendPower = "Strong";
+    }
+    else if(emaStrength >= 1){
+        trendPower = "Medium";
+    }
+    else{
+        trendPower = "Weak";
+    }
+
+}
+// Trend Power affects AI Confidence
+
+let confidenceBonus = 0;
+
+if(trendPower == "Strong"){
+    confidenceBonus = 5;
+}
+else if(trendPower == "Medium"){
+    confidenceBonus = 0;
+}
+else{
+    confidenceBonus = -7;
+    }
+// =====================
+// GoldAI Score Engine
+// =====================
+
+let buyScore = 0;
+let sellScore = 0;
+// Market Quality Score
+
+let marketQuality = 0;
+
+if(emaStatus == "🟢 Bullish" || emaStatus == "🔴 Bearish"){
+    marketQuality += 2;
+}
+
+if(trendPower == "Strong"){
+    marketQuality += 3;
+}
+else if(trendPower == "Medium"){
+    marketQuality += 2;
+}
+else{
+    marketQuality += 0;
+}
+
+if(emaStrength >= 1){
+    marketQuality += 1;
+    }
+if(ema20 !== null){
+
+    if(goldPrice > ema20){
+        buyScore += 2;
+    }else{
+        sellScore += 2;
+    }
+
+}
+
+if(ema50 !== null){
+
+    if(goldPrice > ema50){
+        buyScore += 2;
+    }else{
+        sellScore += 2;
+    }
+
+}
+// EMA20 Distance Strength
+
+if(ema20 !== null){
+
+    let emaDistance = Math.abs(goldPrice - ema20);
+
+    if(emaDistance > 2){
+
+        if(goldPrice > ema20){
+            buyScore += 1;
+        }
+        else{
+            sellScore += 1;
+        }
+
+    }
+
+}
+// EMA Trend Confirmation
+
+if(ema20 !== null && ema50 !== null){
+
+    if(ema20 > ema50){
+        buyScore += 2;
+    }
+
+    else if(ema20 < ema50){
+        sellScore += 2;
+    }
+
+}
+// EMA Trend Penalty
+
+if(ema20 !== null && ema50 !== null){
+
+    if(ema20 > ema50){
+
+        // روند صعودی است، فروش ضعیف می‌شود
+        sellScore -= 2;
+
+    }
+
+    else if(ema20 < ema50){
+
+        // روند نزولی است، خرید ضعیف می‌شود
+        buyScore -= 2;
+
+    }
+
+}
+// EMA Conflict Penalty
+
+if(ema20 !== null && ema50 !== null){
+
+    if(ema20 < ema50 && goldPrice > ema20){
+        buyScore -= 1;
+    }
+
+    if(ema20 > ema50 && goldPrice < ema20){
+        sellScore -= 1;
+    }
+
+}
+// Trend Power Score
+
+if(emaStrength >= 3){
+
+    if(ema20 > ema50){
+        buyScore += 2;
+    }
+
+    else if(ema20 < ema50){
+        sellScore += 2;
+    }
+
+}
