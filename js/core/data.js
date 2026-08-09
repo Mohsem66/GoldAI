@@ -5,14 +5,14 @@
 window.GoldAI_Data = {
 
   goldPrice: 0,
-  candles: { m1: [], m5: [], m15: [], h1: [] },
-  closes: { m1: [], m5: [], m15: [], h1: [] },
-  highs:  { m1: [], m5: [], m15: [], h1: [] },
-  lows:   { m1: [], m5: [], m15: [], h1: [] },
-  volumes:{ m1: [], m5: [], m15: [], h1: [] },
+  candles: { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
+  closes: { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
+  highs:  { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
+  lows:   { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
+  volumes:{ m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
 
   mapTF(tf) {
-    const m = { "1min": "m1", "5min": "m5", "15min": "m15", "1h": "h1" };
+    const m = { "1min": "m1", "5min": "m5", "15min": "m15", "1h": "h1", "4h": "h4", "1day": "daily" };
     return m[tf] || "m5";
   },
 
@@ -41,16 +41,20 @@ window.GoldAI_Data = {
   async loadAll() {
     const cfg = window.GoldAI_Config;
     try {
-      const [m1, m5, m15, h1] = await Promise.all([
+      const [m1, m5, m15, h1, h4, daily] = await Promise.all([
         this.fetchSeries(cfg.TF_SCALP),
         this.fetchSeries(cfg.TF_ENTRY),
         this.fetchSeries(cfg.TF_SWING),
-        this.fetchSeries(cfg.TF_TREND)
+        this.fetchSeries(cfg.TF_TREND),
+        this.fetchSeries(cfg.TF_H4),
+        this.fetchSeries(cfg.TF_DAILY)
       ]);
       if (m1) this.store("m1", m1);
       if (m5) this.store("m5", m5);
       if (m15) this.store("m15", m15);
       if (h1) this.store("h1", h1);
+      if (h4) this.store("h4", h4);
+      if (daily) this.store("daily", daily);
 
       const primary = this.closes.m5.length ? this.closes.m5 : this.closes.m1;
       if (primary.length) this.goldPrice = primary[primary.length - 1];
@@ -101,7 +105,7 @@ window.GoldAI_Data = {
       }
       return { c, cl, h, l, v };
     };
-    ["m1", "m5", "m15", "h1"].forEach((k, i) => {
+    ["m1", "m5", "m15", "h1", "h4", "daily"].forEach((k, i) => {
       const g = gen(100, 0.8 + i * 0.4);
       this.candles[k] = g.c;
       this.closes[k] = g.cl;
