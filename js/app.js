@@ -1,10 +1,12 @@
 // =====================================
-// GoldAI Pro — Main Orchestrator
+// GoldAI Pro — AI-Enhanced Main Orchestrator
 // =====================================
 
 window.GoldAI = {
 
   lastResult: null,
+  backendURL: 'http://localhost:5000/api',
+  currentUID: null,
 
   async init() {
     const data = window.GoldAI_Data;
@@ -14,12 +16,142 @@ window.GoldAI = {
     this.updatePriceUI();
     this.updateMarketClock();
     this.updateRiskUI();
+    this.setupSettingsPanel();
     setInterval(() => this.updateMarketClock(), 1000);
     setInterval(async () => {
       await data.loadPrice();
       this.updatePriceUI();
     }, window.GoldAI_Config.PRICE_REFRESH_MS);
     console.log("✅ GoldAI Pro ready");
+  },
+
+  // ===== Settings Panel Setup =====
+  setupSettingsPanel() {
+    const settingsBtn = document.querySelector('[onclick="GoldAI.openSettings()"]') || 
+                       document.querySelector('[data-action="settings"]');
+    if (!settingsBtn) {
+      // ایجاد دکمه Settings اگر وجود ندارد
+      const newBtn = document.createElement('button');
+      newBtn.className = 'btn-ghost';
+      newBtn.textContent = '⚙️ تنظیمات';
+      newBtn.onclick = () => this.openSettings();
+      const riskCard = document.querySelector('.card');
+      if (riskCard) riskCard.appendChild(newBtn);
+    }
+  },
+
+  openSettings() {
+    const html = `
+      <div id="settingsModal" class="modal">
+        <div class="modal-content">
+          <h3>⚙️ تنظیمات تجارتی</h3>
+          
+          <div class="settings-group">
+            <label>سرمایه ($)</label>
+            <input type="number" id="settingCapital" value="${window.GoldAI_Data.getCapital()}" min="100">
+          </div>
+
+          <div class="settings-group">
+            <label>درصد ریسک (%)</label>
+            <input type="number" id="settingRisk" value="${window.GoldAI_Config.DEFAULT_RISK_PERCENT}" min="0.1" max="5" step="0.1">
+          </div>
+
+          <div class="settings-group">
+            <label>لات</label>
+            <input type="number" id="settingLot" value="0.01" min="0.01" step="0.01">
+          </div>
+
+          <div class="settings-group">
+            <label>Risk:Reward نسبت</label>
+            <input type="number" id="settingRR" value="${window.GoldAI_Config.RISK_REWARD || 2}" min="1" max="10" step="0.5">
+          </div>
+
+          <div class="settings-group">
+            <label>Firebase UID</label>
+            <input type="text" id="settingUID" placeholder="برای sync بین دستگاه‌ها">
+          </div>
+
+          <div class="settings-actions">
+            <button class="btn-main" onclick="GoldAI.saveSettings()">✅ ذخیره</button>
+            <button class="btn-ghost" onclick="GoldAI.closeSettings()">❌ بستن</button>
+          </div>
+        </div>
+      </div>
+      <style>
+        .modal {
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0,0,0,0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 999;
+        }
+        .modal-content {
+          background: #1a1a2e;
+          border-radius: 12px;
+          padding: 24px;
+          max-width: 400px;
+          width: 90%;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .modal-content h3 {
+          margin-bottom: 20px;
+          text-align: right;
+        }
+        .settings-group {
+          margin-bottom: 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .settings-group label {
+          text-align: right;
+          font-size: 14px;
+          color: #aaa;
+        }
+        .settings-group input {
+          padding: 10px;
+          background: #0f0f1e;
+          border: 1px solid #444;
+          border-radius: 6px;
+          color: #fff;
+          text-align: right;
+          font-family: monospace;
+        }
+        .settings-actions {
+          display: flex;
+          gap: 10px;
+          margin-top: 24px;
+        }
+        .settings-actions button {
+          flex: 1;
+        }
+      </style>
+    `;
+    document.body.insertAdjacentHTML('beforeend', html);
+  },
+
+  saveSettings() {
+    const capital = Number(document.getElementById('settingCapital').value);
+    const risk = Number(document.getElementById('settingRisk').value);
+    const lot = Number(document.getElementById('settingLot').value);
+    const rr = Number(document.getElementById('settingRR').value);
+    const uid = document.getElementById('settingUID').value;
+
+    if (capital > 0) window.GoldAI_Data.setCapital(capital);
+    window.GoldAI_Config.DEFAULT_RISK_PERCENT = risk;
+    window.GoldAI_Config.RISK_REWARD = rr;
+    this.currentUID = uid;
+
+    localStorage.setItem('goldai_settings', JSON.stringify({ capital, risk, lot, rr, uid }));
+    this.updateRiskUI();
+    this.closeSettings();
+    alert('✅ تنظیمات ذخیره شد');
+  },
+
+  closeSettings() {
+    document.getElementById('settingsModal')?.remove();
   },
 
   updatePriceUI() {
@@ -46,6 +178,9 @@ window.GoldAI = {
     const now = new Date();
     const day = now.getUTCDay();
     const hour = now.getUTCHours();
+    const min = now.getUTCMinutes();
+    const sec = now.getUTCSeconds();
+    
     let open = true;
     if (day === 6) open = false;
     if (day === 0 && hour < 22) open = false;
@@ -59,12 +194,27 @@ window.GoldAI = {
     const ms = document.getElementById("marketStatus");
     const ss = document.getElementById("marketSession");
     const ts = document.getElementById("tradeStatus");
+    const timeDisplay = document.getElementById("timeDisplay") || this.createTimeDisplay();
+    
     if (ms) ms.textContent = open ? "🟢 OPEN" : "🔴 CLOSED";
     if (ss) ss.textContent = session;
     if (ts) {
       ts.textContent = open ? "SAFE TO TRADE" : "DO NOT TRADE";
       ts.className = open ? "ok" : "bad";
     }
+    if (timeDisplay) {
+      timeDisplay.textContent = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')} UTC`;
+    }
+  },
+
+  createTimeDisplay() {
+    const header = document.querySelector('.header');
+    if (!header) return null;
+    const timeEl = document.createElement('p');
+    timeEl.id = 'timeDisplay';
+    timeEl.style.cssText = 'margin: 10px 0; font-size: 14px; color: #aaa; font-family: monospace;';
+    header.appendChild(timeEl);
+    return timeEl;
   },
 
   changeCapital() {
@@ -91,7 +241,7 @@ window.GoldAI = {
       await data.loadPrice();
       this.updatePriceUI();
 
-      // Primary TF = M5, HTF = H1
+      // Primary TF = M5, HTF = H1, M1 = Scalp
       const closes = data.closes.m5;
       const highs = data.highs.m5;
       const lows = data.lows.m5;
@@ -103,7 +253,11 @@ window.GoldAI = {
       const htfHighs = data.highs.h1.length ? data.highs.h1 : data.highs.m15;
       const htfLows = data.lows.h1.length ? data.lows.h1 : data.lows.m15;
 
-      // --- Engines ---
+      const m1Closes = data.closes.m1 || [];
+      const m1Highs = data.highs.m1 || [];
+      const m1Lows = data.lows.m1 || [];
+
+      // --- Engines (Enhanced) ---
       const ema = window.GoldAI_EMA.analyzeEMA(closes, price, cfg);
       const rsi = window.GoldAI_RSI.analyzeRSI(closes, cfg);
       const div = window.GoldAI_Divergence.analyzeDivergence(closes, rsi.history || []);
@@ -116,16 +270,26 @@ window.GoldAI = {
       const candleP = window.GoldAI_Candles.analyzeCandles(candles);
       const liq = window.GoldAI_Liquidity.analyzeLiquidity(highs, lows, closes);
 
-      // HTF bias
+      // HTF bias (Enhanced)
       const htfEma = window.GoldAI_EMA.analyzeEMA(htfCloses, htfCloses[htfCloses.length - 1], cfg);
       const htfStr = window.GoldAI_MarketStructure.analyzeMarketStructure(htfHighs, htfLows, htfCloses, cfg);
       const htf = {
-        trend: htfStr.trend !== "UNKNOWN" ? htfStr.trend : htfEma.trend
+        trend: htfStr.trend !== "UNKNOWN" ? htfStr.trend : htfEma.trend,
+        strength: htfEma.confidence > 70 ? "STRONG" : "WEAK"
       };
+
+      // M1 Scalp Context
+      let m1 = null;
+      if (m1Closes.length > 5) {
+        const m1Ema = window.GoldAI_EMA.analyzeEMA(m1Closes, m1Closes[m1Closes.length - 1], cfg);
+        m1 = {
+          microstructure: m1Ema.trend
+        };
+      }
 
       const layers = {
         ema, rsi, divergence: div, structure, macd, adx,
-        atr: atrL, volume, sr, candles: candleP, liquidity: liq, htf
+        atr: atrL, volume, sr, candles: candleP, liquidity: liq, htf, m1
       };
 
       const raw = window.GoldAI_Score.runScoreEngine(layers);
@@ -140,19 +304,22 @@ window.GoldAI = {
         cfg
       );
 
+      const now = new Date();
       const result = {
         ...final,
         ...plan,
         price,
         layers,
-        time: new Date().toLocaleString("fa-IR"),
+        time: now.toLocaleString("fa-IR"),
+        timestamp: now.toISOString(),
         tf: "M5 entry · H1 bias · M1 scalp context"
       };
 
       this.lastResult = result;
-      window.GoldAI_V1_Result = result; // bridge compatibility
+      window.GoldAI_V1_Result = result;
       this.render(result);
       this.saveHistory(result);
+      this.sendToBackend(result);
 
       if (status) status.textContent = "🟢 Done";
     } catch (e) {
@@ -161,6 +328,33 @@ window.GoldAI = {
       alert("Analysis error: " + e.message);
     } finally {
       if (btn) btn.disabled = false;
+    }
+  },
+
+  async sendToBackend(result) {
+    if (!this.currentUID) return; // بدون UID ، نمی‌فرستم
+    try {
+      const response = await fetch(`${this.backendURL}/signals/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: this.currentUID,
+          signal: result.signal.includes('BUY') ? 'BUY' : result.signal.includes('SELL') ? 'SELL' : 'WAIT',
+          entry: result.entry,
+          sl: result.stopLoss,
+          tp1: result.tp1,
+          tp2: result.tp2,
+          tp3: result.tp3,
+          confidence: result.confidence,
+          quality: result.entryQuality,
+          reason: result.reason,
+          timestamp: result.timestamp
+        })
+      });
+      const data = await response.json();
+      console.log('✅ Signal saved:', data);
+    } catch (error) {
+      console.warn('⚠️ Backend error:', error);
     }
   },
 
@@ -210,8 +404,8 @@ window.GoldAI = {
 
     const warnBox = document.getElementById("warnings");
     if (warnBox) {
-      const w = (r.warnings || []).map(x => `⚠️ ${x}`).join("<br>");
       const c = (r.confirms || []).map(x => `✅ ${x}`).join("<br>");
+      const w = (r.warnings || []).map(x => `⚠️ ${x}`).join("<br>");
       warnBox.innerHTML = (c ? c + "<br>" : "") + (w || "");
     }
 
@@ -228,7 +422,8 @@ window.GoldAI = {
       entry: r.entry,
       sl: r.stopLoss,
       tp: r.tp2,
-      conf: r.confidence
+      conf: r.confidence,
+      timestamp: r.timestamp
     });
     h = h.slice(0, 50);
     localStorage.setItem(key, JSON.stringify(h));
@@ -275,6 +470,26 @@ TP1: ${r.tp1} | TP2: ${r.tp2} | TP3: ${r.tp3}
 RR: ${r.riskReward} | Lot: ${r.lot}
 ${r.reason}`;
     navigator.clipboard.writeText(text).then(() => alert("✅ Copied"));
+  },
+
+  shareSignal() {
+    const r = this.lastResult;
+    if (!r) return alert("Run analysis first");
+    
+    const text = `🥇 GoldAI Signal\n\n${r.signal}\nConfidence: ${r.confidence}%\n\nEntry: ${r.entry}\nSL: ${r.stopLoss}\nTP: ${r.tp2}\n\n#GoldAI #Trading`;
+    
+    const platforms = {
+      telegram: `https://t.me/share/url?url=&text=${encodeURIComponent(text)}`,
+      whatsapp: `https://wa.me/?text=${encodeURIComponent(text)}`,
+      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,
+      instagram: `https://www.instagram.com/`
+    };
+    
+    // نمایش انتخاب
+    const choice = prompt(`Share via:\n1. Telegram\n2. WhatsApp\n3. Twitter`);
+    if (choice === '1') window.open(platforms.telegram);
+    else if (choice === '2') window.open(platforms.whatsapp);
+    else if (choice === '3') window.open(platforms.twitter);
   }
 };
 
