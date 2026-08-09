@@ -203,7 +203,16 @@ window.GoldAI = {
       ts.className = open ? "ok" : "bad";
     }
     if (timeDisplay) {
-      timeDisplay.textContent = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')} UTC`;
+      try {
+        const dateOpt = { timeZone: 'Asia/Tehran', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const timeOpt = { timeZone: 'Asia/Tehran', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+        const pDate = new Intl.DateTimeFormat('fa-IR', dateOpt).format(now);
+        const pTime = new Intl.DateTimeFormat('fa-IR', timeOpt).format(now);
+        timeDisplay.textContent = `${pDate} ساعت ${pTime} (به وقت ایران)`;
+      } catch (e) {
+        console.error("CLOCK ERROR:", e);
+        timeDisplay.textContent = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')} UTC`;
+      }
     }
   },
 
@@ -287,10 +296,19 @@ window.GoldAI = {
         };
       }
 
+      // Running new Fundamental and Correlation engines
+      const fundamental = window.GoldAI_Fundamental.analyzeFundamentals(cfg);
+      const correlation = window.GoldAI_Correlation.analyzeCorrelation(closes, price);
+
       const layers = {
         ema, rsi, divergence: div, structure, macd, adx,
-        atr: atrL, volume, sr, candles: candleP, liquidity: liq, htf, m1
+        atr: atrL, volume, sr, candles: candleP, liquidity: liq, htf, m1,
+        fundamental, correlation
       };
+
+      // Running AI Brain
+      const aiBrain = window.GoldAI_AIBrain.analyze(layers);
+      layers.aiBrain = aiBrain;
 
       const raw = window.GoldAI_Score.runScoreEngine(layers);
       const final = window.GoldAI_Conflict.runConflictFilter(raw, layers, cfg);
@@ -402,6 +420,25 @@ window.GoldAI = {
     set("dCandle", L.candles?.pattern ?? "—");
     set("dVol", L.volume?.ratio ?? "—");
 
+    // AI & Fundamental rendering
+    const AI = L.aiBrain || {};
+    const FUND = L.fundamental || { details: {} };
+    const CORR = L.correlation || { details: {} };
+
+    set("dAiSignal", AI.aiSignal ?? "—");
+    set("dAiConf", (AI.aiConfidence ? AI.aiConfidence + "%" : "—"));
+    set("dAiCpi", FUND.details?.cpi ?? "—");
+    set("dAiNfp", FUND.details?.nfp ?? "—");
+    set("dAiFed", FUND.details?.fed ?? "—");
+    set("dAiDxy", `شاخص دلار: ${CORR.details?.dxy ?? "—"}`);
+    set("dAiUs10y", `اوراق قرضه: ${CORR.details?.us10y ?? "—"}`);
+    set("dAiSilverSpx", `نقره: ${CORR.details?.silver ?? "—"} | شاخص سهام: ${CORR.details?.spx ?? "—"}`);
+
+    const reasoningEl = document.getElementById("dAiReasoning");
+    if (reasoningEl) {
+      reasoningEl.textContent = AI.reasoning || "تحلیلی توسط هوش مصنوعی ثبت نشده است.";
+    }
+
     const warnBox = document.getElementById("warnings");
     if (warnBox) {
       const c = (r.confirms || []).map(x => `✅ ${x}`).join("<br>");
@@ -474,22 +511,127 @@ ${r.reason}`;
 
   shareSignal() {
     const r = this.lastResult;
-    if (!r) return alert("Run analysis first");
+    if (!r) return alert("ابتدا تحلیل را شروع کنید");
     
-    const text = `🥇 GoldAI Signal\n\n${r.signal}\nConfidence: ${r.confidence}%\n\nEntry: ${r.entry}\nSL: ${r.stopLoss}\nTP: ${r.tp2}\n\n#GoldAI #Trading`;
-    
+    const text =
+`🥇 سیگنال طلا GoldAI
+${r.signal} | اطمینان: ${r.confidence}%
+نقطه ورود: ${r.entry}
+حد ضرر (SL): ${r.stopLoss}
+حد سودها: TP1: ${r.tp1} | TP2: ${r.tp2} | TP3: ${r.tp3}
+نسبت ریسک به ریوارد: ${r.riskReward} | لات: ${r.lot}
+کانال: #GoldAI #Trading`;
+
     const platforms = {
       telegram: `https://t.me/share/url?url=&text=${encodeURIComponent(text)}`,
       whatsapp: `https://wa.me/?text=${encodeURIComponent(text)}`,
-      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,
-      instagram: `https://www.instagram.com/`
+      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
     };
-    
-    // نمایش انتخاب
-    const choice = prompt(`Share via:\n1. Telegram\n2. WhatsApp\n3. Twitter`);
-    if (choice === '1') window.open(platforms.telegram);
-    else if (choice === '2') window.open(platforms.whatsapp);
-    else if (choice === '3') window.open(platforms.twitter);
+
+    // حذف مدال قبلی اگر وجود داشته باشد
+    document.getElementById('shareModal')?.remove();
+
+    const html = `
+      <div id="shareModal" class="modal">
+        <div class="modal-content share-modal-content">
+          <h3>📤 اشتراک‌گذاری سیگنال طلا</h3>
+          <p class="muted" style="font-size: 13px; text-align: center; margin-bottom: 20px;">
+            سیگنال خود را در یکی از پیام‌رسان‌های زیر به اشتراک بگذارید:
+          </p>
+
+          <div class="share-options">
+            <button class="share-btn telegram" onclick="window.open('${platforms.telegram}', '_blank')">
+              <span class="share-icon">✈️</span>
+              <span class="share-text">ارسال در تلگرام (Telegram)</span>
+            </button>
+
+            <button class="share-btn whatsapp" onclick="window.open('${platforms.whatsapp}', '_blank')">
+              <span class="share-icon">💬</span>
+              <span class="share-text">ارسال در واتس‌اپ (WhatsApp)</span>
+            </button>
+
+            <button class="share-btn twitter" onclick="window.open('${platforms.twitter}', '_blank')">
+              <span class="share-icon">🐦</span>
+              <span class="share-text">ارسال در توییتر (X / Twitter)</span>
+            </button>
+          </div>
+
+          <div class="share-preview">
+            <pre style="direction: rtl; text-align: right; margin: 0; font-family: inherit; font-size: 12px; color: #fff; white-space: pre-wrap; word-break: break-all;">${text}</pre>
+          </div>
+
+          <div class="share-actions">
+            <button class="btn-main" style="margin: 0; background: #263241; color: #fff; border: 1px solid #444;" onclick="GoldAI.copySignalText(\`${text.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">📋 کپی کردن متن</button>
+            <button class="btn-ghost" style="margin: 0;" onclick="document.getElementById('shareModal').remove()">❌ بستن</button>
+          </div>
+        </div>
+      </div>
+      <style>
+        .share-modal-content {
+          max-width: 440px !important;
+          border: 1px solid var(--gold);
+        }
+        .share-options {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          margin-bottom: 20px;
+        }
+        .share-btn {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 12px 16px;
+          border: none;
+          border-radius: 10px;
+          color: white;
+          font-weight: bold;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          width: 100%;
+          text-align: right;
+        }
+        .share-btn:hover {
+          transform: translateY(-2px);
+          filter: brightness(1.15);
+        }
+        .share-btn.telegram {
+          background: #0088cc;
+        }
+        .share-btn.whatsapp {
+          background: #25d366;
+        }
+        .share-btn.twitter {
+          background: #111111;
+          border: 1px solid #333;
+        }
+        .share-icon {
+          font-size: 18px;
+        }
+        .share-preview {
+          background: #0b0f14;
+          border: 1px solid #222;
+          border-radius: 10px;
+          padding: 12px;
+          max-height: 150px;
+          overflow-y: auto;
+          margin-bottom: 20px;
+          text-align: right;
+        }
+        .share-actions {
+          display: flex;
+          gap: 10px;
+        }
+      </style>
+    `;
+    document.body.insertAdjacentHTML('beforeend', html);
+  },
+
+  copySignalText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("✅ متن سیگنال در حافظه موقت کپی شد");
+    });
   }
 };
 

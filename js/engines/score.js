@@ -29,8 +29,24 @@ function runScoreEngine(layers) {
   add(layers.sr, 0.95);            // key levels
   add(layers.candles, 0.85);       // pattern
   add(layers.liquidity, 1.4);      // SMC key
-  add(layers.fundamental, 0.8);    // economic events
-  add(layers.correlation, 0.7);    // multi-currency
+  add(layers.fundamental, 1.5);    // افزایش وزن تحلیل بنیادی
+  add(layers.correlation, 1.2);    // افزایش وزن همبستگی بازارها
+
+  // ادغام مستقیم تحلیل چندلایه و تصمیم هوش مصنوعی (AI Brain)
+  if (layers.aiBrain) {
+    if (layers.aiBrain.aiSignal.includes("BUY")) {
+      buy += 6.0;
+      confirms.push("تایید روند صعودی توسط هوش مصنوعی (AI Consensus)");
+    } else if (layers.aiBrain.aiSignal.includes("SELL")) {
+      sell += 6.0;
+      confirms.push("تایید روند نزولی توسط هوش مصنوعی (AI Consensus)");
+    } else {
+      warnings.push("توصیه به صبر و تماشا توسط هوش مصنوعی");
+    }
+    if (layers.aiBrain.reasoning) {
+      reasons.push(layers.aiBrain.reasoning);
+    }
+  }
 
   // Multi-TF alignment (قوی‌تر)
   if (layers.htf) {
@@ -74,7 +90,11 @@ function runScoreEngine(layers) {
   else if (sellScore > buyScore + 1.5) signal = "SELL 🔴";
 
   // Confidence calculation (بهبود یافته)
-  conf = Math.abs(buyScore - sellScore) * 6 + (conf / 12);
+  let aiBrainConf = layers.aiBrain ? layers.aiBrain.aiConfidence : 0;
+  conf = Math.abs(buyScore - sellScore) * 5 + (conf / 14);
+  if (aiBrainConf > 0) {
+    conf = (conf * 0.4) + (aiBrainConf * 0.6); // ۶۰ درصد وزن اطمینان متعلق به مدل هوش مصنوعی است
+  }
   
   // Multi-factor boost
   if (confirms.length >= 3) conf += 8;

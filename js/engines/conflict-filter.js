@@ -66,6 +66,22 @@ function runConflictFilter(score, layers, cfg) {
     }
   }
 
+  // تضاد بین تکنیکال و هوش مصنوعی / فاندامنتال (AI Brain Conflict)
+  if (layers.aiBrain) {
+    if (signal.includes("BUY") && layers.aiBrain.aiSignal.includes("SELL")) {
+      confidence -= 22;
+      warnings.push("تضاد شدید: تحلیل تکنیکال خرید، اما هوش مصنوعی و فاندامنتال ریزش پیش‌بینی می‌کند");
+    }
+    if (signal.includes("SELL") && layers.aiBrain.aiSignal.includes("BUY")) {
+      confidence -= 22;
+      warnings.push("تضاد شدید: تحلیل تکنیکال فروش، اما هوش مصنوعی و فاندامنتال صعود پیش‌بینی می‌کند");
+    }
+    if (layers.aiBrain.aiSignal.includes("WAIT") && !signal.includes("WAIT") && confidence < 80) {
+      confidence -= 12;
+      warnings.push("سیستم عصبی هوش مصنوعی احتیاط و خروج از معامله را به علت ابهامات فاندامنتال توصیه می‌کند");
+    }
+  }
+
   if (confidence > 100) confidence = 100;
   if (confidence < 0) confidence = 0;
   confidence = Math.round(confidence);
