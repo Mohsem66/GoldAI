@@ -17,7 +17,7 @@ function calcATR(highs, lows, closes, period = 14) {
   for (let i = period; i < trs.length; i++) {
     atr = (atr * (period - 1) + trs[i]) / period;
   }
-  return Number(atr.toFixed(3));
+  return Number(atr.toFixed(5)); // Keep full precision for Forex decimals
 }
 
 function analyzeATR(highs, lows, closes, cfg) {
@@ -26,9 +26,17 @@ function analyzeATR(highs, lows, closes, cfg) {
   if (atr == null) {
     return { atr: null, volatility, buyScore: 0, sellScore: 0, reason: "ATR N/A" };
   }
-  if (atr >= 8) volatility = "HIGH";
-  else if (atr >= 3) volatility = "MEDIUM";
-  else volatility = "LOW";
+
+  const sym = (window.GoldAI_Config.SYMBOL || "XAU/USD").toUpperCase();
+  if (sym.includes("XAU") || sym.includes("GOLD")) {
+    if (atr >= 8) volatility = "HIGH";
+    else if (atr >= 3) volatility = "MEDIUM";
+    else volatility = "LOW";
+  } else {
+    if (atr >= 0.0030) volatility = "HIGH";
+    else if (atr >= 0.0008) volatility = "MEDIUM";
+    else volatility = "LOW";
+  }
 
   return {
     atr,
@@ -66,10 +74,10 @@ function buildRiskLevels(entry, signal, atr, cfg) {
   const rr = risk > 0 ? (reward / risk).toFixed(2) : "-";
 
   return {
-    stopLoss: Number(stop.toFixed(2)),
-    tp1: Number(tp1.toFixed(2)),
-    tp2: Number(tp2.toFixed(2)),
-    tp3: Number(tp3.toFixed(2)),
+    stopLoss: Number(stop),
+    tp1: Number(tp1),
+    tp2: Number(tp2),
+    tp3: Number(tp3),
     riskReward: "1:" + rr
   };
 }

@@ -20,17 +20,33 @@ function createTradePlan(signal, entry, atr, capital, riskPercent, cfg) {
   const riskMoney = Number(((capital * riskPct) / 100).toFixed(2));
   const stopDist = Math.abs(entry - levels.stopLoss);
 
-  // XAUUSD approx: $1 move ≈ $1 per 0.01 lot on mini — simplified
-  let lot = stopDist > 0 ? riskMoney / (stopDist * 100) : 0.01;
+  // Symbol specific lot calculations (Approx standard lot weight)
+  const sym = (window.GoldAI_Config.SYMBOL || "XAU/USD").toUpperCase();
+  let baseMultiplier = 100; // default Gold
+  if (sym.includes("EUR/USD") || sym.includes("GBP/USD") || sym.includes("AUD/USD")) {
+    baseMultiplier = 100000; // standard Forex lot unit
+  } else if (sym.includes("JPY")) {
+    baseMultiplier = 1000; // Yen standard point unit
+  }
+
+  let lot = stopDist > 0 ? riskMoney / (stopDist * baseMultiplier) : 0.01;
   if (lot < 0.01) lot = 0.01;
   lot = Number(lot.toFixed(2));
 
   let vol = "MEDIUM";
-  if (atr >= 8) vol = "HIGH";
-  else if (atr < 3) vol = "LOW";
+
+  // Custom volatility indexes per symbol
+  if (sym.includes("XAU") || sym.includes("GOLD")) {
+    if (atr >= 8) vol = "HIGH";
+    else if (atr < 3) vol = "LOW";
+  } else {
+    // Forex
+    if (atr >= 0.0030) vol = "HIGH";
+    else if (atr < 0.0008) vol = "LOW";
+  }
 
   return {
-    entry: Number(entry.toFixed(2)),
+    entry: Number(entry),
     stopLoss: levels.stopLoss,
     tp1: levels.tp1,
     tp2: levels.tp2,

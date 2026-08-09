@@ -1,5 +1,5 @@
 // =====================================
-// GoldAI — Data Layer (Multi-TF)
+// GoldAI — Data Layer (Multi-TF & Multi-Symbol)
 // =====================================
 
 window.GoldAI_Data = {
@@ -88,10 +88,52 @@ window.GoldAI_Data = {
     localStorage.setItem("goldai_capital", String(Number(v)));
   },
 
-  // Demo fallback when no API key
+  resetData() {
+    this.goldPrice = 0;
+    this.candles = { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] };
+    this.closes = { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] };
+    this.highs = { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] };
+    this.lows = { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] };
+    this.volumes = { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] };
+  },
+
+  // Demo fallback when no API key - Enhanced to generate realistic values per currency pair
   seedDemo() {
-    if (this.closes.m5.length) return;
-    let p = 2350;
+    this.resetData();
+    const cfg = window.GoldAI_Config;
+    let basePrice = 2350;
+    let volatilityScale = 1.0;
+
+    const sym = (cfg.SYMBOL || "XAU/USD").toUpperCase();
+
+    if (sym.includes("EUR/USD")) {
+      basePrice = 1.0850;
+      volatilityScale = 0.0008;
+    } else if (sym.includes("GBP/USD")) {
+      basePrice = 1.2720;
+      volatilityScale = 0.0010;
+    } else if (sym.includes("USD/JPY")) {
+      basePrice = 156.40;
+      volatilityScale = 0.12;
+    } else if (sym.includes("AUD/USD")) {
+      basePrice = 0.6650;
+      volatilityScale = 0.0007;
+    } else if (sym.includes("USD/CAD")) {
+      basePrice = 1.3680;
+      volatilityScale = 0.0008;
+    } else if (sym.includes("GBP/JPY")) {
+      basePrice = 198.80;
+      volatilityScale = 0.18;
+    } else if (sym.includes("EUR/JPY")) {
+      basePrice = 169.50;
+      volatilityScale = 0.15;
+    } else {
+      // Default Gold (XAUUSD)
+      basePrice = 2350;
+      volatilityScale = 1.2;
+    }
+
+    let p = basePrice;
     const gen = (n, vol) => {
       const c = [], h = [], l = [], cl = [], v = [];
       for (let i = 0; i < n; i++) {
@@ -105,14 +147,16 @@ window.GoldAI_Data = {
       }
       return { c, cl, h, l, v };
     };
+
     ["m1", "m5", "m15", "h1", "h4", "daily"].forEach((k, i) => {
-      const g = gen(100, 0.8 + i * 0.4);
+      const g = gen(100, volatilityScale * (0.8 + i * 0.4));
       this.candles[k] = g.c;
       this.closes[k] = g.cl;
       this.highs[k] = g.h;
       this.lows[k] = g.l;
       this.volumes[k] = g.v;
     });
+
     this.goldPrice = this.closes.m5[this.closes.m5.length - 1];
   }
 };

@@ -19,13 +19,27 @@
     <div id="panel-home" class="panel">
 
       <div class="card">
-        <h3>XAUUSD</h3>
+        <!-- Dynamic Currency Selection Dropdown -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid #263241; padding-bottom: 8px;">
+          <h3 style="margin: 0;">نماد معاملاتی:</h3>
+          <select id="symbolSelect" onchange="GoldAI.changeSymbol()" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #263241; background: #121820; color: #f5c542; font-size: 14px; font-weight: bold; text-align: right; direction: ltr;">
+            <option value="XAU/USD">🥇 XAU/USD (طلا)</option>
+            <option value="EUR/USD">🇪🇺 EUR/USD (یورو/دلار)</option>
+            <option value="GBP/USD">🇬🇧 GBP/USD (پوند/دلار)</option>
+            <option value="USD/JPY">🇯🇵 USD/JPY (دلار/ین)</option>
+            <option value="AUD/USD">🇦🇺 AUD/USD (دلار استرالیا/دلار)</option>
+            <option value="USD/CAD">🇨🇦 USD/CAD (دلار/دلار کانادا)</option>
+            <option value="GBP/JPY">🇬🇧🇯🇵 GBP/JPY (پوند/ین)</option>
+            <option value="EUR/JPY">🇪🇺🇯🇵 EUR/JPY (یورو/ین)</option>
+          </select>
+        </div>
+
         <div class="price-big" id="goldPrice">—</div>
 
-        <!-- Manual Entry Overwrite Field (Always defaults to empty/auto unless customized) -->
+        <!-- Manual Entry Overwrite Field -->
         <div style="margin: 10px 0; padding: 10px; background: #0c1017; border-radius: 12px; border: 1px solid #1a222c;">
           <label style="display: block; font-size: 12px; color: #8b9bb0; margin-bottom: 6px; text-align: right;">✍️ نقطه ورود دستی (خالی بماند = خودکار):</label>
-          <input type="number" id="manualEntryInput" placeholder="مثال: 2355.50" step="0.01" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #263241; background: #121820; color: #f0f4f8; text-align: right;">
+          <input type="number" id="manualEntryInput" placeholder="مثال: 2355.50" step="0.00001" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #263241; background: #121820; color: #f0f4f8; text-align: right;">
         </div>
 
         <div class="row"><span>وضعیت بازار</span><span id="marketStatus">—</span></div>
@@ -46,7 +60,7 @@
         <h3>🤖 استراتژی و وضعیت هوش مصنوعی</h3>
         <div class="row"><span>وضعیت سیستم</span><span id="aiStatus">🟢 Ready</span></div>
 
-        <!-- Strategy Selection Dropdown (Scalp vs Swing Preset) -->
+        <!-- Strategy Selection Dropdown -->
         <div style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
           <span style="font-size: 13px; color: #8b9bb0;">انتخاب استراتژی:</span>
           <select id="strategySelect" onchange="GoldAI.changeStrategy()" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #263241; background: #121820; color: #f0f4f8; font-size: 12px; direction: rtl; text-align: right;">

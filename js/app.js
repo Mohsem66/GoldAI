@@ -10,6 +10,7 @@ window.GoldAI = {
 
   async init() {
     const data = window.GoldAI_Data;
+    this.loadSettings();
     await data.loadAll();
     if (!data.closes.m5.length) data.seedDemo();
     await data.loadPrice();
@@ -17,13 +18,20 @@ window.GoldAI = {
     this.updateMarketClock();
     this.updateRiskUI();
     this.setupSettingsPanel();
-    this.loadSettings();
     setInterval(() => this.updateMarketClock(), 1000);
     setInterval(async () => {
       await data.loadPrice();
       this.updatePriceUI();
     }, window.GoldAI_Config.PRICE_REFRESH_MS);
     console.log("✅ GoldAI Pro ready");
+  },
+
+  // Helper to determine decimals for the active symbol
+  getDecimals() {
+    const sym = (window.GoldAI_Config.SYMBOL || "XAU/USD").toUpperCase();
+    if (sym.includes("JPY")) return 3; // JPY cross has 3 decimals typically
+    if (sym.includes("XAU") || sym.includes("GOLD")) return 2; // Gold has 2 decimals
+    return 5; // Standard Forex pairs have 5 decimals
   },
 
   // ===== Local Settings Loading =====
@@ -44,11 +52,15 @@ window.GoldAI = {
         if (parsed.tp1Mult) window.GoldAI_Config.ATR_TP1_MULT = parsed.tp1Mult;
         if (parsed.tp2Mult) window.GoldAI_Config.ATR_TP2_MULT = parsed.tp2Mult;
         if (parsed.tp3Mult) window.GoldAI_Config.ATR_TP3_MULT = parsed.tp3Mult;
+        if (parsed.symbol) window.GoldAI_Config.SYMBOL = parsed.symbol;
       }
 
-      // Update config-dependent elements
       const stratEl = document.getElementById("strategySelect");
       if (stratEl) stratEl.value = window.GoldAI_Config.STRATEGY_MODE;
+
+      const symbolEl = document.getElementById("symbolSelect");
+      if (symbolEl) symbolEl.value = window.GoldAI_Config.SYMBOL || "XAU/USD";
+
       this.updateRiskUI();
     } catch (e) {
       console.error("Failed to load settings:", e);
@@ -180,7 +192,8 @@ window.GoldAI = {
 
     localStorage.setItem('goldai_settings', JSON.stringify({
       capital, risk, tpCount, slMult, tp1Mult, tp2Mult, tp3Mult, uid,
-      strategy: window.GoldAI_Config.STRATEGY_MODE
+      strategy: window.GoldAI_Config.STRATEGY_MODE,
+      symbol: window.GoldAI_Config.SYMBOL
     }));
     this.updateRiskUI();
     this.closeSettings();
@@ -194,7 +207,7 @@ window.GoldAI = {
   updatePriceUI() {
     const el = document.getElementById("goldPrice");
     if (el) el.textContent = window.GoldAI_Data.goldPrice
-      ? window.GoldAI_Data.goldPrice.toFixed(2)
+      ? window.GoldAI_Data.goldPrice.toFixed(this.getDecimals())
       : "—";
   },
 
@@ -240,7 +253,6 @@ window.GoldAI = {
       closeTarget.setUTCHours(22, 0, 0, 0);
       let diff = closeTarget - now;
       if (diff < 0) {
-        // Already past Friday close
         open = false;
       } else {
         countdownText = this.formatDuration(diff) + " تا بسته شدن بازار";
@@ -365,6 +377,37 @@ window.GoldAI = {
       stored.strategy = select.value;
       localStorage.setItem('goldai_settings', JSON.stringify(stored));
     }
+  },
+
+  async changeSymbol() {
+    const select = document.getElementById("symbolSelect");
+    if (!select) return;
+
+    const newSymbol = select.value;
+    window.GoldAI_Config.SYMBOL = newSymbol;
+
+    // Save to settings
+    const stored = JSON.parse(localStorage.getItem('goldai_settings') || "{}");
+    stored.symbol = newSymbol;
+    localStorage.setItem('goldai_settings', JSON.stringify(stored));
+
+    const status = document.getElementById("aiStatus");
+    if (status) status.textContent = "🟡 Resetting data...";
+
+    // Reset data and re-seed
+    const data = window.GoldAI_Data;
+    data.resetData();
+    await data.loadAll();
+    data.seedDemo();
+    await data.loadPrice();
+
+    this.updatePriceUI();
+    if (status) status.textContent = "🟢 Ready";
+
+    // Clear old result
+    document.getElementById("resultCard")?.classList.add("hidden");
+    const manualInput = document.getElementById("manualEntryInput");
+    if (manualInput) manualInput.value = "";
   },
 
   async analyze() {
@@ -533,10 +576,16 @@ window.GoldAI = {
       if (el) el.textContent = val;
     };
 
+    const decs = this.getDecimals();
+    const formatValue = (num) => {
+      if (num == null || isNaN(num) || typeof num === "string") return num;
+      return num.toFixed(decs);
+    };
+
     set("signal", r.signal);
     set("confidence", r.confidence + "%");
-    set("entry", r.entry);
-    set("sl", r.stopLoss);
+    set("entry", formatValue(r.entry));
+    set("sl", formatValue(r.stopLoss));
 
     // Dynamically show only chosen TP targets
     const tpCount = window.GoldAI_Config.TP_COUNT || 3;
@@ -544,11 +593,11 @@ window.GoldAI = {
     const tp2El = document.getElementById("tp2");
     const tp3El = document.getElementById("tp3");
 
-    if (tp1El) tp1El.textContent = r.tp1;
+    if (tp1El) tp1El.textContent = formatValue(r.tp1);
     if (tp2El) {
       if (tpCount >= 2) {
         tp2El.closest('.pill')?.classList.remove('hidden');
-        tp2El.textContent = r.tp2;
+        tp2El.textContent = formatValue(r.tp2);
       } else {
         tp2El.closest('.pill')?.classList.add('hidden');
       }
@@ -556,7 +605,7 @@ window.GoldAI = {
     if (tp3El) {
       if (tpCount >= 3) {
         tp3El.closest('.row')?.classList.remove('hidden');
-        tp3El.textContent = r.tp3;
+        tp3El.textContent = formatValue(r.tp3);
       } else {
         tp3El.closest('.row')?.classList.add('hidden');
       }
@@ -577,9 +626,9 @@ window.GoldAI = {
 
     // Details panel
     const L = r.layers || {};
-    set("dEma20", L.ema?.ema20 ?? "—");
-    set("dEma50", L.ema?.ema50 ?? "—");
-    set("dEma200", L.ema?.ema200 ?? "—");
+    set("dEma20", L.ema?.ema20 ? L.ema.ema20.toFixed(decs) : "—");
+    set("dEma50", L.ema?.ema50 ? L.ema.ema50.toFixed(decs) : "—");
+    set("dEma200", L.ema?.ema200 ? L.ema.ema200.toFixed(decs) : "—");
     set("dRsi", L.rsi?.rsi ?? "—");
     set("dMacd", L.macd?.hist ?? "—");
     set("dAdx", L.adx?.adx ?? "—");
@@ -628,6 +677,7 @@ window.GoldAI = {
     try { h = JSON.parse(localStorage.getItem(key) || "[]"); } catch (_) {}
     h.unshift({
       t: r.time,
+      symbol: window.GoldAI_Config.SYMBOL || "XAU/USD",
       signal: r.signal,
       entry: r.entry,
       sl: r.stopLoss,
@@ -680,12 +730,10 @@ window.GoldAI = {
       else if (x.signal.includes("SELL")) sells++;
       else waits++;
 
-      // Simulating realistic outcomes based on analytical signal quality/confidence
       if (!x.signal.includes("WAIT")) {
         const isWin = x.conf > 68 || Math.random() > 0.35;
         if (isWin) {
           wins++;
-          // Approx gain based on standard reward structure
           profit += (window.GoldAI_Config.DEFAULT_CAPITAL * 0.02);
         } else {
           losses++;
@@ -710,16 +758,22 @@ window.GoldAI = {
     const r = this.lastResult;
     if (!r) return alert("Run analysis first");
 
+    const decs = this.getDecimals();
+    const formatValue = (num) => {
+      if (num == null || isNaN(num) || typeof num === "string") return num;
+      return num.toFixed(decs);
+    };
+
     const tpCount = window.GoldAI_Config.TP_COUNT || 3;
-    let tpsText = `TP1: ${r.tp1}`;
-    if (tpCount >= 2) tpsText += ` | TP2: ${r.tp2}`;
-    if (tpCount >= 3) tpsText += ` | TP3: ${r.tp3}`;
+    let tpsText = `TP1: ${formatValue(r.tp1)}`;
+    if (tpCount >= 2) tpsText += ` | TP2: ${formatValue(r.tp2)}`;
+    if (tpCount >= 3) tpsText += ` | TP3: ${formatValue(r.tp3)}`;
 
     const text =
 `GoldAI Signal
-${r.signal} | Conf ${r.confidence}%
-Entry: ${r.entry}
-SL: ${r.stopLoss}
+${window.GoldAI_Config.SYMBOL || "XAU/USD"} | ${r.signal} | Conf ${r.confidence}%
+Entry: ${formatValue(r.entry)}
+SL: ${formatValue(r.stopLoss)}
 ${tpsText}
 RR: ${r.riskReward} | Lot: ${r.lot}
 ${r.reason}`;
@@ -730,16 +784,22 @@ ${r.reason}`;
     const r = this.lastResult;
     if (!r) return alert("ابتدا تحلیل را شروع کنید");
     
+    const decs = this.getDecimals();
+    const formatValue = (num) => {
+      if (num == null || isNaN(num) || typeof num === "string") return num;
+      return num.toFixed(decs);
+    };
+
     const tpCount = window.GoldAI_Config.TP_COUNT || 3;
-    let tpsText = `TP1: ${r.tp1}`;
-    if (tpCount >= 2) tpsText += ` | TP2: ${r.tp2}`;
-    if (tpCount >= 3) tpsText += ` | TP3: ${r.tp3}`;
+    let tpsText = `TP1: ${formatValue(r.tp1)}`;
+    if (tpCount >= 2) tpsText += ` | TP2: ${formatValue(r.tp2)}`;
+    if (tpCount >= 3) tpsText += ` | TP3: ${formatValue(r.tp3)}`;
 
     const text =
-`🥇 سیگنال طلا GoldAI
+`🥇 سیگنال ${window.GoldAI_Config.SYMBOL || "XAU/USD"} GoldAI
 ${r.signal} | اطمینان: ${r.confidence}%
-نقطه ورود: ${r.entry}
-حد ضرر (SL): ${r.stopLoss}
+نقطه ورود: ${formatValue(r.entry)}
+حد ضرر (SL): ${formatValue(r.stopLoss)}
 حد سودها: ${tpsText}
 نسبت ریسک به ریوارد: ${r.riskReward} | لات: ${r.lot}
 کانال: #GoldAI #Trading`;
