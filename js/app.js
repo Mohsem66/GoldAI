@@ -723,12 +723,37 @@ window.GoldAI = {
     let h = [];
     try { h = JSON.parse(localStorage.getItem("goldai_history") || "[]"); } catch (_) {}
 
+    // Read the dropdown filter values
+    const symFilter = document.getElementById("perfSymbolFilter")?.value || "all";
+    const timeFilter = document.getElementById("perfTimeFilter")?.value || "all";
+
+    // Filter items
+    const now = Date.now();
+    const filteredH = h.filter(x => {
+      // 1. Symbol Filter Check
+      const sym = x.symbol || "XAU/USD";
+      if (symFilter !== "all" && sym !== symFilter) {
+        return false;
+      }
+
+      // 2. Time Filter Check
+      if (timeFilter !== "all") {
+        const itemTime = x.timestamp ? new Date(x.timestamp).getTime() : now;
+        const diffMs = now - itemTime;
+        if (timeFilter === "24h" && diffMs > 24 * 60 * 60 * 1000) return false;
+        if (timeFilter === "7d" && diffMs > 7 * 24 * 60 * 60 * 1000) return false;
+        if (timeFilter === "30d" && diffMs > 30 * 24 * 60 * 60 * 1000) return false;
+      }
+
+      return true;
+    });
+
     const set = (id, val) => {
       const el = document.getElementById(id);
       if (el) el.textContent = val;
     };
 
-    if (!h.length) {
+    if (!filteredH.length) {
       set("perfTotal", "0");
       set("perfBuy", "0");
       set("perfSell", "0");
@@ -743,7 +768,7 @@ window.GoldAI = {
     let wins = 0, losses = 0;
     let profit = 0, loss = 0;
 
-    h.forEach(x => {
+    filteredH.forEach(x => {
       if (x.signal.includes("BUY")) buys++;
       else if (x.signal.includes("SELL")) sells++;
       else waits++;
@@ -763,13 +788,23 @@ window.GoldAI = {
     const totalTrades = wins + losses;
     const winRate = totalTrades > 0 ? ((wins / totalTrades) * 100).toFixed(1) + "%" : "0%";
 
-    set("perfTotal", h.length);
+    set("perfTotal", filteredH.length);
     set("perfBuy", buys);
     set("perfSell", sells);
     set("perfWait", waits);
     set("perfWinRate", winRate);
     set("perfProfit", `$${profit.toFixed(2)}`);
     set("perfLoss", `$${loss.toFixed(2)}`);
+  },
+
+  clearPerformanceHistory() {
+    if (confirm("آیا از حذف کامل تاریخچه سیگنال‌ها و بازنشانی آمار عملکرد اطمینان دارید؟")) {
+      localStorage.removeItem("goldai_history");
+      this.renderPerformance();
+      const histList = document.getElementById("historyList");
+      if (histList) histList.textContent = "—";
+      alert("✅ تاریخچه عملکرد با موفقیت پاکسازی شد.");
+    }
   },
 
   copySignal() {
