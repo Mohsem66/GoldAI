@@ -68,6 +68,16 @@
             <option value="swing">سوئینگ (H1 / H4 با تایید Daily)</option>
           </select>
         </div>
+
+        <!-- TP Count Selector -->
+        <div style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <span style="font-size: 13px; color: #8b9bb0;">تعداد حد سودها (TP):</span>
+          <select id="tpCountSelect" onchange="GoldAI.changeTpCount()" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #263241; background: #121820; color: #f0f4f8; font-size: 12px; direction: rtl; text-align: right;">
+            <option value="1">تک حد سود (TP 1)</option>
+            <option value="2">دو حد سود (TP 1 & 2)</option>
+            <option value="3" selected>سه حد سود (TP 1 & 2 & 3)</option>
+          </select>
+        </div>
       </div>
 
       <button id="analyzeBtn" class="btn-main" onclick="GoldAI.analyze()">

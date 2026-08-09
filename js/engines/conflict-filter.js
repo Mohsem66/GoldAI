@@ -86,7 +86,8 @@ function runConflictFilter(score, layers, cfg) {
   if (confidence < 0) confidence = 0;
   confidence = Math.round(confidence);
 
-  const minC = cfg.MIN_CONFIDENCE || 62;
+  // Raised confidence floor to 68% for strict mode filter to reduce noise and optimize win-rate
+  const minC = 68;
   if (cfg.STRICT_MODE && confidence < minC) {
     signal = "WAIT 🟡";
     warnings.push(`Confidence ${confidence} < ${minC}`);

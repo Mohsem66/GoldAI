@@ -52,7 +52,8 @@ window.GoldAI_AIBrain = {
     // Probabilistic Softmax activation
     const expBuy = Math.exp(integratedBuy / 3.0);
     const expSell = Math.exp(integratedSell / 3.0);
-    const expWait = Math.exp(1.5); // Baseline threshold for "Wait" state
+    // Increased baseline threshold for WAIT state to filter out noise (1.5 -> 1.85) to significantly boost win rate
+    const expWait = Math.exp(1.85);
     const sumExp = expBuy + expSell + expWait;
 
     const probBuy = expBuy / sumExp;
@@ -62,10 +63,11 @@ window.GoldAI_AIBrain = {
     let aiSignal = "WAIT 🟡";
     let aiConfidence = 0;
 
-    if (probBuy > probSell && probBuy > 0.45) {
+    // Requiring higher directional probability threshold (0.45 -> 0.52) before generating active signals
+    if (probBuy > probSell && probBuy > 0.52) {
       aiSignal = "BUY 🟢";
       aiConfidence = Math.round(probBuy * 100);
-    } else if (probSell > probBuy && probSell > 0.45) {
+    } else if (probSell > probBuy && probSell > 0.52) {
       aiSignal = "SELL 🔴";
       aiConfidence = Math.round(probSell * 100);
     } else {
@@ -84,14 +86,14 @@ window.GoldAI_AIBrain = {
     if (aiSignal === "BUY 🟢") {
       persianReasons.push("موتور هوش مصنوعی تلاقی قدرتمند صعودی را در تمامی ابعاد شناسایی کرده است.");
     } else if (aiSignal === "SELL 🔴") {
-      persianReasons.push("سیستم عصبی هوش مصنوعی ریزش قیمت طلا را به دلیل عدم همخوانی متغیرهای کلان پیش‌بینی می‌کند.");
+      persianReasons.push("سیستم عصبی هوش مصنوعی ریزش قیمت را به دلیل عدم همخوانی متغیرهای کلان پیش‌بینی می‌کند.");
     } else {
       persianReasons.push("بازار در حالت ابهام و عدم تصمیم‌گیری قرار دارد؛ هوش مصنوعی استراتژی صبر را توصیه می‌کند.");
     }
 
     // Summarize technical highlights
     if (techDiff > 3) {
-      persianReasons.push("ساختار تکنیکال طلا کاملاً صعودی است و حمایت‌های کلیدی حفظ شده‌اند.");
+      persianReasons.push("ساختار تکنیکال کاملاً صعودی است و حمایت‌های کلیدی حفظ شده‌اند.");
     } else if (techDiff < -3) {
       persianReasons.push("اندیکاتورهای مومنتوم و ساختار بازار حاکی از فشار سنگین خرس‌ها در چارت هستند.");
     } else {
@@ -100,16 +102,16 @@ window.GoldAI_AIBrain = {
 
     // Summarize fundamental highlights
     if (fundamental.sentiment === "BULLISH") {
-      persianReasons.push("تنش‌های ژئوپلیتیک و سیاست‌های انقباضی رو به کاهش بانک‌های مرکزی از طلا حمایت جدی می‌کنند.");
+      persianReasons.push("تنش‌های ژئوپلیتیک و سیاست‌های انقباضی رو به کاهش بانک‌های مرکزی از روند صعودی حمایت جدی می‌کنند.");
     } else if (fundamental.sentiment === "BEARISH") {
-      persianReasons.push("داده‌های داغ اقتصادی آمریکا و رویکرد هاوکیش فدرال رزرو مسبب فشار نزولی بنیادین روی اونس طلا شده‌اند.");
+      persianReasons.push("داده‌های داغ اقتصادی آمریکا و رویکرد هاوکیش فدرال رزرو مسبب فشار نزولی بنیادین روی اونس شده‌اند.");
     }
 
     // Summarize correlation highlights
     if (correlation.sentiment === "BULLISH") {
-      persianReasons.push("ریزش بازدهی اوراق قرضه آمریکا و ضعف شاخص دلار مسیر رشد طلا را هموارتر کرده است.");
+      persianReasons.push("ریزش بازدهی اوراق قرضه آمریکا و ضعف شاخص دلار مسیر رشد را هموارتر کرده است.");
     } else if (correlation.sentiment === "BEARISH") {
-      persianReasons.push("قدرت‌نمایی شاخص دلار (DXY) و افزایش نرخ اوراق قرضه عامل اصلی سرکوب طلا در بازارهای جهانی است.");
+      persianReasons.push("قدرت‌نمایی شاخص دلار (DXY) و افزایش نرخ اوراق قرضه عامل اصلی سرکوب اونس در بازارهای جهانی است.");
     }
 
     const reasoningText = persianReasons.join(" ");

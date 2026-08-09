@@ -61,6 +61,9 @@ window.GoldAI = {
       const symbolEl = document.getElementById("symbolSelect");
       if (symbolEl) symbolEl.value = window.GoldAI_Config.SYMBOL || "XAU/USD";
 
+      const tpCountEl = document.getElementById("tpCountSelect");
+      if (tpCountEl) tpCountEl.value = window.GoldAI_Config.TP_COUNT || 3;
+
       this.updateRiskUI();
     } catch (e) {
       console.error("Failed to load settings:", e);
@@ -189,6 +192,9 @@ window.GoldAI = {
     window.GoldAI_Config.ATR_TP2_MULT = tp2Mult;
     window.GoldAI_Config.ATR_TP3_MULT = tp3Mult;
     this.currentUID = uid;
+
+    const tpCountEl = document.getElementById("tpCountSelect");
+    if (tpCountEl) tpCountEl.value = tpCount;
 
     localStorage.setItem('goldai_settings', JSON.stringify({
       capital, risk, tpCount, slMult, tp1Mult, tp2Mult, tp3Mult, uid,
@@ -376,6 +382,18 @@ window.GoldAI = {
       const stored = JSON.parse(localStorage.getItem('goldai_settings') || "{}");
       stored.strategy = select.value;
       localStorage.setItem('goldai_settings', JSON.stringify(stored));
+    }
+  },
+
+  changeTpCount() {
+    const select = document.getElementById("tpCountSelect");
+    if (select) {
+      const val = Number(select.value);
+      window.GoldAI_Config.TP_COUNT = val;
+      const stored = JSON.parse(localStorage.getItem('goldai_settings') || "{}");
+      stored.tpCount = val;
+      localStorage.setItem('goldai_settings', JSON.stringify(stored));
+      this.updateRiskUI();
     }
   },
 
