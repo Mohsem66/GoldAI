@@ -394,6 +394,7 @@ window.GoldAI = {
       stored.tpCount = val;
       localStorage.setItem('goldai_settings', JSON.stringify(stored));
       this.updateRiskUI();
+      this.applyTpCountVisibility();
     }
   },
 
@@ -588,6 +589,31 @@ window.GoldAI = {
     }
   },
 
+  applyTpCountVisibility() {
+    const tpCount = window.GoldAI_Config.TP_COUNT || 3;
+    const tp2El = document.getElementById("tp2");
+    const tp3El = document.getElementById("tp3Container");
+
+    if (tp2El) {
+      const pill = tp2El.closest('.pill');
+      if (pill) {
+        if (tpCount >= 2) {
+          pill.classList.remove('hidden');
+        } else {
+          pill.classList.add('hidden');
+        }
+      }
+    }
+
+    if (tp3El) {
+      if (tpCount >= 3) {
+        tp3El.classList.remove('hidden');
+      } else {
+        tp3El.classList.add('hidden');
+      }
+    }
+  },
+
   render(r) {
     const set = (id, val) => {
       const el = document.getElementById(id);
@@ -606,28 +632,15 @@ window.GoldAI = {
     set("sl", formatValue(r.stopLoss));
 
     // Dynamically show only chosen TP targets
-    const tpCount = window.GoldAI_Config.TP_COUNT || 3;
     const tp1El = document.getElementById("tp1");
     const tp2El = document.getElementById("tp2");
     const tp3El = document.getElementById("tp3");
 
     if (tp1El) tp1El.textContent = formatValue(r.tp1);
-    if (tp2El) {
-      if (tpCount >= 2) {
-        tp2El.closest('.pill')?.classList.remove('hidden');
-        tp2El.textContent = formatValue(r.tp2);
-      } else {
-        tp2El.closest('.pill')?.classList.add('hidden');
-      }
-    }
-    if (tp3El) {
-      if (tpCount >= 3) {
-        tp3El.closest('.row')?.classList.remove('hidden');
-        tp3El.textContent = formatValue(r.tp3);
-      } else {
-        tp3El.closest('.row')?.classList.add('hidden');
-      }
-    }
+    if (tp2El) tp2El.textContent = formatValue(r.tp2);
+    if (tp3El) tp3El.textContent = formatValue(r.tp3);
+
+    this.applyTpCountVisibility();
 
     set("rr", r.riskReward);
     set("lotSize", r.lot);
