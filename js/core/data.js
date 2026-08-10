@@ -16,18 +16,40 @@ window.GoldAI_Data = {
     return m[tf] || "m5";
   },
 
+  lastFetchTime: {},
+  cache: {},
+  lastPriceFetchTime: 0,
+
   async fetchSeries(interval) {
     const cfg = window.GoldAI_Config;
     if (!cfg.API_KEY || cfg.API_KEY === "YOUR_TWELVE_DATA_API_KEY") {
       return null;
     }
+
+    const cacheKey = `${cfg.SYMBOL}_${interval}`;
+    const now = Date.now();
+    // Cache for 30 seconds to bypass rate-limiting limits and optimize performance speeds
+    if (this.cache[cacheKey] && this.lastFetchTime[cacheKey] && (now - this.lastFetchTime[cacheKey] < 30000)) {
+      console.log(`[Cache Hit] Returning cached series for ${cacheKey}`);
+      return this.cache[cacheKey];
+    }
+
     const url =
       `https://api.twelvedata.com/time_series?symbol=${cfg.SYMBOL}` +
       `&interval=${interval}&outputsize=${cfg.CANDLE_COUNT}&apikey=${cfg.API_KEY}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (!data.values) return null;
-    return data.values.reverse();
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.values) return this.cache[cacheKey] || null;
+      const values = data.values.reverse();
+
+      this.cache[cacheKey] = values;
+      this.lastFetchTime[cacheKey] = now;
+      return values;
+    } catch (e) {
+      console.error(`Error fetching ${cacheKey}:`, e);
+      return this.cache[cacheKey] || null;
+    }
   },
 
   store(key, values) {
@@ -69,11 +91,18 @@ window.GoldAI_Data = {
     if (!cfg.API_KEY || cfg.API_KEY === "YOUR_TWELVE_DATA_API_KEY") {
       return this.goldPrice;
     }
+    const now = Date.now();
+    if (this.goldPrice > 0 && (now - this.lastPriceFetchTime < 5000)) {
+      return this.goldPrice;
+    }
     try {
       const url = `https://api.twelvedata.com/price?symbol=${cfg.SYMBOL}&apikey=${cfg.API_KEY}`;
       const res = await fetch(url);
       const data = await res.json();
-      if (data.price) this.goldPrice = Number(data.price);
+      if (data.price) {
+        this.goldPrice = Number(data.price);
+        this.lastPriceFetchTime = now;
+      }
     } catch (e) {
       console.error("Price error:", e);
     }
