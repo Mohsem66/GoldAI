@@ -19,20 +19,17 @@ window.GoldAI_Config = {
 
   CANDLE_COUNT: 120,
 
-  // Risk & Trade Settings (Professional Defaults)
+  // Risk & Trade Settings
   DEFAULT_CAPITAL: 10000,
-  DEFAULT_RISK_PERCENT: 1.0, // Professional risk is typically 1%
+  DEFAULT_RISK_PERCENT: 1.0,
   MAX_TRADES_PER_DAY: 5,
 
-  // Preset Strategy Mode
   // "scalp" = M1/M5 with M15 confirmation
   // "swing" = H1/H4 with Daily confirmation
   STRATEGY_MODE: "scalp",
 
-  // Target Take Profit Count (1, 2, or 3)
   TP_COUNT: 3,
 
-  // Customizable multipliers for SL / TP
   ATR_SL_MULT: 1.5,
   ATR_TP1_MULT: 2.0,
   ATR_TP2_MULT: 3.5,
@@ -57,11 +54,15 @@ window.GoldAI_Config = {
 
   // Structure
   SWING_LOOKBACK: 5,
-  MIN_BREAK_STRENGTH: 0.15, // % of price
+  MIN_BREAK_STRENGTH: 0.12,
 
-  // Decision
-  MIN_CONFIDENCE: 62,
+  // Decision — tighter for higher quality signals
+  MIN_CONFIDENCE: 72,
+  MIN_SCORE_EDGE: 2.5,
   STRICT_MODE: true,
+
+  // Simulated macro weight (until live feeds exist)
+  SIM_MACRO_WEIGHT: 0.35,
 
   // Refresh
   PRICE_REFRESH_MS: 10000
