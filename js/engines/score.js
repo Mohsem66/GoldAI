@@ -105,13 +105,9 @@ function runScoreEngine(layers) {
   conf = Math.round(conf);
 
   let quality = "LOW";
-  if (signal.includes("WAIT")) {
-    quality = "N/A";
-  } else {
-    if (conf >= 85) quality = "EXCELLENT 🔥";
-    else if (conf >= 75) quality = "HIGH ✅";
-    else if (conf >= 60) quality = "MEDIUM ⚠️";
-  }
+  if (conf >= 85) quality = "EXCELLENT";
+  else if (conf >= 75) quality = "HIGH";
+  else if (conf >= 60) quality = "MEDIUM";
 
   // Unique reasons
   const uniq = [...new Set(reasons.filter(Boolean))];

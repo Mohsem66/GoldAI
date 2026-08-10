@@ -99,21 +99,12 @@ function runConflictFilter(score, layers, cfg) {
     warnings.push("No clear directional edge");
   }
 
-  let quality = "LOW";
-  if (signal.includes("WAIT")) {
-    quality = "N/A";
-  } else {
-    if (confidence >= 85) quality = "EXCELLENT 🔥";
-    else if (confidence >= 75) quality = "HIGH ✅";
-    else if (confidence >= 60) quality = "MEDIUM ⚠️";
-  }
-
   return {
     signal,
     confidence,
     buyScore: score.buyScore,
     sellScore: score.sellScore,
-    entryQuality: quality,
+    entryQuality: confidence >= 78 ? "HIGH" : confidence >= 58 ? "MEDIUM" : "LOW",
     reason: score.reason,
     warnings,
     confirms
