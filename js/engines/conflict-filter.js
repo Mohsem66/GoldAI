@@ -64,11 +64,11 @@ function runConflictFilter(score, layers, cfg) {
   if (layers.aiBrain) {
     if (signal.includes("BUY") && layers.aiBrain.aiSignal.includes("SELL")) {
       confidence -= 22;
-      warnings.push("تضاد شدید: تحلیل تکنیکال خرید، اما هوش مصنوعی و فاندامنتال ریزش پیش‌بینی می‌کند");
+      warnings.push("تضاد شدید: تحلیل تکنیکال خرید، اما هوش مصنوعی و فاندامنتال ریزش پیشبینی می‌کند");
     }
     if (signal.includes("SELL") && layers.aiBrain.aiSignal.includes("BUY")) {
       confidence -= 22;
-      warnings.push("تضاد شدید: تحلیل تکنیکال فروش، اما هوش مصنوعی و فاندامنتال صعود پیش‌بینی می‌کند");
+      warnings.push("تضاد شدید: تحلیل تکنیکال فروش، اما هوش مصنوعی و فاندامنتال صعود پیشبینی می‌کند");
     }
     if (layers.aiBrain.aiSignal.includes("WAIT") && !signal.includes("WAIT") && confidence < 80) {
       confidence -= 12;

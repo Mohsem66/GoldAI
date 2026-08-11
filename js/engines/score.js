@@ -18,7 +18,6 @@ function runScoreEngine(layers) {
     if (layer.warnings) warnings.push(...layer.warnings);
   };
 
-  // Enhanced Weights: structure & liquidity + fundamentals
   add(layers.structure, 1.5);
   add(layers.ema, 1.3);
   add(layers.rsi, 1.1);
@@ -48,13 +47,13 @@ function runScoreEngine(layers) {
   }
 
   if (layers.htf) {
-    if (layers.htf.trend === "BULLISH") { 
-      buy += 4; 
-      confirms.push("HTF bullish bias"); 
+    if (layers.htf.trend === "BULLISH") {
+      buy += 4;
+      confirms.push("HTF bullish bias");
     }
-    if (layers.htf.trend === "BEARISH") { 
-      sell += 4; 
-      confirms.push("HTF bearish bias"); 
+    if (layers.htf.trend === "BEARISH") {
+      sell += 4;
+      confirms.push("HTF bearish bias");
     }
     if (layers.htf.strength === "WEAK") {
       conf -= 5;
@@ -89,10 +88,10 @@ function runScoreEngine(layers) {
   if (aiBrainConf > 0) {
     conf = (conf * 0.4) + (aiBrainConf * 0.6);
   }
-  
+
   if (confirms.length >= 3) conf += 8;
   if (confirms.length >= 5) conf += 5;
-  
+
   if (conf > 100) conf = 100;
   if (conf < 0) conf = 0;
   conf = Math.round(conf);
