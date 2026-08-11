@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🥇 GoldAI Pro V2 - نسخه حرفه‌ای دسکتاپ</title>
+
+  <!-- بارگذاری فونت زیبا و مدرن وزیرمتن از گوگل -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* طراحی سیستم دسکتاپ مدرن با تم شیشه‌ای (Glassmorphism) و تم تیره معاملاتی */
+    :root {
+      --bg-dark: #0a0e17;
+      --panel-bg: rgba(16, 24, 40, 0.75);
+      --card-bg: rgba(22, 33, 54, 0.85);
+      --border-color: rgba(38, 56, 89, 0.5);
+      --accent-color: #f5c542;
+      --bullish-color: #10b981;
+      --bearish-color: #ef4444;
+      --wait-color: #f59e0b;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      scrollbar-width: thin;
+      scrollbar-color: #263859 #0a0e17;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 50%, #152035 0%, #06090e 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* هدر سیستم دسکتاپ */
+    header {
+      background: rgba(10, 14, 23, 0.9);
+      border-bottom: 1px solid var(--border-color);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand h1 {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--accent-color);
+      text-shadow: 0 0 10px rgba(245, 197, 66, 0.3);
+    }
+
+    .brand span.badge {
+      background: linear-gradient(135deg, #f5c542, #d1a119);
+      color: #000;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-right: 8px;
+    }
+
+    /* ساعت‌های معاملاتی */
+    .market-clocks {
+      display: flex;
+      gap: 20px;
+      direction: ltr;
+    }
+
+    .clock-item {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: monospace;
+      text-align: center;
+    }
+
+    .clock-item label {
+      color: var(--text-muted);
+      display: block;
+      font-size: 10px;
+      margin-bottom: 2px;
+      font-family: var(--font-family);
+    }
+
+    /* چیدمان کلی دسکتاپ (سه ستونه) */
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 320px 1fr 350px;
+      gap: 20px;
+      padding: 20px 30px;
+      flex-grow: 1;
+      max-width: 1800px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ستون‌ها */
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 0; /* مانع خارج شدن المنت‌ها */
+    }
+
+    /* پنل‌ها و کارت‌ها */
+    .card {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card:hover {
+      border-color: rgba(245, 197, 66, 0.3);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* فرم‌ها و دراپ‌داون‌ها */
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: #0f1420;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    select:focus, input:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 8px rgba(245, 197, 66, 0.2);
+    }
+
+    /* ردیف‌های مقادیر */
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      font-size: 13px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+    }
+
+    .row:last-child {
+      border-bottom: none;
+    }
+
+    .row span {
+      color: var(--text-muted);
+    }
+
+    .row b {
+      color: #fff;
+    }
+
+    /* دکمه‌های پرمیوم */
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f5c542, #d1a119);
+      color: #05070a;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #ffd970, #f5c542);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(245, 197, 66, 0.3);
+    }
+
+    .btn-secondary {
+      background: rgba(30, 41, 59, 0.6);
+      color: #fff;
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(51, 65, 85, 0.8);
+      border-color: var(--accent-color);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--bearish-color);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.4);
+    }
+
+    /* نمایش قیمت زنده */
+    .price-big {
+      font-size: 42px;
+      font-weight: 900;
+      text-align: center;
+      margin: 15px 0;
+      font-family: monospace;
+      color: var(--accent-color);
+      text-shadow: 0 0 15px rgba(245, 197, 66, 0.25);
+    }
+
+    /* پنل نتایج سیگنال */
+    .signal-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 15px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .signal-value {
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 12px;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .signal-value.buy { color: var(--bullish-color); }
+    .signal-value.sell { color: var(--bearish-color); }
+    .signal-value.wait { color: var(--wait-color); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .pill {
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .pill label {
+      display: block;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .pill span {
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    /* جعبه توضیحات هوش مصنوعی */
+    .reason-box {
+      background: rgba(10, 15, 26, 0.8);
+      border-right: 4px solid var(--accent-color);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 15px;
+      text-align: justify;
+    }
+
+    /* پنل ارتباطی متاتریدر ۵ */
+    .mt5-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--bearish-color);
+      display: inline-block;
+      box-shadow: 0 0 8px var(--bearish-color);
+      transition: all 0.3s;
+    }
+
+    .status-dot.active {
+      background: var(--bullish-color);
+      box-shadow: 0 0 8px var(--bullish-color);
+    }
+
+    /* کارت‌های سه تایی موجودی حساب */
+    .mt5-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .metric-card {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .metric-card label {
+      display: block;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .metric-card span {
+      font-size: 11px;
+      font-weight: 700;
+      font-family: monospace;
+    }
+
+    /* جدول پوزیشن‌ها */
+    .positions-table-container {
+      max-height: 150px;
+      overflow-y: auto;
+      margin-top: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    th, td {
+      padding: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    th {
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    /* سوئیچ خودکار اتو ترید */
+    .toggle-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(245, 197, 66, 0.05);
+      border: 1px dashed rgba(245, 197, 66, 0.2);
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 22px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #334155;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--bullish-color);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    /* پاپ آپ پیکربندی پیشرفته */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s;
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      width: 90%;
+      max-width: 480px;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.8);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    .modal-close {
+      cursor: pointer;
+      font-size: 20px;
+      color: var(--text-muted);
+    }
+
+    .modal-close:hover {
+      color: #fff;
+    }
+
+    /* تب‌های ناوبری پایینی فرانت */
+    .tab-nav {
+      display: flex;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 15px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: rgba(245, 197, 66, 0.15);
+      color: var(--accent-color);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- هدر پیشرفته و بومی سیستم دسکتاپ -->
+  <header>
+    <div class="brand">
+      <h1>🥇 GoldAI Pro</h1>
+      <span class="badge">V2 Desktop</span>
+    </div>
+
+    <!-- ساعت‌های بازار با موقعیت بومی ساعت تهران و بازارهای نیویورک و لندن -->
+    <div class="market-clocks">
+      <div class="clock-item">
+        <label>Tehran Clock 🇮🇷</label>
+        <span id="v2TehranTime">—</span>
+      </div>
+      <div class="clock-item">
+        <label>London Session 🇬🇧</label>
+        <span id="v2LondonTime">—</span>
+      </div>
+      <div class="clock-item">
+        <label>New York Session 🇺🇸</label>
+        <span id="v2NyTime">—</span>
+      </div>
+      <div class="clock-item">
+        <label>Market Countdown ⏱️</label>
+        <span id="v2MarketCountdown" style="color: #60a5fa;">—</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- چیدمان پنل دسکتاپ -->
+  <div class="dashboard-container">
+
+    <!-- ستون سمت چپ: تنظیمات استراتژی و لود دیتا -->
+    <div class="column">
+
+      <!-- پنل تنظیمات اصلی و استراتژی -->
+      <div class="card">
+        <h3>⚙️ تنظیمات استراتژی</h3>
+
+        <div class="form-group">
+          <label>انتخاب نماد معاملاتی:</label>
+          <select id="v2SymbolSelect" onchange="V2GoldAI.changeSymbol()">
+            <option value="XAU/USD">🥇 XAU/USD (طلا)</option>
+            <option value="EUR/USD">🇪🇺 EUR/USD (یورو/دلار)</option>
+            <option value="GBP/USD">🇬🇧 GBP/USD (پوند/دلار)</option>
+            <option value="USD/JPY">🇯🇵 USD/JPY (دلار/ین)</option>
+            <option value="AUD/USD">🇦🇺 AUD/USD (دلار استرالیا/دلار)</option>
+            <option value="USD/CAD">🇨🇦 USD/CAD (دلار/دلار کانادا)</option>
+            <option value="GBP/JPY">🇬🇧🇯🇵 GBP/JPY (پوند/ین)</option>
+            <option value="EUR/JPY">🇪🇺🇯🇵 EUR/JPY (یورو/ین)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>انتخاب سبک استراتژی هوش مصنوعی:</label>
+          <select id="v2StrategySelect" onchange="V2GoldAI.changeStrategy()">
+            <option value="scalp">اسکالپ (M1 / M5 با تایید M15)</option>
+            <option value="swing">سوئینگ (H1 / H4 با تایید Daily)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>تعداد حد سودهای معامله (TP):</label>
+          <select id="v2TpCountSelect" onchange="V2GoldAI.changeTpCount()">
+            <option value="1">تک حد سود (TP 1)</option>
+            <option value="2">دو حد سود (TP 1 & 2)</option>
+            <option value="3" selected>سه حد سود (TP 1 & 2 & 3)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>✍️ ورود قیمت دستی (اخالی بماند = قیمت خودکار بازار):</label>
+          <input type="number" id="v2ManualEntryInput" placeholder="مثال: 2355.50" step="0.00001" style="text-align: left; direction: ltr;">
+        </div>
+      </div>
+
+      <!-- پنل مدیریت ریسک و سرمایه -->
+      <div class="card">
+        <h3>💰 مدیریت ریسک و سرمایه</h3>
+        <div class="row"><span>موجودی کل (Capital)</span><b id="v2CapitalText">10000</b></div>
+        <div class="row"><span>ریسک در هر معامله</span><b id="v2RiskText">1%</b></div>
+        <div class="row"><span>حجم پیشنهادی (Lot Size)</span><b id="v2LotText" style="color: var(--accent-color);">0.01</b></div>
+        <div class="row"><span>حداکثر ضرر مالی معامله</span><b id="v2MaxLossText" style="color: var(--bearish-color);">100</b></div>
+
+        <button class="btn btn-secondary" style="margin-top: 10px;" onclick="V2GoldAI.openSettings()">
+          ⚙️ تنظیمات پیشرفته مدیریت ریسک
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ستون وسط: تحلیل هوش مصنوعی و سیگنال نهایی -->
+    <div class="column">
+
+      <!-- تابلوی قیمت بزرگ زنده -->
+      <div class="card" style="text-align: center;">
+        <h3 style="justify-content: center;">📈 قیمت زنده بازار</h3>
+        <div class="price-big" id="v2LivePrice">—</div>
+        <div class="grid-2">
+          <div class="pill"><label>وضعیت سشن</label><span id="v2MarketSession">—</span></div>
+          <div class="pill"><label>شرایط معامله</label><span id="v2TradeStatus">—</span></div>
+        </div>
+      </div>
+
+      <!-- دکمه آنالیز پیشرفته -->
+      <button class="btn btn-primary" id="v2AnalyzeBtn" onclick="V2GoldAI.analyze()" style="font-size: 16px; padding: 15px;">
+        🚀 شروع آنالیز هوشمند و همه‌جانبه بازار
+      </button>
+
+      <!-- نتایج زنده آنالیز و سیگنال نهایی -->
+      <div id="v2ResultCard" class="card hidden">
+        <h3>📈 نتیجه سیگنال صادر شده</h3>
+
+        <div class="signal-box">
+          <div id="v2SignalValue" class="signal-value wait">WAIT 🟡</div>
+          <div class="grid-2">
+            <div class="pill"><label>میزان اطمینان (Confidence)</label><span id="v2ConfidenceText">—</span></div>
+            <div class="pill"><label>کیفیت نقطه ورود (Quality)</label><span id="v2QualityText">—</span></div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 15px;">
+          <div class="pill"><label>نقطه ورود پیشنهادی (Entry)</label><span id="v2EntryText">—</span></div>
+          <div class="pill"><label>حجم معامله (Lot Size)</label><span id="v2LotSizeText">—</span></div>
+          <div class="pill"><label>حد ضرر (Stop Loss)</label><span id="v2SlText" style="color: var(--bearish-color);">—</span></div>
+          <div class="pill"><label>نسبت ریسک به ریوارد</label><span id="v2RrText">—</span></div>
+        </div>
+
+        <!-- اهداف حد سود پویا -->
+        <div class="grid-2" style="margin-bottom: 15px;">
+          <div class="pill" id="v2Tp1Container"><label>حد سود اول (TP1)</label><span id="v2Tp1Text" style="color: var(--bullish-color);">—</span></div>
+          <div class="pill" id="v2Tp2Container"><label>حد سود دوم (TP2)</label><span id="v2Tp2Text" style="color: var(--bullish-color);">—</span></div>
+        </div>
+        <div class="pill" id="v2Tp3Container" style="margin-bottom: 15px; width: 100%;"><label>حد سود سوم (TP3)</label><span id="v2Tp3Text" style="color: var(--bullish-color);">—</span></div>
+
+        <div class="reason-box">
+          <div id="v2AiReasoningText">در حال دریافت داده‌های همه‌جانبه...</div>
+          <div id="v2WarningsText" style="margin-top: 8px; color: var(--bearish-color);"></div>
+        </div>
+
+        <div class="grid-2" style="margin-top: 15px;">
+          <button class="btn btn-secondary" onclick="V2GoldAI.copySignal()">📋 کپی سیگنال</button>
+          <button class="btn btn-secondary" onclick="V2GoldAI.shareSignal()">📤 اشتراک‌گذاری</button>
+        </div>
+
+        <!-- دکمه ارسال به متاتریدر ۵ دستی -->
+        <button class="btn btn-primary" id="v2SendToMt5Btn" style="margin-top: 15px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff;" onclick="V2GoldAI.sendToMt5()">
+          ⚡ ارسال و اجرای مستقیم این معامله در متاتریدر ۵
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ستون سمت راست: پنل متاتریدر ۵ و آمار عملکرد -->
+    <div class="column">
+
+      <!-- پنل ارتباطی با متاتریدر ۵ به صورت کاملاً زنده -->
+      <div class="card">
+        <div class="mt5-header">
+          <h3>🖥️ پنل زنده متاتریدر ۵ (MT5)</h3>
+          <div class="status-dot" id="v2Mt5StatusDot"></div>
+        </div>
+
+        <!-- سوئیچ اجرای خودکار معامله -->
+        <div class="toggle-container">
+          <span style="font-size: 12px; font-weight: bold;">اجرای خودکار سیگنال‌ها روی MT5:</span>
+          <label class="switch">
+            <input type="checkbox" id="v2AutoExecuteToggle" onchange="V2GoldAI.toggleAutoExecute()">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- وضعیت حساب معاملاتی کاربر -->
+        <div class="mt5-metrics">
+          <div class="metric-card">
+            <label>موجودی (Balance)</label>
+            <span id="v2Mt5Balance">$0.00</span>
+          </div>
+          <div class="metric-card">
+            <label>ارزش (Equity)</label>
+            <span id="v2Mt5Equity">$0.00</span>
+          </div>
+          <div class="metric-card">
+            <label>مارجین آزاد</label>
+            <span id="v2Mt5FreeMargin">$0.00</span>
+          </div>
+        </div>
+
+        <!-- فرم ورود به بروکر متاتریدر ۵ -->
+        <div id="v2Mt5LoginForm" style="margin-bottom: 10px;">
+          <div class="form-group" style="margin-bottom: 8px;">
+            <input type="number" id="v2Mt5LoginInput" placeholder="شماره حساب (Login)" style="padding: 6px 10px; font-size: 11px;">
+          </div>
+          <div class="form-group" style="margin-bottom: 8px;">
+            <input type="password" id="v2Mt5PasswordInput" placeholder="رمز عبور حساب" style="padding: 6px 10px; font-size: 11px;">
+          </div>
+          <div class="form-group" style="margin-bottom: 10px;">
+            <input type="text" id="v2Mt5ServerInput" placeholder="نام سرور (مثال: ICMarkets-Demo)" style="padding: 6px 10px; font-size: 11px;">
+          </div>
+          <button class="btn btn-secondary" style="padding: 8px; font-size: 12px;" onclick="V2GoldAI.connectToMt5()">
+            🔗 اتصال به حساب متاتریدر
+          </button>
+        </div>
+
+        <!-- لیست پوزیشن‌های باز زنده -->
+        <div style="margin-top: 15px;">
+          <h4 style="font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between;">
+            <span>💼 معاملات باز زنده در MT5:</span>
+            <span id="v2PositionsCount" style="color: var(--accent-color);">0</span>
+          </h4>
+          <div class="positions-table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>نماد</th>
+                  <th>نوع</th>
+                  <th>لات</th>
+                  <th>سود ($)</th>
+                </tr>
+              </thead>
+              <tbody id="v2PositionsTableBody">
+                <tr>
+                  <td colspan="4" style="color: var(--text-muted);">حسابی متصل نیست</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- تب‌های پایینی برای جزئیات لایه‌های اندیکاتور و آمار عملکرد -->
+      <div class="tab-nav">
+        <button class="tab-btn active" id="v2TabDetailsBtn" onclick="V2GoldAI.showSubPanel('details')">📊 اندیکاتورها</button>
+        <button class="tab-btn" id="v2TabPerformanceBtn" onclick="V2GoldAI.showSubPanel('performance')">📈 عملکرد سیستم</button>
+      </div>
+
+      <!-- پنل جزئیات اندیکاتورها -->
+      <div class="card" id="v2SubPanelDetails">
+        <div class="row"><span>میانگین متحرک EMA20</span><b id="v2Ema20">—</b></div>
+        <div class="row"><span>میانگین متحرک EMA50</span><b id="v2Ema50">—</b></div>
+        <div class="row"><span>شاخص قدرت نسبی RSI</span><b id="v2Rsi">—</b></div>
+        <div class="row"><span>مکدی MACD Histogram</span><b id="v2Macd">—</b></div>
+        <div class="row"><span>قدرت روند ADX</span><b id="v2Adx">—</b></div>
+        <div class="row"><span>ساختار بازار (SMC / BOS)</span><b id="v2Structure">—</b></div>
+        <div class="row"><span>نقدینگی (Liquidity Sweep)</span><b id="v2Liquidity">—</b></div>
+      </div>
+
+      <!-- پنل آمار عملکرد سیستم -->
+      <div class="card hidden" id="v2SubPanelPerformance">
+        <div class="row"><span>کل سیگنال‌های صادر شده</span><b id="v2PerfTotal">—</b></div>
+        <div class="row"><span>سیگنال‌های موفق (Win Rate)</span><b id="v2PerfWinRate" style="color: var(--bullish-color);">0%</b></div>
+        <div class="row"><span>کل سود حاصله (دلار)</span><b id="v2PerfProfit" style="color: var(--bullish-color);">$0.00</b></div>
+
+        <button class="btn btn-danger" style="margin-top: 15px; padding: 6px; font-size: 11px;" onclick="V2GoldAI.clearPerformanceHistory()">
+          🗑️ ریست و حذف تاریخچه آمار
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- دیالوگ تنظیمات پیشرفته مدیریت ریسک -->
+  <div class="modal" id="v2SettingsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="margin:0; border-bottom:none; padding-bottom:0;">⚙️ تنظیمات مدیریت ریسک</h3>
+        <span class="modal-close" onclick="V2GoldAI.closeSettings()">&times;</span>
+      </div>
+      <div class="form-group">
+        <label>سرمایه کل معامله (دلار):</label>
+        <input type="number" id="v2SettingsCapital" value="10000" step="100">
+      </div>
+      <div class="form-group">
+        <label>درصد ریسک مجاز در هر معامله (%):</label>
+        <input type="number" id="v2SettingsRisk" value="1" step="0.1">
+      </div>
+      <button class="btn btn-primary" onclick="V2GoldAI.saveSettings()">💾 ذخیره تنظیمات</button>
+    </div>
+  </div>
+
+  <!-- اسکریپت‌های زیرساختی و منطقی موتور آنالیز -->
+  <script src="js/config.js"></script>
+  <script src="js/core/data.js"></script>
+  <script src="js/core/ema.js"></script>
+  <script src="js/engines/rsi.js"></script>
+  <script src="js/engines/divergence.js"></script>
+  <script src="js/engines/market-structure.js"></script>
+  <script src="js/engines/macd.js"></script>
+  <script src="js/engines/adx.js"></script>
+  <script src="js/engines/atr.js"></script>
+  <script src="js/engines/volume.js"></script>
+  <script src="js/engines/support-resistance.js"></script>
+  <script src="js/engines/candles.js"></script>
+  <script src="js/engines/liquidity.js"></script>
+  <script src="js/engines/fundamental.js"></script>
+  <script src="js/engines/correlation.js"></script>
+  <script src="js/engines/ai-brain.js"></script>
+  <script src="js/engines/score.js"></script>
+  <script src="js/engines/conflict-filter.js"></script>
+  <script src="js/engines/trade-management.js"></script>
+
+  <!-- اسکریپت پیشرفته نسخه دوم -->
+  <script src="js/v2/app-v2.js"></script>
+</body>
+</html>
