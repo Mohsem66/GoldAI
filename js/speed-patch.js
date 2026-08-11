@@ -1,18 +1,17 @@
 // =====================================
-// GoldAI — Speed patch (price + analyze)
-// Does not change UI layout — only load order/timing
+// GoldAI — Speed patch (after app.js)
+// Live price every 5s + faster data path
 // =====================================
 (function () {
-  function patch() {
-    if (!window.GoldAI || !window.GoldAI_Data) {
-      setTimeout(patch, 30);
-      return;
-    }
+  function apply() {
+    if (!window.GoldAI || !window.GoldAI_Data) return false;
 
     var G = window.GoldAI;
     var D = window.GoldAI_Data;
+    if (G.__speedPatched) return true;
+    G.__speedPatched = true;
 
-    // Faster init: show live price immediately, candles in background
+    // --- Fast init: price first ---
     G.init = async function () {
       this.loadSettings();
       try {
@@ -25,30 +24,35 @@
       this.updateRiskUI();
       this.setupSettingsPanel();
 
-      D.loadEssential().then(function () {
-        if (!D.closes.m5.length && !D.closes.h1.length) D.seedDemo();
-        G.updatePriceUI();
-      }).catch(function (e) { console.warn(e); });
+      D.loadEssential()
+        .then(function () {
+          if (!D.closes.m5.length && !D.closes.h1.length) D.seedDemo();
+          G.updatePriceUI();
+        })
+        .catch(function (e) {
+          console.warn(e);
+        });
 
-      setInterval(function () { G.updateMarketClock(); }, 1000);
+      setInterval(function () {
+        G.updateMarketClock();
+      }, 1000);
 
-      // Online price every 5 seconds
-      var refreshMs = (window.GoldAI_Config && window.GoldAI_Config.PRICE_REFRESH_MS) || 5000;
+      var ms = (window.GoldAI_Config && window.GoldAI_Config.PRICE_REFRESH_MS) || 5000;
       setInterval(async function () {
-        await D.loadPrice(true);
-        G.updatePriceUI();
-      }, refreshMs);
+        try {
+          await D.loadPrice(true);
+          G.updatePriceUI();
+        } catch (e) {}
+      }, ms);
 
-      console.log("\u2705 GoldAI Pro ready (fast price mode)");
+      console.log("GoldAI ready — live price every " + ms + "ms");
     };
 
-    // Faster analyze: price + essential TFs only (cache-aware)
+    // --- Fast analyze: preload essential, skip duplicate network in original ---
     var origAnalyze = G.analyze.bind(G);
     G.analyze = async function () {
-      var btn = document.getElementById("analyzeBtn");
-      var status = document.getElementById("aiStatus");
-      if (btn) btn.disabled = true;
-      if (status) status.textContent = "\ud83d\udfe1 Analyzing...";
+      var savedAll = D.loadAll.bind(D);
+      var savedPrice = D.loadPrice.bind(D);
 
       try {
         await D.loadPrice(true);
@@ -57,44 +61,68 @@
         if (!D.closes.m5.length && !D.closes.h1.length) D.seedDemo();
         this.updatePriceUI();
 
-        // Reuse original engine pipeline by temporarily no-op heavy reloads
-        var savedLoadAll = D.loadAll;
-        var savedLoadPrice = D.loadPrice;
-        D.loadAll = async function () { return D; };
-        D.loadPrice = async function () { return D.goldPrice; };
-        try {
-          // Call original analyze body via copying logic is hard;
-          // instead restore and call original after data is ready
-        } finally {
-          D.loadAll = savedLoadAll;
-          D.loadPrice = savedLoadPrice;
-        }
+        // Original analyze calls loadAll/loadPrice again — make them instant
+        D.loadAll = async function () {
+          return D;
+        };
+        D.loadPrice = async function () {
+          return D.goldPrice;
+        };
 
-        // Original analyze will call loadAll/loadPrice again — make them no-op for this run
-        D.loadAll = async function () { return D; };
-        D.loadPrice = async function () { return D.goldPrice; };
         await origAnalyze();
-        D.loadAll = savedLoadAll;
-        D.loadPrice = savedLoadPrice;
-      } catch (e) {
-        console.error(e);
-        if (status) status.textContent = "\ud83d\udd34 Error";
-        if (btn) btn.disabled = false;
-        throw e;
+      } finally {
+        D.loadAll = savedAll;
+        D.loadPrice = savedPrice;
       }
     };
 
-    // Prevent double DOMContentLoaded init race: if already inited, skip
+    // Fix changeSymbol always forcing demo
+    var origSym = G.changeSymbol.bind(G);
+    G.changeSymbol = async function () {
+      var select = document.getElementById("symbolSelect");
+      if (!select) return;
+      var newSymbol = select.value;
+      window.GoldAI_Config.SYMBOL = newSymbol;
+      try {
+        var stored = JSON.parse(localStorage.getItem("goldai_settings") || "{}");
+        stored.symbol = newSymbol;
+        localStorage.setItem("goldai_settings", JSON.stringify(stored));
+      } catch (e) {}
+
+      var status = document.getElementById("aiStatus");
+      if (status) status.textContent = "\ud83d\udfe1 Resetting data...";
+
+      D.resetData();
+      D.cache = {};
+      D.lastFetchTime = {};
+      await D.loadPrice(true);
+      this.updatePriceUI();
+      await D.loadEssential();
+      if (!D.closes.m5.length && !D.closes.h1.length) D.seedDemo();
+      await D.loadPrice(true);
+      this.updatePriceUI();
+
+      if (status) status.textContent = "\ud83d\udfe2 Ready";
+      var rc = document.getElementById("resultCard");
+      if (rc) rc.classList.add("hidden");
+      var manualInput = document.getElementById("manualEntryInput");
+      if (manualInput) manualInput.value = "";
+    };
+
+    return true;
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", function () {
-      // Run before app's init if possible; app also binds DOMContentLoaded
-      patch();
-    });
-  } else {
-    patch();
+  // app.js registers DOMContentLoaded -> init. Patch before that fires if possible.
+  if (apply()) {
+    // If document already loaded, app may have already inited with old init;
+    // re-run price tick only
   }
-  // Also patch immediately in case app.js already defined GoldAI
-  patch();
+
+  document.addEventListener("DOMContentLoaded", function () {
+    apply();
+  });
+
+  // Late safety
+  setTimeout(apply, 0);
+  setTimeout(apply, 50);
 })();
