@@ -1,6 +1,5 @@
 // =====================================
-// GoldAI — Data Layer (Multi-TF & Multi-Symbol)
-// Live price prioritized; series cached to respect API limits
+// GoldAI — Data Layer (fast live price + essential TFs)
 // =====================================
 
 window.GoldAI_Data = {
@@ -24,14 +23,11 @@ window.GoldAI_Data = {
 
   async fetchSeries(interval) {
     const cfg = window.GoldAI_Config;
-    if (!cfg.API_KEY || cfg.API_KEY === "YOUR_TWELVE_DATA_API_KEY") {
-      return null;
-    }
+    if (!cfg.API_KEY || cfg.API_KEY === "YOUR_TWELVE_DATA_API_KEY") return null;
 
     const cacheKey = cfg.SYMBOL + "_" + interval;
     const now = Date.now();
-    // Longer cache = fewer rate-limit hits (free tier is tight)
-    if (this.cache[cacheKey] && this.lastFetchTime[cacheKey] && (now - this.lastFetchTime[cacheKey] < 60000)) {
+    if (this.cache[cacheKey] && this.lastFetchTime[cacheKey] && (now - this.lastFetchTime[cacheKey] < 45000)) {
       return this.cache[cacheKey];
     }
 
@@ -64,42 +60,54 @@ window.GoldAI_Data = {
     this.volumes[key] = values.map(function (c) { return Number(c.volume || 0); });
   },
 
-  async loadAll() {
+  // Only TFs needed for current strategy (much faster)
+  async loadEssential() {
     const cfg = window.GoldAI_Config;
     try {
-      // 1) Live price FIRST so UI is not stuck on demo/stale
       await this.loadPrice(true);
 
-      // 2) Series one-by-one (avoids burning free-tier credits in parallel)
-      const plan = [
-        [cfg.TF_ENTRY, "m5"],
-        [cfg.TF_SCALP, "m1"],
-        [cfg.TF_SWING, "m15"],
-        [cfg.TF_TREND, "h1"],
-        [cfg.TF_H4, "h4"],
-        [cfg.TF_DAILY, "daily"]
-      ];
-
-      for (let i = 0; i < plan.length; i++) {
-        const interval = plan[i][0];
-        const key = plan[i][1];
-        const values = await this.fetchSeries(interval);
-        if (values && values.length) this.store(key, values);
-        // tiny gap between calls
-        if (i < plan.length - 1) {
-          await new Promise(function (r) { setTimeout(r, 120); });
-        }
+      var plan;
+      if (cfg.STRATEGY_MODE === "swing") {
+        plan = [
+          [cfg.TF_TREND, "h1"],
+          [cfg.TF_H4, "h4"],
+          [cfg.TF_DAILY, "daily"],
+          [cfg.TF_SWING, "m15"]
+        ];
+      } else {
+        plan = [
+          [cfg.TF_ENTRY, "m5"],
+          [cfg.TF_SWING, "m15"],
+          [cfg.TF_TREND, "h1"],
+          [cfg.TF_SCALP, "m1"]
+        ];
       }
 
-      // Only fill goldPrice from candles if live price never arrived
+      for (var i = 0; i < plan.length; i++) {
+        var interval = plan[i][0];
+        var key = plan[i][1];
+        if (this.closes[key] && this.closes[key].length > 30) {
+          var cacheKey = cfg.SYMBOL + "_" + interval;
+          var t = this.lastFetchTime[cacheKey] || 0;
+          if (Date.now() - t < 45000) continue;
+        }
+        var values = await this.fetchSeries(interval);
+        if (values && values.length) this.store(key, values);
+      }
+
       if (!this.livePriceOk || !this.goldPrice) {
-        const primary = this.closes.m5.length ? this.closes.m5 : this.closes.m1;
-        if (primary.length) this.goldPrice = primary[primary.length - 1];
+        var primary = this.closes.m5.length ? this.closes.m5
+          : (this.closes.h1.length ? this.closes.h1 : this.closes.m1);
+        if (primary && primary.length) this.goldPrice = primary[primary.length - 1];
       }
     } catch (e) {
-      console.error("Data load error:", e);
+      console.error("loadEssential error:", e);
     }
     return this;
+  },
+
+  async loadAll() {
+    return this.loadEssential();
   },
 
   async loadPrice(force) {
@@ -108,8 +116,7 @@ window.GoldAI_Data = {
       return this.goldPrice;
     }
     const now = Date.now();
-    // Short cache so refresh feels live; still avoids spam
-    if (!force && this.goldPrice > 0 && (now - this.lastPriceFetchTime < 2500)) {
+    if (!force && this.goldPrice > 0 && (now - this.lastPriceFetchTime < 1500)) {
       return this.goldPrice;
     }
     try {
@@ -148,61 +155,41 @@ window.GoldAI_Data = {
     this.volumes = { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] };
   },
 
-  // Demo fallback when no API key
   seedDemo() {
-    // Keep live price if we already have one
-    const keepPrice = this.livePriceOk ? this.goldPrice : 0;
+    var keepPrice = this.livePriceOk ? this.goldPrice : 0;
     this.resetData();
     if (keepPrice) {
       this.goldPrice = keepPrice;
       this.livePriceOk = true;
     }
 
-    const cfg = window.GoldAI_Config;
-    let basePrice = keepPrice || 2350;
-    let volatilityScale = 1.0;
-
-    const sym = (cfg.SYMBOL || "XAU/USD").toUpperCase();
+    var cfg = window.GoldAI_Config;
+    var basePrice = keepPrice || 2350;
+    var volatilityScale = 1.0;
+    var sym = (cfg.SYMBOL || "XAU/USD").toUpperCase();
 
     if (!keepPrice) {
-      if (sym.includes("EUR/USD")) {
-        basePrice = 1.0850;
-        volatilityScale = 0.0008;
-      } else if (sym.includes("GBP/USD")) {
-        basePrice = 1.2720;
-        volatilityScale = 0.0010;
-      } else if (sym.includes("USD/JPY")) {
-        basePrice = 156.40;
-        volatilityScale = 0.12;
-      } else if (sym.includes("AUD/USD")) {
-        basePrice = 0.6650;
-        volatilityScale = 0.0007;
-      } else if (sym.includes("USD/CAD")) {
-        basePrice = 1.3680;
-        volatilityScale = 0.0008;
-      } else if (sym.includes("GBP/JPY")) {
-        basePrice = 198.80;
-        volatilityScale = 0.18;
-      } else if (sym.includes("EUR/JPY")) {
-        basePrice = 169.50;
-        volatilityScale = 0.15;
-      } else {
-        basePrice = 2350;
-        volatilityScale = 1.2;
-      }
+      if (sym.indexOf("EUR/USD") >= 0) { basePrice = 1.0850; volatilityScale = 0.0008; }
+      else if (sym.indexOf("GBP/USD") >= 0) { basePrice = 1.2720; volatilityScale = 0.0010; }
+      else if (sym.indexOf("USD/JPY") >= 0) { basePrice = 156.40; volatilityScale = 0.12; }
+      else if (sym.indexOf("AUD/USD") >= 0) { basePrice = 0.6650; volatilityScale = 0.0007; }
+      else if (sym.indexOf("USD/CAD") >= 0) { basePrice = 1.3680; volatilityScale = 0.0008; }
+      else if (sym.indexOf("GBP/JPY") >= 0) { basePrice = 198.80; volatilityScale = 0.18; }
+      else if (sym.indexOf("EUR/JPY") >= 0) { basePrice = 169.50; volatilityScale = 0.15; }
+      else { basePrice = 2350; volatilityScale = 1.2; }
     } else {
-      volatilityScale = sym.includes("XAU") || sym.includes("GOLD") ? 1.2 : 0.001;
+      volatilityScale = (sym.indexOf("XAU") >= 0 || sym.indexOf("GOLD") >= 0) ? 1.2 : 0.001;
     }
 
-    let p = basePrice;
-    const gen = function (n, vol) {
-      const c = [], h = [], l = [], cl = [], v = [];
-      for (let i = 0; i < n; i++) {
-        const d = (Math.random() - 0.48) * vol;
-        const o = p;
+    var p = basePrice;
+    var gen = function (n, vol) {
+      var c = [], h = [], l = [], cl = [], v = [];
+      for (var i = 0; i < n; i++) {
+        var d = (Math.random() - 0.48) * vol;
+        var o = p;
         p = p + d;
-        const hi = Math.max(o, p) + Math.random() * vol * 0.3;
-        const lo = Math.min(o, p) - Math.random() * vol * 0.3;
+        var hi = Math.max(o, p) + Math.random() * vol * 0.3;
+        var lo = Math.min(o, p) - Math.random() * vol * 0.3;
         c.push({ open: o, high: hi, low: lo, close: p, volume: 800 + Math.random() * 400 });
         cl.push(p); h.push(hi); l.push(lo); v.push(800 + Math.random() * 400);
       }
@@ -210,7 +197,7 @@ window.GoldAI_Data = {
     };
 
     ["m1", "m5", "m15", "h1", "h4", "daily"].forEach(function (k, i) {
-      const g = gen(100, volatilityScale * (0.8 + i * 0.4));
+      var g = gen(100, volatilityScale * (0.8 + i * 0.4));
       this.candles[k] = g.c;
       this.closes[k] = g.cl;
       this.highs[k] = g.h;
