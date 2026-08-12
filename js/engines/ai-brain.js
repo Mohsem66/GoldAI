@@ -1,120 +1,88 @@
 // =====================================
-// GoldAI — Advanced AI Decision Brain
+// GoldAI — AI Decision Brain (Meta v2)
+// Meta-filter only — does NOT re-score tech layers
 // =====================================
 
 window.GoldAI_AIBrain = {
   analyze(layers) {
-    // Advanced Neural-Probabilistic Ensemble Classifier
-    // Consolidates technical, fundamental, and correlation layers.
-
+    // Aggregate technical direction WITHOUT feeding scores back into Score engine
     let techBuy = 0;
     let techSell = 0;
-    let techConfidence = 0;
-    let totalTechFactors = 0;
+    let n = 0;
 
-    // Aggregate Technical inputs
-    const addTech = (layer) => {
+    const peek = (layer) => {
       if (!layer) return;
       techBuy += layer.buyScore || 0;
       techSell += layer.sellScore || 0;
-      techConfidence += layer.confidence || 0;
-      totalTechFactors++;
+      n++;
     };
 
-    addTech(layers.structure);
-    addTech(layers.ema);
-    addTech(layers.rsi);
-    addTech(layers.divergence);
-    addTech(layers.macd);
-    addTech(layers.adx);
-    addTech(layers.volume);
-    addTech(layers.sr);
-    addTech(layers.candles);
-    addTech(layers.liquidity);
+    peek(layers.structure);
+    peek(layers.ema);
+    peek(layers.rsi);
+    peek(layers.divergence);
+    peek(layers.macd);
+    peek(layers.adx);
+    peek(layers.volume);
+    peek(layers.sr);
+    peek(layers.candles);
+    peek(layers.liquidity);
 
-    // Normalize tech confidence
-    const avgTechConf = totalTechFactors > 0 ? (techConfidence / totalTechFactors) : 0;
     const techDiff = techBuy - techSell;
 
-    // Fetch fundamental and correlation inputs
-    const fundamental = layers.fundamental || { buyScore: 0, sellScore: 0, confidence: 0, reasons: [] };
-    const correlation = layers.correlation || { buyScore: 0, sellScore: 0, confidence: 0, reasons: [] };
+    const fund = layers.fundamental || { buyScore: 0, sellScore: 0, sentiment: "NEUTRAL" };
+    const corr = layers.correlation || { buyScore: 0, sellScore: 0, sentiment: "NEUTRAL" };
 
-    // Weight allocation parameters (Simulating feedforward neural network parameters)
-    const W_TECH = 0.50; // Technical is 50% of the weight
-    const W_FUND = 0.30; // Fundamental is 30% of the weight
-    const W_CORR = 0.20; // Correlation is 20% of the weight
+    // Soft ensemble probabilities (meta bias only)
+    const techScore = techDiff / 3;
+    const fundScore = (fund.buyScore - fund.sellScore) / 4;
+    const corrScore = (corr.buyScore - corr.sellScore) / 4;
 
-    // Calculate integrated Weighted Scores
-    const integratedBuy = (techBuy * W_TECH) + (fundamental.buyScore * W_FUND) + (correlation.buyScore * W_CORR);
-    const integratedSell = (techSell * W_TECH) + (fundamental.sellScore * W_FUND) + (correlation.sellScore * W_CORR);
+    // Tech dominates; simulated macro is soft
+    const integrated = techScore * 0.7 + fundScore * 0.18 + corrScore * 0.12;
 
-    // Probabilistic Softmax activation
-    const expBuy = Math.exp(integratedBuy / 3.0);
-    const expSell = Math.exp(integratedSell / 3.0);
-    // Increased baseline threshold for WAIT state to filter out noise (1.5 -> 1.85) to significantly boost win rate
-    const expWait = Math.exp(1.85);
-    const sumExp = expBuy + expSell + expWait;
+    const expBuy = Math.exp(Math.max(0, integrated));
+    const expSell = Math.exp(Math.max(0, -integrated));
+    const expWait = Math.exp(1.4);
+    const sum = expBuy + expSell + expWait;
 
-    const probBuy = expBuy / sumExp;
-    const probSell = expSell / sumExp;
-    const probWait = expWait / sumExp;
+    const probBuy = expBuy / sum;
+    const probSell = expSell / sum;
+    const probWait = expWait / sum;
 
     let aiSignal = "WAIT 🟡";
-    let aiConfidence = 0;
+    let aiConfidence = Math.round(probWait * 100);
 
-    // Requiring higher directional probability threshold (0.45 -> 0.52) before generating active signals
-    if (probBuy > probSell && probBuy > 0.52) {
+    // Higher bar for directional meta signal
+    if (probBuy > 0.48 && probBuy > probSell + 0.08) {
       aiSignal = "BUY 🟢";
       aiConfidence = Math.round(probBuy * 100);
-    } else if (probSell > probBuy && probSell > 0.52) {
+    } else if (probSell > 0.48 && probSell > probBuy + 0.08) {
       aiSignal = "SELL 🔴";
       aiConfidence = Math.round(probSell * 100);
-    } else {
-      aiSignal = "WAIT 🟡";
-      aiConfidence = Math.round(probWait * 100);
     }
 
-    // Force strict confidence bounds
-    if (aiConfidence > 100) aiConfidence = 100;
-    if (aiConfidence < 0) aiConfidence = 0;
-
-    // Generate dynamic deep reasoning commentary in Persian
     const persianReasons = [];
-
-    // Trend bias explanation
-    if (aiSignal === "BUY 🟢") {
-      persianReasons.push("موتور هوش مصنوعی تلاقی قدرتمند صعودی را در تمامی ابعاد شناسایی کرده است.");
-    } else if (aiSignal === "SELL 🔴") {
-      persianReasons.push("سیستم عصبی هوش مصنوعی ریزش قیمت را به دلیل عدم همخوانی متغیرهای کلان پیش‌بینی می‌کند.");
+    if (aiSignal.includes("BUY")) {
+      persianReasons.push("هم‌راستایی نسبی لایه‌های تکنیکال به نفع خرید است.");
+    } else if (aiSignal.includes("SELL")) {
+      persianReasons.push("هم‌راستایی نسبی لایه‌های تکنیکال به نفع فروش است.");
     } else {
-      persianReasons.push("بازار در حالت ابهام و عدم تصمیم‌گیری قرار دارد؛ هوش مصنوعی استراتژی صبر را توصیه می‌کند.");
+      persianReasons.push("هم‌راستایی کافی نیست؛ صبر منطقی‌تر است.");
     }
 
-    // Summarize technical highlights
-    if (techDiff > 3) {
-      persianReasons.push("ساختار تکنیکال کاملاً صعودی است و حمایت‌های کلیدی حفظ شده‌اند.");
+    if (Math.abs(techDiff) < 2) {
+      persianReasons.push("تکنیکال جهت مشخصی ندارد.");
+    } else if (techDiff > 3) {
+      persianReasons.push("ساختار و مومنتوم تکنیکال متمایل به صعود است.");
     } else if (techDiff < -3) {
-      persianReasons.push("اندیکاتورهای مومنتوم و ساختار بازار حاکی از فشار سنگین خرس‌ها در چارت هستند.");
-    } else {
-      persianReasons.push("نوسانات تکنیکال در چارت کوتاه مدت فاقد جهت مشخص است.");
+      persianReasons.push("ساختار و مومنتوم تکنیکال متمایل به نزول است.");
     }
 
-    // Summarize fundamental highlights
-    if (fundamental.sentiment === "BULLISH") {
-      persianReasons.push("تنش‌های ژئوپلیتیک و سیاست‌های انقباضی رو به کاهش بانک‌های مرکزی از روند صعودی حمایت جدی می‌کنند.");
-    } else if (fundamental.sentiment === "BEARISH") {
-      persianReasons.push("داده‌های داغ اقتصادی آمریکا و رویکرد هاوکیش فدرال رزرو مسبب فشار نزولی بنیادین روی اونس شده‌اند.");
-    }
-
-    // Summarize correlation highlights
-    if (correlation.sentiment === "BULLISH") {
-      persianReasons.push("ریزش بازدهی اوراق قرضه آمریکا و ضعف شاخص دلار مسیر رشد را هموارتر کرده است.");
-    } else if (correlation.sentiment === "BEARISH") {
-      persianReasons.push("قدرت‌نمایی شاخص دلار (DXY) و افزایش نرخ اوراق قرضه عامل اصلی سرکوب اونس در بازارهای جهانی است.");
-    }
-
-    const reasoningText = persianReasons.join(" ");
+    if (fund.sentiment === "BULLISH") persianReasons.push("بایاس بنیادی شبیه‌سازی‌شده صعودی است.");
+    if (fund.sentiment === "BEARISH") persianReasons.push("بایاس بنیادی شبیه‌سازی‌شده نزولی است.");
+    if (corr.sentiment === "BULLISH") persianReasons.push("همبستگی بین‌بازاری شبیه‌سازی‌شده حامی طلا است.");
+    if (corr.sentiment === "BEARISH") persianReasons.push("همبستگی بین‌بازاری شبیه‌سازی‌شده علیه طلا است.");
 
     return {
       aiSignal,
@@ -122,13 +90,14 @@ window.GoldAI_AIBrain = {
       probBuy,
       probSell,
       probWait,
-      techWeight: Math.round(W_TECH * 100),
-      fundWeight: Math.round(W_FUND * 100),
-      corrWeight: Math.round(W_CORR * 100),
-      reasoning: reasoningText,
+      techWeight: 70,
+      fundWeight: 18,
+      corrWeight: 12,
+      reasoning: persianReasons.join(" "),
       techDiff,
-      buyScore: integratedBuy,
-      sellScore: integratedSell
+      // Explicitly zero so Score does not double-count tech
+      buyScore: 0,
+      sellScore: 0
     };
   }
 };

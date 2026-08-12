@@ -8,6 +8,7 @@ function runConflictFilter(score, layers, cfg) {
   const warnings = [];
   const confirms = [];
 
+  // EMA vs Signal
   if (layers.ema) {
     if (signal.includes("BUY") && layers.ema.trend === "BEARISH") {
       confidence -= 15;
@@ -21,6 +22,7 @@ function runConflictFilter(score, layers, cfg) {
     if (signal.includes("SELL") && layers.ema.trend === "BEARISH") confirms.push("EMA confirms SELL");
   }
 
+  // RSI extreme against trade
   if (layers.rsi && layers.rsi.rsi != null) {
     if (signal.includes("BUY") && layers.rsi.rsi >= 78) {
       confidence -= 18;
@@ -32,6 +34,7 @@ function runConflictFilter(score, layers, cfg) {
     }
   }
 
+  // Structure conflict
   if (layers.structure) {
     if (signal.includes("BUY") && layers.structure.trend === "BEARISH" && !layers.structure.choch) {
       confidence -= 12;
@@ -45,11 +48,13 @@ function runConflictFilter(score, layers, cfg) {
     if (layers.structure.choch) warnings.push("CHoCH — regime shift");
   }
 
+  // ADX range → force caution
   if (layers.adx && layers.adx.regime === "RANGE" && confidence < 80) {
     confidence -= 10;
     warnings.push("Range market — avoid force entry");
   }
 
+  // HTF conflict
   if (layers.htf) {
     if (signal.includes("BUY") && layers.htf.trend === "BEARISH") {
       confidence -= 10;
@@ -61,6 +66,7 @@ function runConflictFilter(score, layers, cfg) {
     }
   }
 
+  // تضاد بین تکنیکال و هوش مصنوعی / فاندامنتال (AI Brain Conflict)
   if (layers.aiBrain) {
     if (signal.includes("BUY") && layers.aiBrain.aiSignal.includes("SELL")) {
       confidence -= 22;
@@ -80,12 +86,14 @@ function runConflictFilter(score, layers, cfg) {
   if (confidence < 0) confidence = 0;
   confidence = Math.round(confidence);
 
+  // Raised confidence floor to 68% for strict mode filter to reduce noise and optimize win-rate
   const minC = 68;
   if (cfg.STRICT_MODE && confidence < minC) {
     signal = "WAIT 🟡";
     warnings.push(`Confidence ${confidence} < ${minC}`);
   }
 
+  // Score too close
   if (Math.abs(score.buyScore - score.sellScore) < 2) {
     signal = "WAIT 🟡";
     warnings.push("No clear directional edge");

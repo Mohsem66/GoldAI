@@ -8,7 +8,7 @@
   <!-- بارگذاری فونت زیبا و مدرن وزیرمتن از گوگل -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     /* طراحی سیستم دسکتاپ مدرن با تم شیشه‌ای (Glassmorphism) و تم تیره معاملاتی */
@@ -33,6 +33,11 @@
       font-family: var(--font-family);
       scrollbar-width: thin;
       scrollbar-color: #263859 #0a0e17;
+
+      /* بهینه‌سازی فونت‌ها برای ویندوز جهت داشتن حداکثر شفافیت و زیبایی (Anti-aliasing) */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
     }
 
     body {
@@ -848,6 +853,6 @@
   <script src="js/engines/trade-management.js"></script>
 
   <!-- اسکریپت پیشرفته نسخه دوم -->
-  <script src="js/v2/app-v2.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
