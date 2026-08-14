@@ -109,6 +109,13 @@ window.V2GoldAI = {
     updateTime();
   },
 
+  getDecimals() {
+    const sym = (this.state.symbol || "XAU/USD").toUpperCase();
+    if (sym.includes("JPY")) return 3;
+    if (sym.includes("XAU") || sym.includes("GOLD")) return 2;
+    return 5;
+  },
+
   // Safe and clean market data fetching
   async loadMarketData() {
     const symbol = this.state.symbol;
@@ -136,7 +143,7 @@ window.V2GoldAI = {
 
     // Set Live Price Display
     this.state.livePrice = data.goldPrice || (data.closes.m5[data.closes.m5.length - 1]) || 2045.55;
-    document.getElementById("v2LivePrice").textContent = "$" + this.state.livePrice.toFixed(2);
+    document.getElementById("v2LivePrice").textContent = "$" + this.state.livePrice.toFixed(this.getDecimals());
 
     // Session Info Mapping
     const hrs = new Date().getUTCHours();
@@ -353,14 +360,22 @@ window.V2GoldAI = {
 
     document.getElementById("v2ConfidenceText").textContent = r.confidence + "%";
     document.getElementById("v2QualityText").textContent = r.quality;
-    document.getElementById("v2EntryText").textContent = "$" + r.entry.toFixed(2);
-    document.getElementById("v2LotSizeText").textContent = r.lot;
-    document.getElementById("v2SlText").textContent = "$" + r.stopLoss.toFixed(2);
-    document.getElementById("v2RrText").textContent = "1:" + r.riskReward;
 
-    document.getElementById("v2Tp1Text").textContent = "$" + r.tp1.toFixed(2);
-    document.getElementById("v2Tp2Text").textContent = "$" + r.tp2.toFixed(2);
-    document.getElementById("v2Tp3Text").textContent = "$" + r.tp3.toFixed(2);
+    // Safely format everything using getDecimals()
+    const decs = this.getDecimals();
+    const formatValue = (num) => {
+      if (num == null || isNaN(num) || typeof num === "string" || num === "-") return num;
+      return typeof num === "number" ? num.toFixed(decs) : num;
+    };
+
+    document.getElementById("v2EntryText").textContent = typeof r.entry === 'number' ? "$" + formatValue(r.entry) : r.entry;
+    document.getElementById("v2LotSizeText").textContent = r.lot;
+    document.getElementById("v2SlText").textContent = typeof r.stopLoss === 'number' ? "$" + formatValue(r.stopLoss) : r.stopLoss;
+    document.getElementById("v2RrText").textContent = typeof r.riskReward === 'number' ? "1:" + r.riskReward : r.riskReward;
+
+    document.getElementById("v2Tp1Text").textContent = typeof r.tp1 === 'number' ? "$" + formatValue(r.tp1) : r.tp1;
+    document.getElementById("v2Tp2Text").textContent = typeof r.tp2 === 'number' ? "$" + formatValue(r.tp2) : r.tp2;
+    document.getElementById("v2Tp3Text").textContent = typeof r.tp3 === 'number' ? "$" + formatValue(r.tp3) : r.tp3;
 
     document.getElementById("v2AiReasoningText").textContent = r.reason;
     document.getElementById("v2WarningsText").textContent = r.warnings;
