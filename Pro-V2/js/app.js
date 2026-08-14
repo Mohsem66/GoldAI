@@ -1,6 +1,6 @@
 /**
  * GoldAI Pro V2 - Desktop-Optimized Reactive Application
- * Fully integrates with Python MT5 Connector and resolves V1 weaknesses.
+ * Features 3-Tier Price Failover Cascade (MT5 -> Twelve Data -> Manual/Simulated)
  */
 
 window.V2GoldAI = {
@@ -11,6 +11,7 @@ window.V2GoldAI = {
     tpCount: 3,
     manualEntry: null,
     livePrice: null,
+    priceSource: 'Simulated',
     analyzing: false,
     lastResult: null,
 
@@ -29,7 +30,7 @@ window.V2GoldAI = {
 
   // Initialize V2 Desktop App
   async init() {
-    console.log("🚀 Initializing GoldAI Pro V2...");
+    console.log("🚀 Initializing GoldAI Pro V2 with 3-Tier Price Failover...");
 
     // Load local storage states
     this.loadState();
@@ -37,7 +38,7 @@ window.V2GoldAI = {
     // Start local clocks
     this.startClocks();
 
-    // Initialize price feed & data loading
+    // Initialize price feed & data loading via failover cascade
     await this.loadMarketData();
 
     // Start real-time MT5 polling loop (every 5 seconds)
@@ -116,33 +117,63 @@ window.V2GoldAI = {
     return 5;
   },
 
-  // Safe and clean market data fetching
+  // 3-Tier Price Failover Cascade: Tier 1: MT5 -> Tier 2: Twelve Data API -> Tier 3: Manual/Demo Feed
   async loadMarketData() {
     const symbol = this.state.symbol;
     const config = window.GoldAI_Config || {};
     config.SYMBOL = symbol;
-
-    // Clear old state data
     const data = window.GoldAI_Data;
-    data.closes = { m1: [], m5: [], m15: [], h1: [], h4: [], d1: [] };
 
-    // Load data from live Twelve Data API
-    try {
-      await data.loadAll();
-    } catch (e) {
-      console.warn("Could not retrieve live Twelve Data API feeds. Initializing simulated candles.");
+    let priceFound = false;
+
+    // TIER 1: Check Live MetaTrader 5 Bridge Connection first
+    if (this.state.mt5Connected) {
+      try {
+        const res = await fetch(`http://localhost:5001/current-price?symbol=${encodeURIComponent(symbol)}`, { signal: AbortSignal.timeout(2000) }).catch(() => null);
+        if (res) {
+          const mt5Data = await res.json();
+          if (mt5Data && mt5Data.price && mt5Data.price > 0) {
+            this.state.livePrice = mt5Data.price;
+            this.state.priceSource = "MetaTrader 5 (Live Terminal) ⚡";
+            priceFound = true;
+            console.log("🟢 Tier 1 Success: Price fetched directly from MetaTrader 5.");
+          }
+        }
+      } catch (e) {
+        console.log("Tier 1 MT5 fetch skipped:", e.message);
+      }
     }
 
-    // Fix Bug #1: Ensure we NEVER unconditionally overwrite loaded live Twelve Data with dummy values
-    if (!data.closes.m5.length) {
-      console.log("No live API data found. Seeding beautiful realistic market demo feeds...");
-      data.seedDemo();
-    } else {
-      console.log("✅ Successfully loaded real-time market candlesticks from Twelve Data API.");
+    // TIER 2: Online Twelve Data API Fallback
+    if (!priceFound) {
+      try {
+        await data.loadAll();
+        if (data.closes && data.closes.m5 && data.closes.m5.length > 0) {
+          this.state.livePrice = data.goldPrice || data.closes.m5[data.closes.m5.length - 1];
+          this.state.priceSource = "Twelve Data API (Online) 🌐";
+          priceFound = true;
+          console.log("🟢 Tier 2 Success: Price fetched from Twelve Data API.");
+        }
+      } catch (e) {
+        console.warn("Tier 2 Twelve Data API skipped/failed:", e.message);
+      }
     }
 
-    // Set Live Price Display
-    this.state.livePrice = data.goldPrice || (data.closes.m5[data.closes.m5.length - 1]) || 2045.55;
+    // TIER 3: Manual Price Overwrite or Instant Simulated Demo Feed Fallback
+    if (!priceFound || !data.closes.m5.length) {
+      const manualVal = parseFloat(document.getElementById("v2ManualEntryInput")?.value);
+      if (manualVal && !isNaN(manualVal) && manualVal > 0) {
+        this.state.livePrice = manualVal;
+        this.state.priceSource = "ورود دستی کاربر ✍️";
+      } else {
+        console.log("🟡 Tier 3 Active: Seeding instant realistic demo feed...");
+        data.seedDemo();
+        this.state.livePrice = data.goldPrice || data.closes.m5[data.closes.m5.length - 1] || 2045.55;
+        this.state.priceSource = "موتور شبیه‌ساز انحصاری 🤖";
+      }
+    }
+
+    // Render Live Price and Source Badge
     document.getElementById("v2LivePrice").textContent = "$" + this.state.livePrice.toFixed(this.getDecimals());
 
     // Session Info Mapping
@@ -151,7 +182,7 @@ window.V2GoldAI = {
     if (hrs >= 7 && hrs < 15) session = "London Session 🇪🇺";
     else if (hrs >= 12 && hrs < 21) session = "New York Session 🇺🇸";
     document.getElementById("v2MarketSession").textContent = session;
-    document.getElementById("v2TradeStatus").textContent = "High Liquidity Consensus";
+    document.getElementById("v2TradeStatus").textContent = "منبع قیمت: " + this.state.priceSource;
   },
 
   async changeSymbol() {
@@ -161,7 +192,6 @@ window.V2GoldAI = {
     await this.loadMarketData();
     this.updateRiskUI();
     if (this.state.lastResult) {
-      // Re-run analysis instantly for the new symbol
       await this.analyze();
     }
   },
@@ -174,7 +204,6 @@ window.V2GoldAI = {
     }
   },
 
-  // Fix Bug #2: Real-time, instant update of TP targets in the signal card on dropdown change
   changeTpCount() {
     this.state.tpCount = parseInt(document.getElementById("v2TpCountSelect").value) || 3;
     this.saveState();
@@ -203,7 +232,6 @@ window.V2GoldAI = {
   },
 
   updateRiskUI() {
-    // Read local configuration parameters
     const capital = this.state.capital;
     const riskPercent = this.state.riskPercent;
 
@@ -212,7 +240,6 @@ window.V2GoldAI = {
     document.getElementById("v2RiskText").textContent = riskPercent + "%";
     document.getElementById("v2MaxLossText").textContent = "$" + maxLoss.toFixed(2);
 
-    // Calculate simulated lot size based on symbol volatility ATR
     const data = window.GoldAI_Data;
     const cfg = window.GoldAI_Config || {};
     const atrValue = window.GoldAI_ATR ? window.GoldAI_ATR.analyzeATR(data.highs?.m5 || [], data.lows?.m5 || [], data.closes?.m5 || [], cfg).atr : 1.5;
@@ -221,22 +248,21 @@ window.V2GoldAI = {
     document.getElementById("v2LotText").textContent = this.state.lotSize;
   },
 
-  // Real-time analysis with state-managed results
+  // Instant non-blocking multi-engine analysis
   async analyze() {
-    console.log("⚡ Starting multi-engine analysis in V2...");
+    console.log("⚡ Executing non-blocking multi-engine consensus analysis in V2...");
     this.state.analyzing = true;
     const analyzeBtn = document.getElementById("v2AnalyzeBtn");
     analyzeBtn.disabled = true;
     analyzeBtn.textContent = "در حال تحلیل لایه‌های بازار و سنتیمنت هوش مصنوعی...";
 
-    // Simulated short analysis load time
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Refresh price feeds before analysis via failover cascade
+    await this.loadMarketData();
 
-    // Compile active engines using actual method names of GoldAI Pro V1
+    // Compile active engines using actual method names
     const data = window.GoldAI_Data;
     const cfg = window.GoldAI_Config || {};
 
-    // Assign temp config attributes to match state
     cfg.SYMBOL = this.state.symbol;
     cfg.STRATEGY_MODE = this.state.strategy;
     cfg.TP_COUNT = this.state.tpCount;
@@ -300,8 +326,8 @@ window.V2GoldAI = {
     const final = window.GoldAI_Conflict.runConflictFilter(raw, layers, cfg);
 
     // Trade Management parameters
-    const manualEntry = parseFloat(document.getElementById("v2ManualEntryInput").value);
-    const entryPrice = manualEntry || this.state.livePrice;
+    const manualEntry = parseFloat(document.getElementById("v2ManualEntryInput")?.value);
+    const entryPrice = (manualEntry && !isNaN(manualEntry) && manualEntry > 0) ? manualEntry : this.state.livePrice;
 
     const tradePlan = window.GoldAI_Trade.createTradePlan(
       final.signal,
@@ -330,7 +356,7 @@ window.V2GoldAI = {
     // Render results
     this.renderResult();
 
-    // Auto-execute on MT5 if toggled
+    // Auto-execute on MT5 if toggled and active
     if (this.state.mt5AutoExecute && this.state.mt5Connected) {
       if (this.state.lastResult.signal.includes("BUY") || this.state.lastResult.signal.includes("SELL")) {
         console.log("⚡ Auto Trade trigger active. Placing order to MT5...");
@@ -361,7 +387,7 @@ window.V2GoldAI = {
     document.getElementById("v2ConfidenceText").textContent = r.confidence + "%";
     document.getElementById("v2QualityText").textContent = r.quality;
 
-    // Safely format everything using getDecimals()
+    // Safely format values
     const decs = this.getDecimals();
     const formatValue = (num) => {
       if (num == null || isNaN(num) || typeof num === "string" || num === "-") return num;
@@ -390,7 +416,6 @@ window.V2GoldAI = {
     document.getElementById("v2Structure").textContent = "BOS Detected (Bullish)";
     document.getElementById("v2Liquidity").textContent = "Sell-side Sweep Complete";
 
-    // Update internal performance mock metric
     this.updatePerformanceHistory(r);
   },
 
@@ -431,7 +456,7 @@ window.V2GoldAI = {
     alert("تاریخچه عملکرد با موفقیت ریست شد.");
   },
 
-  // MT5 Bridge Connector Integrations (Live AJAX Calls)
+  // MT5 Bridge Connector Integrations
   async connectToMt5() {
     const login = document.getElementById("v2Mt5LoginInput").value;
     const password = document.getElementById("v2Mt5PasswordInput").value;
@@ -446,13 +471,11 @@ window.V2GoldAI = {
     btn.textContent = "در حال اتصال به کارگزاری...";
 
     try {
-      // Connect directly to the Python MT5 local connector (port 5001)
       const res = await fetch("http://localhost:5001/connect", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ login, password, server })
       }).catch(() => {
-        // Fallback for simulation mode connection if local connector isn't running
         return {
           json: () => Promise.resolve({ status: "connected", message: "[Simulation Mode] Connection Succeeded" })
         };
@@ -465,8 +488,9 @@ window.V2GoldAI = {
         document.getElementById("v2Mt5LoginForm").style.display = "none";
         alert("✅ متاتریدر ۵ با موفقیت متصل شد!\n" + data.message);
 
-        // Immediate fetch of balance & positions
         await this.fetchMt5AccountDetails();
+        // Trigger price reload from MT5 immediately
+        await this.loadMarketData();
       } else {
         alert("❌ خطا در اتصال به متاتریدر: " + data.message);
       }
@@ -531,7 +555,6 @@ window.V2GoldAI = {
   },
 
   startMt5Polling() {
-    // Poll MT5 data every 5 seconds to keep dashboard perfectly alive
     setInterval(() => {
       this.fetchMt5AccountDetails();
     }, 5000);
@@ -584,7 +607,6 @@ window.V2GoldAI = {
 
   toggleAutoExecute() {
     this.state.mt5AutoExecute = document.getElementById("v2AutoExecuteToggle").checked;
-    console.log("Auto-execute state:", this.state.mt5AutoExecute);
   },
 
   // Navigation tabs helper
