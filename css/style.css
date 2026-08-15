@@ -598,3 +598,16 @@ body.light .nav-btn.active { background: #dce3ec; }
   .time-display .clocks { gap: 6px; }
   .time-display .clocks span { font-size: 11px; padding: 2px 6px; }
 }
+/* ===== اسم دکمه‌های ناوبری ===== */
+.nav-labels {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+}
+.nav-labels span {
+  padding: 2px 0;
+}
