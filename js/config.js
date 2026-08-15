@@ -1,10 +1,13 @@
 // =====================================
-// GoldAI Pro — Config
+// GoldAI Pro — Config (بدون کلید API)
 // =====================================
 
 window.GoldAI_Config = {
 
-  API_KEY: "3302af6a7da54960b1dcef8db0edf78b",
+  // 🔐 کلید API به backend/server.js منتقل شده است
+  // از این پس از BACKEND_URL برای دریافت داده استفاده می‌شود
+
+  BACKEND_URL: "http://localhost:5000/api",  // آدرس بک‌اند
 
   SYMBOL: "XAU/USD",
 
@@ -49,6 +52,8 @@ window.GoldAI_Config = {
   MIN_CONFIDENCE: 68,
   STRICT_MODE: true,
 
-  // Live price refresh every 5 seconds
-  PRICE_REFRESH_MS: 5000
+  PRICE_REFRESH_MS: 5000,
+
+  // تنظیمات اعلان (اختیاری)
+  NTFY_TOPIC: "goldai_signals",  // برای اعلان به گوشی
 };
