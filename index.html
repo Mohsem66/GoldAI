@@ -12,17 +12,29 @@
 
     <!-- ===== HEADER ===== -->
     <header class="header">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div class="header-top">
         <h1>🥇 GoldAI Pro</h1>
-        <div>
-          <button id="themeToggle" class="btn-icon" onclick="GoldAI.toggleTheme()">🌙</button>
-        </div>
+        <button id="themeToggle" class="btn-icon" onclick="GoldAI.toggleTheme()">🌙</button>
+      </div>
+      <div class="header-symbol">
+        <label>نماد:</label>
+        <select id="symbolSelect" onchange="GoldAI.changeSymbol()">
+          <option value="XAU/USD">🥇 XAU/USD</option>
+          <option value="EUR/USD">🇪🇺 EUR/USD</option>
+          <option value="GBP/USD">🇬🇧 GBP/USD</option>
+          <option value="USD/JPY">🇯🇵 USD/JPY</option>
+          <option value="AUD/USD">🇦🇺 AUD/USD</option>
+          <option value="USD/CAD">🇨🇦 USD/CAD</option>
+          <option value="GBP/JPY">🇬🇧🇯🇵 GBP/JPY</option>
+          <option value="EUR/JPY">🇪🇺🇯🇵 EUR/JPY</option>
+        </select>
       </div>
       <div class="price-row">
         <span class="price-big" id="goldPrice">—</span>
         <span class="market-status" id="marketStatus">—</span>
+        <span class="session" id="marketSession">—</span>
       </div>
-      <div id="timeDisplay" style="margin-top: 6px; font-size: 13px; color: var(--muted);"></div>
+      <div id="timeDisplay" class="time-display"></div>
     </header>
 
     <!-- ===== PANEL HOME ===== -->
@@ -31,22 +43,19 @@
       <!-- کارت سیگنال -->
       <div class="card signal-card">
         <div id="signal" class="signal-value wait">WAIT 🟡</div>
-        <div style="margin: 6px 0 10px;">
-          <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted);">
-            <span>ضعیف</span>
-            <span>قدرت: <span id="signalStrengthText">0%</span></span>
-            <span>قوی</span>
+        <div class="strength-bar">
+          <span>ضعیف</span>
+          <div class="bar-track">
+            <div id="signalStrengthBar" style="width:0%;"></div>
           </div>
-          <div style="width:100%; height:8px; background:#1a222c; border-radius:4px; overflow:hidden;">
-            <div id="signalStrengthBar" style="width:0%; height:100%; background:var(--gold); border-radius:4px; transition: width 0.5s ease;"></div>
-          </div>
+          <span>قوی</span>
+          <span id="signalStrengthText" class="strength-text">0%</span>
         </div>
         <div class="signal-details" id="signalDetails"></div>
-        <div class="reason-box" id="aiReason" style="font-size:13px; margin-top:8px;">—</div>
-        <div id="warnings" style="font-size:12px; color:var(--muted); margin-top:4px;"></div>
-        <div style="display:flex; gap:8px; margin-top:10px;">
-          <button class="btn-ghost" style="flex:1;" onclick="GoldAI.copySignal()">📋 کپی</button>
-          <button class="btn-ghost" style="flex:1;" onclick="GoldAI.shareSignal()">📤 اشتراک</button>
+        <div class="reason-box" id="aiReason">—</div>
+        <div id="warnings" class="warnings"></div>
+        <div class="signal-actions">
+          <button class="btn-ghost" onclick="GoldAI.shareSignal()">📤 اشتراک</button>
         </div>
       </div>
 
@@ -89,10 +98,10 @@
         <button class="btn-ghost" style="margin-top:8px;" onclick="GoldAI.applyTradeSettings()">✅ اعمال تنظیمات</button>
       </div>
 
-      <!-- کارت ریسک و وین‌ریت با سود/ضرر احتمالی -->
+      <!-- کارت ریسک و عملکرد -->
       <div class="card risk-card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <h3 style="margin:0;">💰 ریسک و عملکرد</h3>
+        <div class="risk-header">
+          <h3>💰 ریسک و عملکرد</h3>
           <button class="btn-icon" onclick="GoldAI.openSettings()">⚙️</button>
         </div>
         <div class="risk-row">
@@ -101,18 +110,29 @@
           <span>حد ضرر ($)</span><b id="maxLossText">100</b>
           <span>لات</span><b id="lotText">0.01</b>
         </div>
+        <!-- تنظیمات پیشرفته (برگشت داده شده) -->
+        <div class="advanced-settings">
+          <div class="adv-row">
+            <label>سرمایه ($)</label>
+            <input type="number" id="advCapital" value="10000" min="100" onchange="GoldAI.updateAdvancedSettings()" />
+          </div>
+          <div class="adv-row">
+            <label>درصد ریسک (%)</label>
+            <input type="number" id="advRisk" value="1" min="0.1" max="10" step="0.1" onchange="GoldAI.updateAdvancedSettings()" />
+          </div>
+          <div class="adv-row">
+            <label>استراتژی</label>
+            <select id="strategySelect" onchange="GoldAI.changeStrategy()">
+              <option value="scalp">اسکالپ</option>
+              <option value="swing">سوئینگ</option>
+            </select>
+          </div>
+        </div>
         <div class="winrate-row">
           <span>وین‌ریت امروز: <b id="dailyWinRate">—</b></span>
           <span>سود احتمالی: <b id="dailyProfit">$0.00</b></span>
           <span>ضرر احتمالی: <b id="dailyLoss">$0.00</b></span>
         </div>
-      </div>
-
-      <!-- دکمه‌های ابزار -->
-      <div style="display:flex; gap:8px; margin-bottom:12px;">
-        <button class="btn-ghost" style="flex:1; margin:0;" onclick="GoldAI.runBacktest()">📊 بک‌تست</button>
-        <button class="btn-ghost" style="flex:1; margin:0;" onclick="GoldAI.showPanel('performance')">📈 عملکرد</button>
-        <button class="btn-ghost" style="flex:1; margin:0;" onclick="GoldAI.showPanel('details')">📊 جزئیات</button>
       </div>
 
       <!-- نتیجه بک‌تست -->
@@ -122,12 +142,101 @@
       </div>
     </div>
 
-    <!-- ===== سایر پنل‌ها ===== -->
-    <div id="panel-details" class="panel hidden"></div>
-    <div id="panel-performance" class="panel hidden"></div>
-    <div id="panel-about" class="panel hidden"></div>
+    <!-- ===== پنل عملکرد ===== -->
+    <div id="panel-performance" class="panel hidden">
+      <div class="card">
+        <h3>📈 عملکرد سیستم</h3>
+        <div class="perf-filters">
+          <select id="perfSymbolFilter" onchange="GoldAI.renderPerformance()">
+            <option value="all">همه نمادها</option>
+            <option value="XAU/USD">XAU/USD</option>
+            <option value="EUR/USD">EUR/USD</option>
+            <option value="GBP/USD">GBP/USD</option>
+            <option value="USD/JPY">USD/JPY</option>
+          </select>
+          <select id="perfTimeFilter" onchange="GoldAI.renderPerformance()">
+            <option value="all">همه زمان‌ها</option>
+            <option value="24h">۲۴ ساعت</option>
+            <option value="7d">۷ روز</option>
+            <option value="30d">۳۰ روز</option>
+          </select>
+          <button class="btn-ghost" onclick="GoldAI.clearPerformanceHistory()">🗑️ ریست</button>
+        </div>
+        <div class="perf-stats">
+          <div class="perf-item"><span>کل</span><b id="perfTotal">0</b></div>
+          <div class="perf-item"><span>BUY</span><b id="perfBuy">0</b></div>
+          <div class="perf-item"><span>SELL</span><b id="perfSell">0</b></div>
+          <div class="perf-item"><span>WAIT</span><b id="perfWait">0</b></div>
+          <div class="perf-item"><span>وین‌ریت</span><b id="perfWinRate">0%</b></div>
+          <div class="perf-item"><span>سود</span><b id="perfProfit">$0</b></div>
+          <div class="perf-item"><span>ضرر</span><b id="perfLoss">$0</b></div>
+        </div>
+        <button class="btn-ghost" onclick="GoldAI.runBacktest()" style="margin-top:10px;">📊 اجرای بک‌تست</button>
+      </div>
+    </div>
 
-    <!-- ناوبری -->
+    <!-- ===== پنل جزئیات ===== -->
+    <div id="panel-details" class="panel hidden">
+      <div class="card">
+        <h3>📊 جزئیات اندیکاتورها</h3>
+        <div class="detail-grid">
+          <div class="detail-row"><span>EMA20</span><span id="dEma20">—</span></div>
+          <div class="detail-row"><span>EMA50</span><span id="dEma50">—</span></div>
+          <div class="detail-row"><span>EMA200</span><span id="dEma200">—</span></div>
+          <div class="detail-row"><span>RSI</span><span id="dRsi">—</span></div>
+          <div class="detail-row"><span>MACD Hist</span><span id="dMacd">—</span></div>
+          <div class="detail-row"><span>ADX</span><span id="dAdx">—</span></div>
+          <div class="detail-row"><span>ATR</span><span id="dAtr">—</span></div>
+          <div class="detail-row"><span>Volume</span><span id="dVol">—</span></div>
+          <div class="detail-row"><span>Reversal</span><span id="dReversal">—</span></div>
+          <div class="detail-row"><span>Structure</span><span id="dStruct">—</span></div>
+          <div class="detail-row"><span>BOS</span><span id="dBos">—</span></div>
+          <div class="detail-row"><span>CHoCH</span><span id="dChoch">—</span></div>
+          <div class="detail-row"><span>Divergence</span><span id="dDiv">—</span></div>
+          <div class="detail-row"><span>Liquidity</span><span id="dLiq">—</span></div>
+          <div class="detail-row"><span>Candle</span><span id="dCandle">—</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>🧠 AI & Fundamental</h3>
+        <div class="detail-grid">
+          <div class="detail-row"><span>AI Signal</span><span id="dAiSignal">—</span></div>
+          <div class="detail-row"><span>AI Conf</span><span id="dAiConf">—</span></div>
+          <div class="detail-row"><span>CPI</span><span id="dAiCpi">—</span></div>
+          <div class="detail-row"><span>NFP</span><span id="dAiNfp">—</span></div>
+          <div class="detail-row"><span>Fed</span><span id="dAiFed">—</span></div>
+          <div class="detail-row"><span>DXY</span><span id="dAiDxy">—</span></div>
+          <div class="detail-row"><span>US10Y</span><span id="dAiUs10y">—</span></div>
+          <div class="detail-row"><span>Silver/SPX</span><span id="dAiSilverSpx">—</span></div>
+        </div>
+        <div id="dAiReasoning" class="reason-box" style="margin-top:10px;">منتظر تحلیل...</div>
+      </div>
+    </div>
+
+    <!-- ===== پنل درباره ===== -->
+    <div id="panel-about" class="panel hidden">
+      <div class="card">
+        <h3>ℹ️ درباره GoldAI</h3>
+        <p>سیستم سیگنال‌دهی چندموتوره برای طلا و جفت ارزها.</p>
+        <div class="tag-container">
+          <span class="tag">EMA 20/50/200</span>
+          <span class="tag">RSI</span>
+          <span class="tag">MACD</span>
+          <span class="tag">ADX</span>
+          <span class="tag">ATR</span>
+          <span class="tag">Volume</span>
+          <span class="tag">S/R</span>
+          <span class="tag">Candles</span>
+          <span class="tag">Liquidity</span>
+          <span class="tag">Reversal</span>
+          <span class="tag">Divergence</span>
+          <span class="tag">Conflict Filter</span>
+        </div>
+        <p class="muted" style="margin-top:12px;">⚠️ فقط جنبه آموزشی — مشاوره مالی نیست.</p>
+      </div>
+    </div>
+
+    <!-- ===== ناوبری ===== -->
     <nav class="nav">
       <button class="nav-btn active" data-panel="home" onclick="GoldAI.showPanel('home')">🏠</button>
       <button class="nav-btn" data-panel="details" onclick="GoldAI.showPanel('details')">📊</button>
