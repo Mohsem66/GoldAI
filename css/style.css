@@ -1,0 +1,58 @@
+/* ===== قیمت دستی ===== */
+.manual-price-input {
+  margin: 4px 0 6px;
+  width: 100%;
+  max-width: 200px;
+}
+.manual-price-input input {
+  width: 100%;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  text-align: center;
+  font-family: "Vazirmatn", sans-serif;
+}
+.manual-price-input input::placeholder {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ===== اسم دکمه‌های ناوبری ===== */
+.nav-labels {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+}
+.nav-labels span {
+  padding: 2px 0;
+}
+
+/* ===== مودال تنظیمات پیشرفته ===== */
+.settings-group {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.settings-group label {
+  font-size: 13px;
+  color: var(--muted);
+}
+.settings-group input,
+.settings-group select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: "Vazirmatn", sans-serif;
+  text-align: center;
+}
