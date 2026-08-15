@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GoldAI Pro</title>
-  <!-- فونت وزیرمتن از CDN -->
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -42,9 +41,7 @@
             <div id="signalStrengthBar" style="width:0%; height:100%; background:var(--gold); border-radius:4px; transition: width 0.5s ease;"></div>
           </div>
         </div>
-        <div class="signal-details" id="signalDetails">
-          <!-- این بخش به‌صورت پویا توسط جاوااسکریپت پر می‌شود -->
-        </div>
+        <div class="signal-details" id="signalDetails"></div>
         <div class="reason-box" id="aiReason" style="font-size:13px; margin-top:8px;">—</div>
         <div id="warnings" style="font-size:12px; color:var(--muted); margin-top:4px;"></div>
         <div style="display:flex; gap:8px; margin-top:10px;">
@@ -92,7 +89,7 @@
         <button class="btn-ghost" style="margin-top:8px;" onclick="GoldAI.applyTradeSettings()">✅ اعمال تنظیمات</button>
       </div>
 
-      <!-- کارت ریسک و وین‌ریت -->
+      <!-- کارت ریسک و وین‌ریت با سود/ضرر احتمالی -->
       <div class="card risk-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <h3 style="margin:0;">💰 ریسک و عملکرد</h3>
@@ -125,10 +122,10 @@
       </div>
     </div>
 
-    <!-- ===== سایر پنل‌ها (مثل قبل) ===== -->
-    <div id="panel-details" class="panel hidden"><!-- جزئیات --></div>
-    <div id="panel-performance" class="panel hidden"><!-- عملکرد --></div>
-    <div id="panel-about" class="panel hidden"><!-- درباره --></div>
+    <!-- ===== سایر پنل‌ها ===== -->
+    <div id="panel-details" class="panel hidden"></div>
+    <div id="panel-performance" class="panel hidden"></div>
+    <div id="panel-about" class="panel hidden"></div>
 
     <!-- ناوبری -->
     <nav class="nav">
