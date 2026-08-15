@@ -614,47 +614,58 @@ window.GoldAI = {
   },
 
   updateMarketClock() {
-    const now = new Date();
-    const day = now.getUTCDay();
-    const hour = now.getUTCHours();
+  const now = new Date();
+  const day = now.getUTCDay();
+  const hour = now.getUTCHours();
 
-    const open = this.isMarketOpen();
-    let session = "Sydney";
-    if (hour >= 7 && hour < 12) session = "Tokyo";
-    else if (hour >= 12 && hour < 17) session = "London";
-    else if (hour >= 17 || hour < 0) session = "New York";
+  const open = this.isMarketOpen();
+  let session = "Sydney";
+  if (hour >= 7 && hour < 12) session = "Tokyo";
+  else if (hour >= 12 && hour < 17) session = "London";
+  else if (hour >= 17 || hour < 0) session = "New York";
 
-    const ms = document.getElementById("marketStatus");
-    if (ms) {
-      ms.textContent = open ? "🟢 OPEN" : "🔴 CLOSED";
-      ms.className = "market-status " + (open ? "open" : "closed");
+  // ===== به‌روزرسانی وضعیت بازار =====
+  const ms = document.getElementById("marketStatus");
+  if (ms) {
+    ms.textContent = open ? "🟢 OPEN" : "🔴 CLOSED";
+    ms.className = "market-status " + (open ? "open" : "closed");
+  }
+  document.getElementById("marketSession").textContent = session;
+
+  // ===== نمایش/مخفی کردن هشدار بازار بسته =====
+  const warning = document.getElementById("marketClosedWarning");
+  if (warning) {
+    if (open) warning.classList.add("hidden");
+    else warning.classList.remove("hidden");
+  }
+
+  // ===== ساعت‌ها و تاریخ =====
+  const td = document.getElementById("timeDisplay");
+  if (td) {
+    try {
+      const zones = [
+        { name: "تهران", tz: "Asia/Tehran" },
+        { name: "لندن", tz: "Europe/London" },
+        { name: "نیویورک", tz: "America/New_York" },
+        { name: "توکیو", tz: "Asia/Tokyo" }
+      ];
+      const clocksHTML = zones.map(z => {
+        const opt = { timeZone: z.tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+        const f = new Intl.DateTimeFormat('fa-IR', opt).format(now);
+        return `<span><b>${z.name}</b> ${f}</span>`;
+      }).join('');
+      const dateOpt = { timeZone: 'Asia/Tehran', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const persianDate = new Intl.DateTimeFormat('fa-IR', dateOpt).format(now);
+      td.innerHTML = `<div class="date-row">${persianDate}</div><div class="clocks">${clocksHTML}</div>`;
+    } catch (e) {
+      td.textContent = now.toUTCString();
     }
-    document.getElementById("marketSession").textContent = session;
+  }
 
-    // زمان و تاریخ
-    const td = document.getElementById("timeDisplay");
-    if (td) {
-      try {
-        const zones = [
-          { name: "تهران", tz: "Asia/Tehran" },
-          { name: "لندن", tz: "Europe/London" },
-          { name: "نیویورک", tz: "America/New_York" },
-          { name: "توکیو", tz: "Asia/Tokyo" }
-        ];
-        const clocksHTML = zones.map(z => {
-          const opt = { timeZone: z.tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-          const f = new Intl.DateTimeFormat('fa-IR', opt).format(now);
-          return `<span><b>${z.name}</b> ${f}</span>`;
-        }).join('');
-        const dateOpt = { timeZone: 'Asia/Tehran', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const persianDate = new Intl.DateTimeFormat('fa-IR', dateOpt).format(now);
-        td.innerHTML = `<div>${persianDate}</div><div class="clocks">${clocksHTML}</div>`;
-      } catch (e) {
-        td.textContent = now.toUTCString();
-      }
-    }
-  },
-
+  // ===== به‌روزرسانی وین‌ریت =====
+  this.updateRiskUI();
+},
+    
   setupSettingsPanel() {
     // تنظیمات قبلی از طریق دکمه تنظیمات در کارت ریسک انجام می‌شود
   },
