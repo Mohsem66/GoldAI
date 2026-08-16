@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoldAI - سیستم معاملاتی هوشمند طلا</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- هدر -->
+        <header class="header">
+            <div class="container">
+                <div class="logo">
+                    <i class="fas fa-coins"></i>
+                    <h1>GoldAI</h1>
+                    <span class="version">v2.0</span>
+                </div>
+                <nav class="nav">
+                    <button class="nav-btn active" data-tab="dashboard">
+                        <i class="fas fa-chart-pie"></i> داشبورد
+                    </button>
+                    <button class="nav-btn" data-tab="backtest">
+                        <i class="fas fa-history"></i> بک‌تست
+                    </button>
+                    <button class="nav-btn" data-tab="settings">
+                        <i class="fas fa-cog"></i> تنظیمات
+                    </button>
+                </nav>
+                <div class="status-bar">
+                    <span class="status-dot online"></span>
+                    <span>سیستم فعال</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- محتوای اصلی -->
+        <main class="main">
+            <div class="container">
+                <!-- بخش داشبورد -->
+                <section id="dashboard" class="tab-content active">
+                    <!-- کارت قیمت -->
+                    <div class="price-card">
+                        <div class="price-header">
+                            <span class="price-label">قیمت طلا (XAU/USD)</span>
+                            <span class="price-timestamp" id="last-update">آخرین به‌روزرسانی: --</span>
+                        </div>
+                        <div class="price-body">
+                            <span class="current-price" id="current-price">$---</span>
+                            <span class="price-change" id="price-change">---</span>
+                        </div>
+                    </div>
+
+                    <!-- سیگنال اصلی -->
+                    <div class="signal-card">
+                        <div class="signal-header">
+                            <h3><i class="fas fa-bullhorn"></i> سیگنال معاملاتی</h3>
+                        </div>
+                        <div class="signal-body">
+                            <div class="signal-status" id="signal-status">HOLD</div>
+                            <div class="signal-metrics">
+                                <div class="metric">
+                                    <label>قدرت سیگنال</label>
+                                    <span class="signal-strength" id="signal-strength">0%</span>
+                                </div>
+                                <div class="metric">
+                                    <label>اطمینان</label>
+                                    <span class="signal-confidence" id="signal-confidence">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- لایه‌ها -->
+                    <div class="layers-section">
+                        <h3><i class="fas fa-layer-group"></i> لایه‌های تحلیلی</h3>
+                        <div class="layers-grid" id="layers-grid">
+                            <!-- توسط JS پر می‌شود -->
+                        </div>
+                    </div>
+
+                    <!-- اخبار -->
+                    <div class="news-section">
+                        <h3><i class="fas fa-newspaper"></i> اخبار</h3>
+                        <div class="news-list" id="news-list">
+                            <!-- توسط JS پر می‌شود -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- بخش بک‌تست -->
+                <section id="backtest" class="tab-content">
+                    <div class="backtest-controls">
+                        <h3><i class="fas fa-sliders-h"></i> تنظیمات بک‌تست</h3>
+                        <form id="backtest-form">
+                            <div class="form-group">
+                                <label>سرمایه اولیه</label>
+                                <input type="number" id="initial-capital" value="10000">
+                            </div>
+                            <div class="form-group">
+                                <label>تاریخ شروع</label>
+                                <input type="date" id="start-date" value="2024-01-01">
+                            </div>
+                            <div class="form-group">
+                                <label>تاریخ پایان</label>
+                                <input type="date" id="end-date" value="2024-12-31">
+                            </div>
+                            <div class="form-group">
+                                <label>اسپرد (pip)</label>
+                                <input type="number" id="spread" value="0.0003" step="0.0001">
+                            </div>
+                            <div class="form-group">
+                                <label>Slippage (pip)</label>
+                                <input type="number" id="slippage" value="0.0001" step="0.0001">
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-play"></i> اجرای بک‌تست
+                            </button>
+                        </form>
+                    </div>
+                    <div class="backtest-results" id="backtest-results">
+                        <!-- نتایج بک‌تست -->
+                    </div>
+                </section>
+
+                <!-- بخش تنظیمات -->
+                <section id="settings" class="tab-content">
+                    <div class="settings-section">
+                        <h3><i class="fas fa-cogs"></i> تنظیمات سیستم</h3>
+                        <div class="settings-grid">
+                            <div class="setting-item">
+                                <label>
+                                    <input type="checkbox" id="enable-news" checked>
+                                    فعال‌سازی اخبار
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <label>
+                                    <input type="checkbox" id="enable-fundamental" disabled>
+                                    لایه Fundamental (غیرفعال)
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <label>
+                                    <input type="checkbox" id="enable-correlation" disabled>
+                                    لایه Correlation (غیرفعال)
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <label>
+                                    ریسک در هر معامله
+                                    <input type="range" id="risk-per-trade" min="1" max="5" value="2">
+                                    <span id="risk-value">2%</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- فوتر -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2026 GoldAI Trading System. All rights reserved.</p>
+                <span class="footer-version">نسخه 2.0.0</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ⚠️ لایه‌های غیرفعال شده - کامنت شده‌اند -->
+    <!-- ============================================================ -->
+    
+    <!-- لایه‌های اصلی (فعال) -->
+    <script src="js/config.js"></script>
+    <script src="js/engines/score.js"></script>
+    <script src="js/engines/ai-brain.js"></script>
+    <script src="js/engines/conflict-filter.js"></script>
+    <script src="js/engines/trade-management.js"></script>
+    
+    <!-- ⚠️ لایه‌های غیرفعال شده (کامنت شده) -->
+    <!-- <script src="js/engines/fundamental.js"></script> -->
+    <!-- <script src="js/engines/correlation.js"></script> -->
+    
+    <!-- فایل اصلی اپلیکیشن -->
+    <script src="js/app.js"></script>
+</body>
+</html>
