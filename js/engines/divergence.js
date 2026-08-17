@@ -37,6 +37,12 @@ function analyzeDivergence(prices, rsiValues) {
 
   if (!prices || !rsiValues || prices.length < 20 || rsiValues.length < 20) return result;
 
+  // Require aligned series length to avoid index mismatch (look-ahead / misaligned RSI)
+  const len = Math.min(prices.length, rsiValues.length);
+  if (len < 20) return result;
+  prices = prices.slice(prices.length - len);
+  rsiValues = rsiValues.slice(rsiValues.length - len);
+
   const lb = 3;
   const confMap = { STRONG: 20, MEDIUM: 12, WEAK: 5 };
 
