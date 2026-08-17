@@ -1,8 +1,9 @@
 // =====================================
 // GoldAI — Trade Management
+// Lot sizing uses symbolSpecs when available (from MT5 bridge)
 // =====================================
 
-function createTradePlan(signal, entry, atr, capital, riskPercent, cfg) {
+function createTradePlan(signal, entry, atr, capital, riskPercent, cfg, symbolSpecs) {
   if (!signal || signal.includes("WAIT") || !atr) {
     return {
       entry: entry || "-",
@@ -20,20 +21,33 @@ function createTradePlan(signal, entry, atr, capital, riskPercent, cfg) {
   const riskMoney = Number(((capital * riskPct) / 100).toFixed(2));
   const stopDist = Math.abs(entry - levels.stopLoss);
 
-  // Approximate contract sizing (broker-dependent — verify on your MT5 symbol specs)
-  // Gold: many brokers use $1 per 0.01 lot per $1 price move → multiplier ≈ 100
-  // Standard FX: 100000 units; JPY pairs often 1000 point value approximation
-  const sym = (window.GoldAI_Config.SYMBOL || "XAU/USD").toUpperCase();
-  let baseMultiplier = 100; // XAU default
-  if (sym.includes("EUR/USD") || sym.includes("GBP/USD") || sym.includes("AUD/USD") || sym.includes("USD/CAD")) {
-    baseMultiplier = 100000;
-  } else if (sym.includes("JPY")) {
-    baseMultiplier = 1000;
+  const sym = (cfg.SYMBOL || window.GoldAI_Config.SYMBOL || "XAU/USD").toUpperCase();
+  const specs = symbolSpecs || cfg.SYMBOL_SPECS || window.GoldAI_Config.SYMBOL_SPECS || {};
+
+  let lot = 0.01;
+  const tickSize = Number(specs.trade_tick_size || specs.tickSize || 0);
+  const tickValue = Number(specs.trade_tick_value || specs.tickValue || 0);
+  const volMin = Number(specs.volume_min || specs.volumeMin || 0.01);
+  const volMax = Number(specs.volume_max || specs.volumeMax || 50);
+  const volStep = Number(specs.volume_step || specs.volumeStep || 0.01);
+
+  if (tickSize > 0 && tickValue > 0 && stopDist > 0) {
+    const lossPerLot = (stopDist / tickSize) * tickValue;
+    if (lossPerLot > 0) lot = riskMoney / lossPerLot;
+  } else {
+    let baseMultiplier = 100;
+    if (sym.includes("EUR/USD") || sym.includes("GBP/USD") || sym.includes("AUD/USD") || sym.includes("USD/CAD")) {
+      baseMultiplier = 100000;
+    } else if (sym.includes("JPY")) {
+      baseMultiplier = 1000;
+    }
+    lot = stopDist > 0 ? riskMoney / (stopDist * baseMultiplier) : volMin;
   }
 
-  let lot = stopDist > 0 ? riskMoney / (stopDist * baseMultiplier) : 0.01;
-  if (lot < 0.01) lot = 0.01;
-  if (lot > 50) lot = 50; // hard safety cap
+  if (lot < volMin) lot = volMin;
+  if (lot > volMax) lot = volMax;
+  if (lot > 50) lot = 50;
+  lot = Math.round(lot / volStep) * volStep;
   lot = Number(lot.toFixed(2));
 
   let vol = "MEDIUM";
@@ -56,7 +70,8 @@ function createTradePlan(signal, entry, atr, capital, riskPercent, cfg) {
     riskPercent: riskPct,
     riskReward: levels.riskReward,
     volatility: vol,
-    atr
+    atr,
+    lotMethod: (tickSize > 0 && tickValue > 0) ? "broker_tick_value" : "approx_multiplier"
   };
 }
 
