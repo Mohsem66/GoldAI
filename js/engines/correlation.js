@@ -4,24 +4,22 @@
 
 window.GoldAI_Correlation = {
   analyzeCorrelation(prices, currentPrice) {
-    // Calculates inter-market correlation impacts on XAUUSD.
-    // Gold typically has strong negative correlations with DXY (US Dollar Index)
-    // and US10Y (US 10-Year Bond Yields), and positive correlation with XAG (Silver).
+    // SIMULATED ONLY — not live inter-market data.
+    // Deterministic seed based on day for stable dynamic calculations.
 
     const date = new Date();
-    // Deterministic seed based on day to ensure smooth and stable dynamic calculations
     const seed = (date.getUTCFullYear() * 10000 + (date.getUTCMonth() + 1) * 100 + date.getUTCDate()) % 5;
 
-    let dxyTrend = "BEARISH";   // Bullish for Gold (Inverse correlation)
-    let us10yTrend = "BEARISH"; // Bullish for Gold (Inverse correlation)
-    let silverTrend = "BULLISH"; // Bullish for Gold (Positive correlation)
-    let spxTrend = "BULLISH";    // Risk-On (Mixed/slightly bearish for Gold)
+    let dxyTrend = "BEARISH";
+    let us10yTrend = "BEARISH";
+    let silverTrend = "BULLISH";
+    let spxTrend = "BULLISH";
 
     if (seed === 0) {
-      dxyTrend = "BULLISH";     // Bearish for Gold
-      us10yTrend = "BULLISH";   // Bearish for Gold
-      silverTrend = "BEARISH";   // Bearish for Gold
-      spxTrend = "BEARISH";     // Risk-off (Bullish safe haven)
+      dxyTrend = "BULLISH";
+      us10yTrend = "BULLISH";
+      silverTrend = "BEARISH";
+      spxTrend = "BEARISH";
     } else if (seed === 1) {
       dxyTrend = "BULLISH";
       us10yTrend = "BEARISH";
@@ -54,7 +52,6 @@ window.GoldAI_Correlation = {
       spx: spxTrend
     };
 
-    // 1. DXY Correlation Analysis (Weight: High, Inverse)
     if (dxyTrend === "BEARISH") {
       buy += 4;
       reasons.push("روند نزولی شاخص دلار (DXY) → محرک قوی صعود طلا");
@@ -65,7 +62,6 @@ window.GoldAI_Correlation = {
       reasons.push("شاخص دلار (DXY) در محدوده رنج");
     }
 
-    // 2. US10Y Correlation Analysis (Weight: High, Inverse)
     if (us10yTrend === "BEARISH") {
       buy += 3;
       reasons.push("نزول بازدهی اوراق ۱۰ ساله آمریکا → کاهش هزینه فرصت خرید طلا");
@@ -76,7 +72,6 @@ window.GoldAI_Correlation = {
       reasons.push("بازدهی اوراق ۱۰ ساله در وضعیت خنثی");
     }
 
-    // 3. Silver Correlation Analysis (Weight: Medium, Positive)
     if (silverTrend === "BULLISH") {
       buy += 2;
       reasons.push("همبستگی صعودی نقره (XAG/USD) با طلا");
@@ -85,7 +80,6 @@ window.GoldAI_Correlation = {
       reasons.push("همبستگی نزولی نقره با طلا");
     }
 
-    // 4. SPX Correlation (Weight: Low, Risk Sentiment)
     if (spxTrend === "BEARISH") {
       buy += 1;
       reasons.push("کاهش بازار سهام (ریسک‌گریزی) → ورود سرمایه به طلا به عنوان دارایی امن");
@@ -109,7 +103,9 @@ window.GoldAI_Correlation = {
       sentiment,
       reasons,
       details,
-      summary: `تحلیل همبستگی: ${sentiment === "BULLISH" ? "صعودی 🟢" : sentiment === "BEARISH" ? "نزولی 🔴" : "خنثی 🟡"}`
+      simulated: true,
+      warnings: ["Correlation is simulated (not live data)"],
+      summary: `تحلیل همبستگی (شبیه‌سازی): ${sentiment === "BULLISH" ? "صعودی 🟢" : sentiment === "BEARISH" ? "نزولی 🔴" : "خنثی 🟡"}`
     };
   }
 };

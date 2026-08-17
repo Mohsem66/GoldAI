@@ -3,10 +3,19 @@
 // HH/HL · LH/LL · BOS · CHoCH · Swings
 // =====================================
 
+// Per-series memory to avoid cross-timeframe pollution (M1 memory affecting M5 etc.)
 const MS = {
   lookback: 5,
-  memory: { trend: "UNKNOWN" }
+  memoryMap: {}   // key → { trend }
 };
+
+function getMemoryKey(highs, lows, closes) {
+  // Simple stable key based on series identity (length + last values)
+  const lastH = highs && highs.length ? highs[highs.length - 1] : 0;
+  const lastL = lows && lows.length ? lows[lows.length - 1] : 0;
+  const lastC = closes && closes.length ? closes[closes.length - 1] : 0;
+  return (highs ? highs.length : 0) + "_" + lastH + "_" + lastL + "_" + lastC;
+}
 
 function isSwingHigh(prices, i, lb) {
   if (i < lb || i >= prices.length - lb) return false;
@@ -120,14 +129,18 @@ function analyzeMarketStructure(highs, lows, closes, cfg) {
     result.reason.push(`Bearish BOS (str ${result.breakStrength}%)`);
   }
 
-  // CHoCH — character change vs memory
-  if (MS.memory.trend === "BULLISH" && result.trend === "BEARISH") {
+  // CHoCH — character change vs per-series memory (prevents M1 memory leaking into M5/H1)
+  const memKey = getMemoryKey(highs, lows, closes);
+  if (!MS.memoryMap[memKey]) MS.memoryMap[memKey] = { trend: "UNKNOWN" };
+  const prevTrend = MS.memoryMap[memKey].trend;
+
+  if (prevTrend === "BULLISH" && result.trend === "BEARISH") {
     result.choch = true;
     result.chochDir = "BEARISH";
     result.sellScore += 6;
     result.confidence += 18;
     result.reason.push("Bearish CHoCH");
-  } else if (MS.memory.trend === "BEARISH" && result.trend === "BULLISH") {
+  } else if (prevTrend === "BEARISH" && result.trend === "BULLISH") {
     result.choch = true;
     result.chochDir = "BULLISH";
     result.buyScore += 6;
@@ -135,7 +148,7 @@ function analyzeMarketStructure(highs, lows, closes, cfg) {
     result.reason.push("Bullish CHoCH");
   }
   if (result.trend === "BULLISH" || result.trend === "BEARISH") {
-    MS.memory.trend = result.trend;
+    MS.memoryMap[memKey].trend = result.trend;
   }
 
   // Confidence from score gap

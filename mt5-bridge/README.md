@@ -1,1 +1,71 @@
-# GoldAI MT5 Bridge\n\n## نصب\n\n### گام ۱: نصب MetaTrader 5\n```bash\n# دانلود MetaTrader 5 از:\n# https://download.mql5.com/mt5/mt5setup.exe\n```\n\n### گام ۲: نصب Python Packages\n```bash\ncd mt5-bridge\npip install -r requirements.txt\n```\n\n### گام ۳: تنظیم اطلاعات حساب\n```bash\ncp .env.example .env\n# سپس .env را ویرایش کنید با اطلاعات حساب MT5 شما\n```\n\n### گام ۴: اجرای Bridge\n```bash\npython mt5_connector.py\n```\n\n---\n\n## API Endpoints\n\n### 1. اتصال به MT5\n```\nPOST /api/mt5/connect\nBody:\n{\n  \"login\": 123456,\n  \"password\": \"your_password\",\n  \"server\": \"ICMarkets-Demo\"\n}\n```\n\n### 2. دریافت اطلاعات حساب\n```\nGET /api/mt5/account-info\nResponse:\n{\n  \"balance\": 10000,\n  \"equity\": 10500,\n  \"free_margin\": 9500\n}\n```\n\n### 3. دریافت قیمت فعلی\n```\nGET /api/mt5/current-price\nResponse:\n{\n  \"bid\": 2045.50,\n  \"ask\": 2045.55,\n  \"spread\": 0.05\n}\n```\n\n### 4. باز کردن معاملهٔ جدید\n```\nPOST /api/mt5/open-trade\nBody:\n{\n  \"signal\": \"BUY\",\n  \"volume\": 0.1,\n  \"entry\": 2045.50,\n  \"stopLoss\": 2043.50,\n  \"tp1\": 2048.50,\n  \"tp2\": 2051.50,\n  \"tp3\": 2054.50\n}\n```\n\n### 5. دریافت معاملات باز\n```\nGET /api/mt5/positions\nResponse:\n{\n  \"positions\": [...],\n  \"count\": 3\n}\n```\n\n### 6. دریافت تاریخچهٔ معاملات\n```\nGET /api/mt5/trades-history?limit=50\nResponse:\n{\n  \"trades\": [...],\n  \"count\": 50\n}\n```\n\n### 7. بررسی وضعیت\n```\nGET /api/mt5/health\nResponse:\n{\n  \"status\": \"online\",\n  \"connected\": true\n}\n```\n\n---\n\n## مشکلات و حل‌ها\n\n### خطا: \"Initialize failed\"\n- ✅ MetaTrader 5 را چک کنید\n- ✅ Login و Password درست است؟\n- ✅ Server نام درست است؟\n\n### خطا: \"Symbol not found\"\n- ✅ Symbol را در MetaTrader فعال کنید\n- ✅ XAUUSD را جستجو کنید\n\n### خطا: \"Not enough margin\"\n- ✅ موجودی حساب را افزایش دهید\n- ✅ حجم معاملهٔ را کاهش دهید\n\n---\n\n## Architecture\n\n```\n┌─────────────────────┐\n│   GoldAI Frontend   │\n│   (Signal Gen)      │\n└──────────┬──────────┘\n           │ HTTP POST\n           ▼\n┌─────────────────────┐\n│  Node.js Backend    │\n│  (Route Manager)    │\n└──────────┬──────────┘\n           │ HTTP POST\n           ▼\n┌─────────────────────┐\n│  Python MT5 Bridge  │ ◄─── اینجا هستید\n│  (Auto Trading)     │\n└──────────┬──────────┘\n           │ MT5 API\n           ▼\n┌─────────────────────┐\n│   MetaTrader 5      │\n│   (Execution)       │\n└─────────────────────┘\n```\n\n---\n\n## نکات مهم\n\n⚠️ **Demo حساب برای تست**\n- اول بر روی Demo تست کنید\n- بعد به حساب Real منتقل شوید\n\n🔒 **Security**\n- هرگز Password را Commit نکنید\n- از .env استفاده کنید\n- Credentials را رمزنگاری کنید\n\n📊 **Monitoring**\n- تمام Trades را log کنید\n- Drawdown را کنترل کنید\n- Daily Report تهیه کنید\n\n---\n\n**توسعه‌دهنده:** GoldAI Team\n**نسخه:** 1.0.0\n**آخرین بروزرسانی:** 2026-08-09\n"
+# GoldAI MT5 Bridge
+
+> **Status: Scaffold / incomplete**
+> Execution is **not production-ready**. The Node route returns clear states:
+> `READY` | `PENDING` | `DISCONNECTED` | `ERROR`.
+> Do **not** enable auto-trading until the Python bridge is fully tested on a **demo** account.
+
+## What this is
+
+Optional bridge between GoldAI signals and MetaTrader 5:
+
+```
+Frontend signal → Node /api/mt5 → Python bridge (:5001) → MT5 terminal
+```
+
+If the Python process is offline, trades are **not** executed. The API reports `DISCONNECTED`.
+
+## Setup (demo only)
+
+1. Install MetaTrader 5 and log into a **demo** account
+2. `cd mt5-bridge && pip install -r requirements.txt` (if present)
+3. Configure `.env` with MT5 login / server (never commit real passwords)
+4. Run the Python connector on port **5001**
+5. Start the Node backend (`backend/`)
+
+## Health check
+
+```http
+GET /api/mt5/health
+```
+
+Example when bridge is down:
+
+```json
+{
+  "status": "degraded",
+  "bridge": "DISCONNECTED",
+  "executionState": "DISCONNECTED",
+  "message": "Python MT5 bridge not reachable on port 5001"
+}
+```
+
+## Safety rules
+
+- Always test on **demo** first
+- Node must never report success if the bridge is offline
+- Lot size and SL/TP must match broker symbol specs
+- GoldAI confidence is a **score**, not a win probability
+
+## Architecture
+
+```
+┌─────────────────────┐
+│   GoldAI Frontend   │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│  Node.js Backend    │  /api/mt5/*
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│  Python MT5 Bridge  │  :5001
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│   MetaTrader 5      │
+└─────────────────────┘
+```
