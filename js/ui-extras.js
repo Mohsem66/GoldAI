@@ -5,7 +5,6 @@
     var G = window.GoldAI;
     var D = window.GoldAI_Data;
 
-    // ---- Manual price ----
     G.applyManualPrice = function () {
       var el = document.getElementById("manualEntryInput");
       if (!el) return;
@@ -61,7 +60,6 @@
             if (typeof D.seedDemo === "function") D.seedDemo();
           }
           var out = await _analyze();
-          // refresh history panel data in memory
           try {
             var h = JSON.parse(localStorage.getItem("goldai_history") || "[]");
             this.signalHistory = h.slice(0, 50);
@@ -75,7 +73,6 @@
       };
     }
 
-    // ---- Settings modal ----
     G.openSettingsModal = function () {
       var cfg = window.GoldAI_Config || {};
       var cap = (D.getCapital && D.getCapital()) || 10000;
@@ -159,19 +156,14 @@
       alert("✅ تنظیمات ذخیره شد");
     };
 
-    // ---- History ----
     G.getHistory = function () {
-      try {
-        return JSON.parse(localStorage.getItem("goldai_history") || "[]");
-      } catch (e) {
-        return [];
-      }
+      try { return JSON.parse(localStorage.getItem("goldai_history") || "[]"); }
+      catch (e) { return []; }
     };
 
     G.renderPerformance = function () {
       var list = this.getHistory();
       this.signalHistory = list.slice(0, 50);
-
       var total = list.length, buy = 0, sell = 0, wait = 0;
       list.forEach(function (x) {
         var s = String(x.signal || "");
@@ -179,15 +171,11 @@
         else if (s.indexOf("SELL") >= 0) sell++;
         else wait++;
       });
-
       var set = function (id, v) {
         var el = document.getElementById(id);
         if (el) el.textContent = v;
       };
-      set("perfTotal", total);
-      set("perfBuy", buy);
-      set("perfSell", sell);
-      set("perfWait", wait);
+      set("perfTotal", total); set("perfBuy", buy); set("perfSell", sell); set("perfWait", wait);
 
       var box = document.getElementById("historyList");
       if (!box) return;
@@ -195,18 +183,16 @@
         box.innerHTML = '<div class="history-meta" style="padding:12px;opacity:.7">هنوز سیگنالی ذخیره نشده. بعد از تحلیل اینجا نمایش داده می‌شود.</div>';
         return;
       }
-
       box.innerHTML = list.slice(0, 40).map(function (x) {
         var s = String(x.signal || "WAIT");
         var cls = s.indexOf("BUY") >= 0 ? "sig-buy" : s.indexOf("SELL") >= 0 ? "sig-sell" : "sig-wait";
-        var entry = x.entry != null ? x.entry : "—";
-        var conf = x.conf != null ? x.conf : (x.confidence != null ? x.confidence : "—");
         return (
           '<div class="history-item">' +
           '<div><b class="' + cls + '">' + s + '</b> · ' + (x.symbol || "") +
-          '<div class="history-meta">Entry: ' + entry + ' | SL: ' + (x.sl || "—") + ' | TP1: ' + (x.tp1 || "—") + '</div></div>' +
-          '<div class="history-meta" style="text-align:left;direction:ltr">' + (x.t || "") + '<br>Conf: ' + conf + '%</div>' +
-          '</div>'
+          '<div class="history-meta">Entry: ' + (x.entry != null ? x.entry : "—") +
+          ' | SL: ' + (x.sl || "—") + ' | TP1: ' + (x.tp1 || "—") + '</div></div>' +
+          '<div class="history-meta" style="text-align:left;direction:ltr">' + (x.t || "") +
+          '<br>Conf: ' + (x.conf != null ? x.conf : (x.confidence != null ? x.confidence : "—")) + '%</div></div>'
         );
       }).join("");
     };
@@ -217,13 +203,9 @@
       this.signalHistory = [];
       this.renderPerformance();
       var bt = document.getElementById("backtestSummary");
-      if (bt) {
-        bt.classList.add("hidden");
-        bt.innerHTML = "";
-      }
+      if (bt) { bt.classList.add("hidden"); bt.innerHTML = ""; }
     };
 
-    // ---- Backtest ----
     G.runBacktest = function () {
       var box = document.getElementById("backtestSummary");
       try {
@@ -231,7 +213,7 @@
           if (D.seedDemo) D.seedDemo();
         }
         if (!window.GoldAI_Backtest || !window.GoldAI_Backtest.runWalkForward) {
-          alert("موتور بک‌تست لود نشده (js/engines/backtest.js)");
+          alert("موتور بک‌تست لود نشده");
           return;
         }
         var report = window.GoldAI_Backtest.runWalkForward({
@@ -241,36 +223,30 @@
           volumes: D.volumes.m5,
           candles: D.candles.m5,
           cfg: window.GoldAI_Config,
-          windowSize: 60,
-          horizon: 3
+          warmup: 50,
+          step: 5,
+          horizon: 5
         });
-
-        var trades = report.trades || report.totalTrades || 0;
+        var trades = report.trades || 0;
         var wins = report.wins || 0;
         var losses = report.losses || 0;
-        var net = report.net != null ? report.net : (report.netProfit != null ? report.netProfit : 0);
-        var wr = trades > 0 ? ((wins / trades) * 100).toFixed(1) : "0.0";
-
+        var net = report.netScore != null ? report.netScore : 0;
+        var wr = report.winRate != null ? report.winRate : (trades > 0 ? ((wins / trades) * 100).toFixed(1) : 0);
         if (box) {
           box.classList.remove("hidden");
           box.innerHTML =
             "<b>نتیجه Walk-Forward</b><br>" +
-            "معاملات: <b>" + trades + "</b> &nbsp;|&nbsp; برد: <b>" + wins + "</b> &nbsp;|&nbsp; باخت: <b>" + losses + "</b><br>" +
-            "وین‌ریت: <b>" + wr + "%</b> &nbsp;|&nbsp; Net (تقریبی %): <b>" + (typeof net === "number" ? net.toFixed(2) : net) + "</b><br>" +
-            "<span style='opacity:.7;font-size:12px'>بدون نگاه به آینده — فقط روی پنجره گذشته سیگنال می‌سازد.</span>";
-        } else {
-          alert("Trades: " + trades + " | WinRate: " + wr + "%");
+            "معاملات: <b>" + trades + "</b> | برد: <b>" + wins + "</b> | باخت: <b>" + losses + "</b><br>" +
+            "وین‌ریت: <b>" + wr + "%</b> | NetScore: <b>" + net + "</b><br>" +
+            "<span style='opacity:.7;font-size:12px'>بدون Look-Ahead — فقط روی داده گذشته</span>";
         }
       } catch (e) {
         console.error(e);
-        if (box) {
-          box.classList.remove("hidden");
-          box.textContent = "خطا در بک‌تست: " + e.message;
-        } else alert("خطا در بک‌تست: " + e.message);
+        if (box) { box.classList.remove("hidden"); box.textContent = "خطا: " + e.message; }
+        else alert("خطا در بک‌تست: " + e.message);
       }
     };
 
-    // ---- showPanel: refresh history when opening performance ----
     if (G.showPanel && !G.__showPanelWrapped) {
       G.__showPanelWrapped = true;
       var _show = G.showPanel.bind(G);
