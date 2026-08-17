@@ -5,11 +5,12 @@
 window.GoldAI_Config = {
 
   // API key lives only in backend/.env (never commit real keys)
-  // Frontend should prefer BACKEND_URL for price + historical data
-
   BACKEND_URL: "http://localhost:5000/api",
 
   SYMBOL: "XAU/USD",
+
+  // Optional: filled from MT5 /api/mt5/symbol-info for accurate lots
+  SYMBOL_SPECS: null,
 
   TF_SCALP: "1min",
   TF_ENTRY: "5min",
@@ -54,6 +55,5 @@ window.GoldAI_Config = {
 
   PRICE_REFRESH_MS: 5000,
 
-  // Optional notification topic
   NTFY_TOPIC: "goldai_signals",
 };
