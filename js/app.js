@@ -266,7 +266,7 @@ window.GoldAI = {
       const userLot = cfg.USER_LOT || 0;
       const plan = window.GoldAI_Trade.createTradePlan(
         final.signal, price, atrL.atr, data.getCapital(),
-        cfg.DEFAULT_RISK_PERCENT, cfg
+        cfg.DEFAULT_RISK_PERCENT, cfg, cfg.SYMBOL_SPECS
       );
       if (userLot > 0) plan.lot = userLot;
 
@@ -279,7 +279,6 @@ window.GoldAI = {
         reversal: reversal.signal
       };
 
-      // ===== هشدارهای اعتبار داده =====
       result.warnings = result.warnings || [];
       if (!open && result.signal && !result.signal.includes('WAIT')) {
         result.warnings.push("⛔ بازار بسته است - این سیگنال فقط جنبه آموزشی دارد");
@@ -451,8 +450,6 @@ window.GoldAI = {
     if (el) el.textContent = window.GoldAI_Data.goldPrice
       ? window.GoldAI_Data.goldPrice.toFixed(this.getDecimals())
       : "—";
-
-    // Data source badge (Live / Demo / Mixed)
     const badge = document.getElementById("dataModeBadge");
     if (badge) {
       const mode = (window.GoldAI_Data.dataMode || "demo").toLowerCase();
@@ -550,13 +547,63 @@ window.GoldAI = {
     } catch (e) { console.warn('Backend error:', e); }
   },
 
+  // Format optimized for Signal Swift paste parser
+  buildSwiftSignalText(r) {
+    const decs = this.getDecimals();
+    const fmt = (n) => (n == null || isNaN(n) ? null : Number(n).toFixed(decs));
+    const rawSym = (window.GoldAI_Config.SYMBOL || "XAU/USD").toUpperCase();
+    const symbol = rawSym.replace("/", "").replace("GOLD", "XAUUSD");
+    const side = (r.signal || "").toUpperCase().includes("SELL") ? "SELL"
+               : (r.signal || "").toUpperCase().includes("BUY") ? "BUY" : null;
+    if (!side) return null;
+
+    const entry = fmt(r.entry);
+    const sl = fmt(r.stopLoss);
+    const tpCount = window.GoldAI_Config.TP_COUNT || 3;
+    const lines = [];
+    if (entry) lines.push(side + " " + symbol + " @ " + entry);
+    else lines.push(side + " " + symbol);
+    if (sl) lines.push("SL: " + sl);
+    if (fmt(r.tp1)) lines.push("TP1: " + fmt(r.tp1));
+    if (tpCount >= 2 && fmt(r.tp2)) lines.push("TP2: " + fmt(r.tp2));
+    if (tpCount >= 3 && fmt(r.tp3)) lines.push("TP3: " + fmt(r.tp3));
+    return lines.join("\n");
+  },
+
   shareSignal() {
     const r = this.lastResult;
     if (!r) return alert("ابتدا تحلیل کنید");
-    const decs = this.getDecimals();
-    const fmt = (n) => (n == null || isNaN(n) ? "—" : n.toFixed(decs));
-    const text = `🥇 GoldAI Signal\n${window.GoldAI_Config.SYMBOL || "XAU/USD"} | ${r.signal} | ${r.confidence}%\nEntry: ${fmt(r.entry)}\nSL: ${fmt(r.stopLoss)}\nTP1: ${fmt(r.tp1)}\nRR: ${r.riskReward} | Lot: ${r.lot}`;
-    navigator.clipboard?.writeText(text).then(() => alert('✅ کپی شد')).catch(() => alert(text));
+    if (r.signal && String(r.signal).includes("WAIT")) {
+      return alert("سیگنال WAIT است — چیزی برای ارسال به Signal Swift نیست");
+    }
+
+    const swiftText = this.buildSwiftSignalText(r);
+    if (!swiftText) return alert("سیگنال قابل تبدیل نیست");
+
+    const pretty = "🥇 GoldAI → Signal Swift\n" + swiftText +
+      "\nLot: " + (r.lot || "—") + " | RR: " + (r.riskReward || "—") +
+      " | Conf: " + (r.confidence || 0) + "%";
+
+    window._goldaiSwiftClipboard = swiftText;
+    window._goldaiPrettyClipboard = pretty;
+
+    document.getElementById("shareModal")?.remove();
+    const html = `
+      <div id="shareModal" class="modal" style="position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:9999;">
+        <div class="modal-content" style="background:var(--card,#1a1a22);padding:16px;border-radius:12px;max-width:420px;width:92%;">
+          <h3 style="margin:0 0 8px;">📤 اشتراک / Signal Swift</h3>
+          <p style="font-size:12px;opacity:.7;margin:0 0 8px;">این متن را در Signal Swift پیست کنید:</p>
+          <pre id="swiftPreview" style="margin:0;font-size:13px;white-space:pre-wrap;direction:ltr;text-align:left;background:rgba(0,0,0,.25);padding:10px;border-radius:8px;"></pre>
+          <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;">
+            <button class="btn-main" onclick="navigator.clipboard.writeText(window._goldaiSwiftClipboard||'').then(()=>alert('✅ کپی شد — داخل Signal Swift پیست کنید'))">📋 کپی برای Signal Swift</button>
+            <button class="btn-ghost" onclick="navigator.clipboard.writeText(window._goldaiPrettyClipboard||'').then(()=>alert('✅ متن کامل کپی شد'))">کپی کامل</button>
+            <button class="btn-ghost" onclick="document.getElementById('shareModal').remove()">❌ بستن</button>
+          </div>
+        </div>
+      </div>`;
+    document.body.insertAdjacentHTML("beforeend", html);
+    const pre = document.getElementById("swiftPreview");
+    if (pre) pre.textContent = swiftText;
   }
 };
 
