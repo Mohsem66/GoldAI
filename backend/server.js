@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
-const fetch = require('node-fetch'); // اگر نصب نیست: npm install node-fetch
+const fetch = require('node-fetch');
 
 dotenv.config();
 
@@ -15,19 +15,21 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // =============================================
-// 🔥 NEW: دریافت قیمت لحظه‌ای از Twelve Data
+// Live price from Twelve Data (via backend only)
 // =============================================
 app.get('/api/price', async (req, res) => {
   try {
+    if (!TWELVE_DATA_API_KEY || String(TWELVE_DATA_API_KEY).includes('your_twelve_data')) {
+      return res.status(503).json({ error: 'TWELVE_DATA_API_KEY not configured in backend/.env' });
+    }
     const symbol = req.query.symbol || 'XAU/USD';
-    // Twelve Data expects symbol like "XAU/USD" -> "XAU/USD" is fine
     const url = `https://api.twelvedata.com/price?symbol=${encodeURIComponent(symbol)}&apikey=${TWELVE_DATA_API_KEY}`;
     const response = await fetch(url);
     const data = await response.json();
     if (data.price) {
-      res.json({ price: parseFloat(data.price) });
+      res.json({ price: parseFloat(data.price), source: 'twelve_data' });
     } else {
-      res.status(500).json({ error: 'Failed to fetch price', details: data });
+      res.status(502).json({ error: 'Failed to fetch price', details: data });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -35,10 +37,13 @@ app.get('/api/price', async (req, res) => {
 });
 
 // =============================================
-// 🔥 NEW: دریافت داده‌های تاریخی (برای بک‌تست)
+// Historical candles (for analysis / backtest)
 // =============================================
 app.get('/api/historical', async (req, res) => {
   try {
+    if (!TWELVE_DATA_API_KEY || String(TWELVE_DATA_API_KEY).includes('your_twelve_data')) {
+      return res.status(503).json({ error: 'TWELVE_DATA_API_KEY not configured in backend/.env' });
+    }
     const symbol = req.query.symbol || 'XAU/USD';
     const interval = req.query.interval || '5min';
     const outputsize = req.query.outputsize || 120;
@@ -48,7 +53,7 @@ app.get('/api/historical', async (req, res) => {
     if (data.values) {
       res.json(data);
     } else {
-      res.status(500).json({ error: 'Failed to fetch historical data', details: data });
+      res.status(502).json({ error: 'Failed to fetch historical data', details: data });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -56,7 +61,7 @@ app.get('/api/historical', async (req, res) => {
 });
 
 // =============================================
-// Firebase (همانند قبل)
+// Firebase
 // =============================================
 const admin = require('firebase-admin');
 const firebaseConfig = require('./firebase-config');
@@ -68,7 +73,6 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 const auth = admin.auth();
 
-// Routes (همان فایل‌های قبلی)
 const authRoutes = require('./routes/auth');
 const signalRoutes = require('./routes/signals');
 const performanceRoutes = require('./routes/performance');
@@ -79,23 +83,16 @@ app.use('/api/signals', signalRoutes(db));
 app.use('/api/performance', performanceRoutes(db));
 app.use('/api/mt5', mt5Routes);
 
-// Health Check
 app.get('/api/health', (req, res) => {
   res.json({
-    status: 'Online ✅',
-    server: 'GoldAI Backend',
-    timestamp: new Date().toISOString()
+    status: 'ok',
+    hasApiKey: !!(TWELVE_DATA_API_KEY && !String(TWELVE_DATA_API_KEY).includes('your_twelve_data'))
   });
 });
 
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({ error: 'Server error', message: err.message });
-});
-
 app.listen(PORT, () => {
-  console.log(`\n🚀 GoldAI Backend started on http://localhost:${PORT}`);
-  console.log(`📊 Price API: http://localhost:${PORT}/api/price?symbol=XAU/USD\n`);
+  console.log(`GoldAI backend running on http://localhost:${PORT}`);
+  if (!TWELVE_DATA_API_KEY || String(TWELVE_DATA_API_KEY).includes('your_twelve_data')) {
+    console.warn('WARNING: TWELVE_DATA_API_KEY not set — live data endpoints will return 503');
+  }
 });
-
-module.exports = { app, db, auth };
