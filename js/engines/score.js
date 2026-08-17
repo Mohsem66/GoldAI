@@ -30,9 +30,16 @@ function runScoreEngine(layers) {
   add(layers.candles, 0.85);
   add(layers.liquidity, 1.4);
 
-  // Simulated macro: low weight so it cannot dominate live technicals
-  add(layers.fundamental, 0.45);
-  add(layers.correlation, 0.4);
+  // Simulated macro — very low weight + explicit warning (not real live data)
+  // These must NOT drive the final decision until real data feeds are connected.
+  if (layers.fundamental) {
+    add(layers.fundamental, 0.15);
+    warnings.push("Fundamental is simulated (not live)");
+  }
+  if (layers.correlation) {
+    add(layers.correlation, 0.12);
+    warnings.push("Correlation is simulated (not live)");
+  }
 
   // AI Brain is meta-bias only — light nudge, no double-count of tech
   if (layers.aiBrain) {
