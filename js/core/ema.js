@@ -59,33 +59,36 @@ function analyzeEMA(prices, price, cfg) {
   const dist200 = e200 != null ? price - e200 : 0;
   const sl20 = slope(s20, 5);
   const sl50 = slope(s50, 5);
+  const hasEma200 = e200 != null;
 
-  // Alignment
-  if (e20 > e50 && (e200 == null || e50 > e200)) {
+  // Alignment — do not claim full stack when EMA200 is missing
+  if (e20 > e50 && hasEma200 && e50 > e200) {
     alignment = "BULL_STACK";
     buy += 4;
     reasons.push("EMA stack 20>50>200");
-  } else if (e20 < e50 && (e200 == null || e50 < e200)) {
+  } else if (e20 < e50 && hasEma200 && e50 < e200) {
     alignment = "BEAR_STACK";
     sell += 4;
     reasons.push("EMA stack 20<50<200");
   } else if (e20 > e50) {
     alignment = "BULLISH";
     buy += 2;
-    reasons.push("EMA20 > EMA50");
+    reasons.push(hasEma200 ? "EMA20 > EMA50" : "EMA20 > EMA50 (EMA200 N/A)");
   } else if (e20 < e50) {
     alignment = "BEARISH";
-    sell += 2;
-    reasons.push("EMA20 < EMA50");
+    buy += 2;
+    reasons.push(hasEma200 ? "EMA20 < EMA50" : "EMA20 < EMA50 (EMA200 N/A)");
   }
 
   // Price vs EMAs
   if (price > e20 && price > e50) { buy += 2; reasons.push("Price above EMA20/50"); }
   if (price < e20 && price < e50) { sell += 2; reasons.push("Price below EMA20/50"); }
 
-  if (e200 != null) {
+  if (hasEma200) {
     if (price > e200) { buy += 2; reasons.push("Price above EMA200"); }
     else { sell += 2; reasons.push("Price below EMA200"); }
+  } else {
+    reasons.push("EMA200 unavailable (need more candles)");
   }
 
   // Slope
