@@ -96,6 +96,8 @@ function runConflictFilter(score, layers, cfg) {
   return {
     signal,
     confidence,
+    // Explicit: this is a technical strength score (0-100), NOT a real win-probability
+    confidenceNote: "score (not probability)",
     buyScore: score.buyScore,
     sellScore: score.sellScore,
     entryQuality: confidence >= 78 ? "HIGH" : confidence >= 65 ? "MEDIUM" : "LOW",
