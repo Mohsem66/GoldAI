@@ -31,7 +31,6 @@ window.GoldAI = {
     console.log("✅ GoldAI Pro ready");
   },
 
-  // ===== تشخیص باز بودن بازار =====
   isMarketOpen() {
     const now = new Date();
     const day = now.getUTCDay();
@@ -42,7 +41,6 @@ window.GoldAI = {
     return true;
   },
 
-  // ===== دریافت قیمت از بک‌اند =====
   async fetchPriceFromBackend() {
     try {
       const symbol = window.GoldAI_Config.SYMBOL || 'XAU/USD';
@@ -50,6 +48,7 @@ window.GoldAI = {
       const data = await response.json();
       if (data.price) {
         window.GoldAI_Data.goldPrice = data.price;
+        if (window.GoldAI_Data.dataMode === 'demo') window.GoldAI_Data.dataMode = 'mixed';
         return data.price;
       }
     } catch (e) {
@@ -60,7 +59,6 @@ window.GoldAI = {
     return window.GoldAI_Data.goldPrice;
   },
 
-  // ===== تم =====
   loadTheme() {
     try {
       const saved = localStorage.getItem('goldai_theme');
@@ -78,7 +76,6 @@ window.GoldAI = {
     localStorage.setItem('goldai_theme', this.theme);
   },
 
-  // ===== اعلان =====
   setupNotificationPermission() {
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
@@ -111,7 +108,6 @@ window.GoldAI = {
     } catch (_) {}
   },
 
-  // ===== تنظیمات معامله =====
   updateTradeSettings() {
     const tpCount = parseInt(document.getElementById('userTpCount').value) || 3;
     const slMult = parseFloat(document.getElementById('userSlMult').value) || 1.5;
@@ -119,21 +115,15 @@ window.GoldAI = {
     const tp2Mult = parseFloat(document.getElementById('userTp2Mult').value) || 3.5;
     const tp3Mult = parseFloat(document.getElementById('userTp3Mult').value) || 5.0;
     const userLot = parseFloat(document.getElementById('userLot').value) || 0;
-
     window.GoldAI_Config.TP_COUNT = tpCount;
     window.GoldAI_Config.ATR_SL_MULT = slMult;
     window.GoldAI_Config.ATR_TP1_MULT = tp1Mult;
     window.GoldAI_Config.ATR_TP2_MULT = tp2Mult;
     window.GoldAI_Config.ATR_TP3_MULT = tp3Mult;
     window.GoldAI_Config.USER_LOT = userLot;
-
     const stored = JSON.parse(localStorage.getItem('goldai_settings') || '{}');
-    stored.tpCount = tpCount;
-    stored.slMult = slMult;
-    stored.tp1Mult = tp1Mult;
-    stored.tp2Mult = tp2Mult;
-    stored.tp3Mult = tp3Mult;
-    stored.userLot = userLot;
+    stored.tpCount = tpCount; stored.slMult = slMult; stored.tp1Mult = tp1Mult;
+    stored.tp2Mult = tp2Mult; stored.tp3Mult = tp3Mult; stored.userLot = userLot;
     localStorage.setItem('goldai_settings', JSON.stringify(stored));
   },
   applyTradeSettings() {
@@ -142,41 +132,32 @@ window.GoldAI = {
     alert('✅ تنظیمات معامله اعمال شد');
   },
 
-  // ===== تنظیمات پیشرفته =====
   updateAdvancedSettings() {
     const capital = parseFloat(document.getElementById('advCapital').value) || 10000;
     const risk = parseFloat(document.getElementById('advRisk').value) || 1;
     if (capital > 0) window.GoldAI_Data.setCapital(capital);
     window.GoldAI_Config.DEFAULT_RISK_PERCENT = risk;
     const stored = JSON.parse(localStorage.getItem('goldai_settings') || '{}');
-    stored.capital = capital;
-    stored.risk = risk;
+    stored.capital = capital; stored.risk = risk;
     localStorage.setItem('goldai_settings', JSON.stringify(stored));
     this.updateRiskUI();
   },
 
-  // ===== موتور برگشت =====
   detectReversal(closes, rsiHistory) {
     if (closes.length < 30) return { signal: 'NONE', strength: 0 };
     const last = closes.length - 1;
     const price = closes[last];
     const price20 = closes[last - 20] || price;
     let reversal = { signal: 'NONE', strength: 0, type: '' };
-
     if (rsiHistory && rsiHistory.length > 20) {
       const rsi = rsiHistory[last];
       const rsi20 = rsiHistory[last - 20] || rsi;
-      if (price < price20 && rsi > rsi20 && rsi < 50) {
-        reversal = { signal: 'BUY', strength: 70, type: 'HIDDEN_BULLISH_RSI' };
-      }
-      if (price > price20 && rsi < rsi20 && rsi > 50) {
-        reversal = { signal: 'SELL', strength: 70, type: 'HIDDEN_BEARISH_RSI' };
-      }
+      if (price < price20 && rsi > rsi20 && rsi < 50) reversal = { signal: 'BUY', strength: 70, type: 'HIDDEN_BULLISH_RSI' };
+      if (price > price20 && rsi < rsi20 && rsi > 50) reversal = { signal: 'SELL', strength: 70, type: 'HIDDEN_BEARISH_RSI' };
     }
     return reversal;
   },
 
-  // ===== وزن‌دهی پویا =====
   updateDynamicWeights() {
     const engines = ['ema', 'rsi', 'macd', 'structure', 'volume', 'sr', 'candles'];
     const history = this.signalHistory.slice(-20);
@@ -185,145 +166,13 @@ window.GoldAI = {
       let score = 50;
       const matches = history.filter(h => h.engine === eng && h.correct === true);
       const total = history.filter(h => h.engine === eng);
-      if (total.length > 5) {
-        const rate = matches.length / total.length;
-        score = 50 + (rate * 50);
-  }
-  weights[eng] = Math.min(100, Math.max(20, score));
+      if (total.length > 5) score = 50 + ((matches.length / total.length) * 50);
+      weights[eng] = Math.min(100, Math.max(20, score));
     });
     this.dynamicWeights = weights;
     return weights;
   },
 
-  // ===== بک‌تست =====
-  async runBacktest() {
-    const status = document.getElementById("aiStatus");
-    const resultDiv = document.getElementById("backtestResult");
-    const summary = document.getElementById("backtestSummary");
-
-    if (status) status.textContent = "🟡 Running backtest...";
-    resultDiv?.classList.remove("hidden");
-
-    try {
-      const data = window.GoldAI_Data;
-      const cfg = window.GoldAI_Config;
-      await data.loadAll();
-      if (!data.closes.m5.length) data.seedDemo();
-
-      const closes = data.closes.m5;
-      const highs = data.highs.m5;
-      const lows = data.lows.m5;
-      const vols = data.volumes.m5;
-      const candles = data.candles.m5;
-
-      if (closes.length < 50) {
-        summary.innerHTML = "⚠️ داده کافی نیست (حداقل ۵۰ کندل)";
-        if (status) status.textContent = "🔴 Error";
-        return;
-      }
-
-      let wins = 0, losses = 0, total = 0;
-      let profit = 0, loss = 0;
-      let marketClosedCount = 0;
-
-      for (let i = 50; i < closes.length - 5; i += 5) {
-        const isOpen = this.isMarketOpen();
-        if (!isOpen) {
-          marketClosedCount++;
-          continue;
-        }
-
-        const sliceCloses = closes.slice(0, i);
-        const sliceHighs = highs.slice(0, i);
-        const sliceLows = lows.slice(0, i);
-        const sliceVols = vols.slice(0, i);
-        const sliceCandles = candles.slice(0, i);
-
-        const price = sliceCloses[sliceCloses.length - 1];
-
-        const ema = window.GoldAI_EMA.analyzeEMA(sliceCloses, price, cfg);
-        const rsi = window.GoldAI_RSI.analyzeRSI(sliceCloses, cfg);
-        const structure = window.GoldAI_MarketStructure.analyzeMarketStructure(sliceHighs, sliceLows, sliceCloses, cfg);
-        const macd = window.GoldAI_MACD.analyzeMACD(sliceCloses);
-        const adx = window.GoldAI_ADX.analyzeADX(sliceHighs, sliceLows, sliceCloses, cfg.ADX_PERIOD || 14);
-        const atrL = window.GoldAI_ATR.analyzeATR(sliceHighs, sliceLows, sliceCloses, cfg);
-        const volume = window.GoldAI_Volume.analyzeVolume(sliceVols, sliceCloses);
-        const sr = window.GoldAI_SR.analyzeSR(sliceHighs, sliceLows, price, cfg);
-        const candlesP = window.GoldAI_Candles.analyzeCandles(sliceCandles);
-        const liq = window.GoldAI_Liquidity.analyzeLiquidity(sliceHighs, sliceLows, sliceCloses);
-
-        const layers = { ema, rsi, divergence: { type: 'NONE' }, structure, macd, adx, atr: atrL, volume, sr, candles: candlesP, liquidity: liq };
-        const raw = window.GoldAI_Score.runScoreEngine(layers);
-        const final = window.GoldAI_Conflict.runConflictFilter(raw, layers, cfg);
-
-        if (final.signal && final.signal !== 'WAIT') {
-          total++;
-          const futurePrice = closes[i + 5] || price;
-          const change = (futurePrice - price) / price * 100;
-          const isWin = (final.signal.includes('BUY') && change > 0) || (final.signal.includes('SELL') && change < 0);
-
-          if (isWin) { wins++; profit += Math.abs(change) * 100; }
-          else { losses++; loss += Math.abs(change) * 100; }
-        }
-      }
-
-      const winRate = total > 0 ? ((wins / total) * 100).toFixed(1) : 0;
-      const netProfit = profit - loss;
-
-      summary.innerHTML = `
-        <div class="row"><span>تعداد معاملات</span><span>${total}</span></div>
-        <div class="row"><span>برد</span><span style="color:var(--green);">${wins}</span></div>
-        <div class="row"><span>باخت</span><span style="color:var(--red);">${losses}</span></div>
-        <div class="row"><span>وین‌ریت</span><span style="color:var(--gold);font-weight:bold;">${winRate}%</span></div>
-        <div class="row"><span>سود خالص</span><span style="color:${netProfit >= 0 ? 'var(--green)' : 'var(--red)'};font-weight:bold;">${netProfit.toFixed(2)}</span></div>
-        <div class="row"><span>بازار بسته (رد شده)</span><span style="color:var(--muted);">${marketClosedCount}</span></div>
-      `;
-
-      if (status) status.textContent = "🟢 Backtest done";
-    } catch (e) {
-      console.error(e);
-      summary.innerHTML = "❌ خطا: " + e.message;
-      if (status) status.textContent = "🔴 Error";
-    }
-  },
-
-  // ===== وین‌ریت روزانه با سود/ضرر =====
-  getDailyWinRate() {
-    const history = this.signalHistory.slice(-50);
-    const today = new Date().toDateString();
-    const todaySignals = history.filter(h => new Date(h.timestamp).toDateString() === today);
-    
-    let totalProfit = 0, totalLoss = 0;
-    let buys = 0, sells = 0, wins = 0, total = 0;
-
-    todaySignals.forEach(h => {
-      if (h.signal.includes('BUY')) buys++;
-      else if (h.signal.includes('SELL')) sells++;
-      if (!h.signal.includes('WAIT')) {
-        total++;
-        const entry = h.entry || 0;
-        const tp1 = h.tp1 || entry * 1.005;
-        const sl = h.sl || entry * 0.995;
-        const currentPrice = window.GoldAI_Data.goldPrice || entry;
-        const isWin = Math.abs(currentPrice - tp1) < Math.abs(currentPrice - sl);
-        if (isWin) { wins++; totalProfit += Math.abs(tp1 - entry) * 100; }
-        else { totalLoss += Math.abs(sl - entry) * 100; }
-      }
-    });
-
-    const winRate = total > 0 ? ((wins / total) * 100).toFixed(1) : 0;
-    return {
-      total,
-      buys,
-      sells,
-      wins,
-      winRate,
-      totalProfit: totalProfit.toFixed(2),
-      totalLoss: totalLoss.toFixed(2)
-    };
-  },
-
-  // ===== تحلیل اصلی =====
   async analyze() {
     const btn = document.getElementById("analyzeBtn");
     const status = document.getElementById("aiStatus");
@@ -331,11 +180,8 @@ window.GoldAI = {
     if (status) status.textContent = "🟡 Analyzing...";
 
     try {
-      // ===== تشخیص بازار بسته (فقط هشدار، جلوی تحلیل را نمی‌گیرد) =====
       const open = this.isMarketOpen();
-      if (!open) {
-        console.warn("⚠️ Market is closed, signal for educational purposes only");
-      }
+      if (!open) console.warn("⚠️ Market is closed, signal for educational purposes only");
 
       const data = window.GoldAI_Data;
       const cfg = window.GoldAI_Config;
@@ -345,9 +191,7 @@ window.GoldAI = {
       this.updatePriceUI();
 
       let entryTF = "m5", biasTF = "h1", scalpTF = "m1";
-      if (cfg.STRATEGY_MODE === "swing") {
-        entryTF = "h1"; biasTF = "daily"; scalpTF = "m15";
-      }
+      if (cfg.STRATEGY_MODE === "swing") { entryTF = "h1"; biasTF = "daily"; scalpTF = "m15"; }
 
       const closes = data.closes[entryTF];
       const highs = data.highs[entryTF];
@@ -355,8 +199,8 @@ window.GoldAI = {
       const vols = data.volumes[entryTF];
       const candles = data.candles[entryTF];
 
-      const manualInput = document.getElementById("manualEntryInput");
       let price = data.goldPrice || closes[closes.length - 1];
+      const manualInput = document.getElementById("manualEntryInput");
       if (manualInput && manualInput.value.trim() !== "") {
         const parsed = Number(manualInput.value);
         if (!isNaN(parsed) && parsed > 0) price = parsed;
@@ -378,7 +222,6 @@ window.GoldAI = {
       const sr = window.GoldAI_SR.analyzeSR(highs, lows, price, cfg);
       const candleP = window.GoldAI_Candles.analyzeCandles(candles);
       const liq = window.GoldAI_Liquidity.analyzeLiquidity(highs, lows, closes);
-
       const reversal = this.detectReversal(closes, rsi.history || []);
 
       const htfEma = window.GoldAI_EMA.analyzeEMA(htfCloses, htfCloses[htfCloses.length - 1], cfg);
@@ -436,10 +279,21 @@ window.GoldAI = {
         reversal: reversal.signal
       };
 
-      // ===== اگر بازار بسته است، هشدار به نتیجه اضافه می‌شود =====
-      if (!open && result && result.signal && !result.signal.includes('WAIT')) {
-        result.warnings = result.warnings || [];
+      // ===== هشدارهای اعتبار داده =====
+      result.warnings = result.warnings || [];
+      if (!open && result.signal && !result.signal.includes('WAIT')) {
         result.warnings.push("⛔ بازار بسته است - این سیگنال فقط جنبه آموزشی دارد");
+      }
+      const dMode = (data.dataMode || "demo").toLowerCase();
+      if (dMode === "demo") {
+        result.warnings.push("⚠️ داده Demo (ساختگی) — سیگنال قابل معامله نیست");
+        if (result.signal && !result.signal.includes("WAIT")) {
+          result.signal = "WAIT 🟡";
+          result.confidence = Math.min(result.confidence || 0, 40);
+          result.reason = (result.reason || "") + " | Demo data → forced WAIT";
+        }
+      } else if (dMode === "mixed") {
+        result.warnings.push("⚠️ داده Mixed (قیمت زنده + کندل ساختگی) — با احتیاط استفاده شود");
       }
 
       this.lastResult = result;
@@ -462,29 +316,22 @@ window.GoldAI = {
     }
   },
 
-  // ===== رندر =====
   render(r) {
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
     const decs = this.getDecimals();
     const fmt = (num) => (num == null || isNaN(num) ? "—" : num.toFixed(decs));
-        set("signal", r.signal);
-    set("confidence", r.confidence + "%");
+    set("signal", r.signal);
+    set("confidence", (r.confidence || 0) + "%");
     set("entry", fmt(r.entry));
     set("sl", fmt(r.stopLoss));
 
     const tpCount = window.GoldAI_Config.TP_COUNT || 3;
-    let detailsHtml = `
-      <div class="detail-item"><span>ورود</span><b>${fmt(r.entry)}</b></div>
-      <div class="detail-item"><span>SL</span><b>${fmt(r.stopLoss)}</b></div>
-      <div class="detail-item"><span>TP1</span><b>${fmt(r.tp1)}</b></div>
-    `;
+    let detailsHtml = `<div class="detail-item"><span>ورود</span><b>${fmt(r.entry)}</b></div><div class="detail-item"><span>SL</span><b>${fmt(r.stopLoss)}</b></div><div class="detail-item"><span>TP1</span><b>${fmt(r.tp1)}</b></div>`;
     if (tpCount >= 2) detailsHtml += `<div class="detail-item"><span>TP2</span><b>${fmt(r.tp2)}</b></div>`;
     if (tpCount >= 3) detailsHtml += `<div class="detail-item"><span>TP3</span><b>${fmt(r.tp3)}</b></div>`;
-    detailsHtml += `
-      <div class="detail-item"><span>R:R</span><b>${r.riskReward}</b></div>
-      <div class="detail-item"><span>لات</span><b>${r.lot}</b></div>
-    `;
-    document.getElementById('signalDetails').innerHTML = detailsHtml;
+    detailsHtml += `<div class="detail-item"><span>R:R</span><b>${r.riskReward || "—"}</b></div><div class="detail-item"><span>لات</span><b>${r.lot || "—"}</b></div>`;
+    const sd = document.getElementById('signalDetails');
+    if (sd) sd.innerHTML = detailsHtml;
 
     const strength = Math.min(100, Math.max(0, r.confidence || 0));
     const bar = document.getElementById("signalStrengthBar");
@@ -498,12 +345,14 @@ window.GoldAI = {
     const sig = document.getElementById("signal");
     if (sig) {
       sig.className = "signal-value";
-      if (r.signal.includes("BUY")) sig.classList.add("buy");
-      else if (r.signal.includes("SELL")) sig.classList.add("sell");
+      if (r.signal && r.signal.includes("BUY")) sig.classList.add("buy");
+      else if (r.signal && r.signal.includes("SELL")) sig.classList.add("sell");
       else sig.classList.add("wait");
     }
 
-    document.getElementById("aiReason").textContent = r.reason || "—";
+    const ar = document.getElementById("aiReason");
+    if (ar) ar.textContent = r.reason || "—";
+
     const L = r.layers || {};
     const details = {
       dEma20: L.ema?.ema20, dEma50: L.ema?.ema50, dEma200: L.ema?.ema200,
@@ -528,7 +377,8 @@ window.GoldAI = {
     set("dAiDxy", CORR.details?.dxy ?? "—");
     set("dAiUs10y", CORR.details?.us10y ?? "—");
     set("dAiSilverSpx", `${CORR.details?.silver ?? "—"} | ${CORR.details?.spx ?? "—"}`);
-    document.getElementById("dAiReasoning").textContent = AI.reasoning || "منتظر تحلیل...";
+    const reasonEl = document.getElementById("dAiReasoning");
+    if (reasonEl) reasonEl.textContent = AI.reasoning || "منتظر تحلیل...";
 
     const warnBox = document.getElementById("warnings");
     if (warnBox) {
@@ -540,7 +390,6 @@ window.GoldAI = {
     document.getElementById("resultCard")?.classList.remove("hidden");
   },
 
-  // ===== ذخیره تاریخچه =====
   saveHistory(r) {
     const key = "goldai_history";
     let h = [];
@@ -557,7 +406,6 @@ window.GoldAI = {
     this.updateRiskUI();
   },
 
-  // ===== توابع کمکی =====
   getDecimals() {
     const sym = (window.GoldAI_Config.SYMBOL || "XAU/USD").toUpperCase();
     if (sym.includes("JPY")) return 3;
@@ -581,16 +429,16 @@ window.GoldAI = {
         if (p.tp2Mult) window.GoldAI_Config.ATR_TP2_MULT = p.tp2Mult;
         if (p.tp3Mult) window.GoldAI_Config.ATR_TP3_MULT = p.tp3Mult;
         if (p.userLot) window.GoldAI_Config.USER_LOT = p.userLot;
-        // به‌روزرسانی UI
-        document.getElementById('advCapital').value = p.capital || 10000;
-        document.getElementById('advRisk').value = p.risk || 1;
-        document.getElementById('strategySelect').value = p.strategy || 'scalp';
-        document.getElementById('userTpCount').value = p.tpCount || 3;
-        document.getElementById('userSlMult').value = p.slMult || 1.5;
-        document.getElementById('userTp1Mult').value = p.tp1Mult || 2.0;
-        document.getElementById('userTp2Mult').value = p.tp2Mult || 3.5;
-        document.getElementById('userTp3Mult').value = p.tp3Mult || 5.0;
-        document.getElementById('userLot').value = p.userLot || 0;
+        const el = (id) => document.getElementById(id);
+        if (el('advCapital')) el('advCapital').value = p.capital || 10000;
+        if (el('advRisk')) el('advRisk').value = p.risk || 1;
+        if (el('strategySelect')) el('strategySelect').value = p.strategy || 'scalp';
+        if (el('userTpCount')) el('userTpCount').value = p.tpCount || 3;
+        if (el('userSlMult')) el('userSlMult').value = p.slMult || 1.5;
+        if (el('userTp1Mult')) el('userTp1Mult').value = p.tp1Mult || 2.0;
+        if (el('userTp2Mult')) el('userTp2Mult').value = p.tp2Mult || 3.5;
+        if (el('userTp3Mult')) el('userTp3Mult').value = p.tp3Mult || 5.0;
+        if (el('userLot')) el('userLot').value = p.userLot || 0;
       }
       const symbolEl = document.getElementById("symbolSelect");
       if (symbolEl) symbolEl.value = window.GoldAI_Config.SYMBOL || "XAU/USD";
@@ -603,6 +451,16 @@ window.GoldAI = {
     if (el) el.textContent = window.GoldAI_Data.goldPrice
       ? window.GoldAI_Data.goldPrice.toFixed(this.getDecimals())
       : "—";
+
+    // Data source badge (Live / Demo / Mixed)
+    const badge = document.getElementById("dataModeBadge");
+    if (badge) {
+      const mode = (window.GoldAI_Data.dataMode || "demo").toLowerCase();
+      badge.className = "data-mode " + mode;
+      if (mode === "live") badge.textContent = "LIVE";
+      else if (mode === "mixed") badge.textContent = "MIXED";
+      else badge.textContent = "DEMO";
+    }
   },
 
   updateRiskUI() {
@@ -610,54 +468,36 @@ window.GoldAI = {
     const risk = window.GoldAI_Config.DEFAULT_RISK_PERCENT;
     const maxLoss = ((cap * risk) / 100).toFixed(2);
     const lot = Math.max(0.01, Number((cap / 10000).toFixed(2)));
-    document.getElementById('capitalText').textContent = cap;
-    document.getElementById('riskText').textContent = risk + "%";
-    document.getElementById('maxLossText').textContent = maxLoss;
-    document.getElementById('lotText').textContent = lot;
-
-    const wr = this.getDailyWinRate();
-    document.getElementById('dailyWinRate').textContent = wr.winRate + '%';
-    document.getElementById('dailyProfit').textContent = '$' + wr.totalProfit;
-    document.getElementById('dailyLoss').textContent = '$' + wr.totalLoss;
-    document.getElementById('dailyTotalSignals').textContent = wr.total;
-
-    const winRateNum = parseFloat(wr.winRate) || 0;
-    const progressBar = document.getElementById('winrateProgressBar');
-    const percentText = document.getElementById('winratePercent');
-    if (progressBar) {
-      progressBar.style.width = Math.min(100, winRateNum) + '%';
-      progressBar.style.background = winRateNum >= 60 ? 'var(--green)' : winRateNum >= 40 ? 'var(--gold)' : 'var(--red)';
-    }
-    if (percentText) percentText.textContent = winRateNum + '%';
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('capitalText', cap);
+    set('riskText', risk + "%");
+    set('maxLossText', maxLoss);
+    set('lotText', lot);
   },
 
   updateMarketClock() {
     const now = new Date();
-    const day = now.getUTCDay();
     const hour = now.getUTCHours();
-
     const open = this.isMarketOpen();
     let session = "Sydney";
     if (hour >= 7 && hour < 12) session = "Tokyo";
     else if (hour >= 12 && hour < 17) session = "London";
     else if (hour >= 17 || hour < 0) session = "New York";
 
-    // ===== وضعیت بازار =====
     const ms = document.getElementById("marketStatus");
     if (ms) {
       ms.textContent = open ? "🟢 OPEN" : "🔴 CLOSED";
       ms.className = "market-status " + (open ? "open" : "closed");
     }
-    document.getElementById("marketSession").textContent = session;
+    const sess = document.getElementById("marketSession");
+    if (sess) sess.textContent = session;
 
-    // ===== هشدار بازار بسته =====
     const warning = document.getElementById("marketClosedWarning");
     if (warning) {
       if (open) warning.classList.add("hidden");
       else warning.classList.remove("hidden");
     }
 
-    // ===== ساعت‌ها و تاریخ =====
     const td = document.getElementById("timeDisplay");
     if (td) {
       try {
@@ -679,77 +519,17 @@ window.GoldAI = {
         td.textContent = now.toUTCString();
       }
     }
-
     this.updateRiskUI();
   },
 
-  setupSettingsPanel() {
-    // تنظیمات از طریق دکمه در کارت ریسک انجام می‌شود
-  },
+  setupSettingsPanel() {},
 
-  openSettings() {
-    const cfg = window.GoldAI_Config;
-    const html = `
-      <div id="settingsModal" class="modal">
-        <div class="modal-content">
-          <h3>⚙️ تنظیمات پیشرفته</h3>
-          <div class="settings-group"><label>سرمایه ($)</label><input type="number" id="modalCapital" value="${window.GoldAI_Data.getCapital()}" min="100"></div>
-          <div class="settings-group"><label>درصد ریسک (%)</label><input type="number" id="modalRisk" value="${cfg.DEFAULT_RISK_PERCENT}" min="0.1" max="10" step="0.1"></div>
-          <div class="settings-group"><label>Firebase UID</label><input type="text" id="modalUID" value="${this.currentUID || ''}"></div>
-          <div class="settings-actions">
-            <button class="btn-main" onclick="GoldAI.saveModalSettings()">✅ ذخیره</button>
-            <button class="btn-ghost" onclick="GoldAI.closeSettings()">❌ بستن</button>
-          </div>
-        </div>
-      </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', html);
-  },
-  saveModalSettings() {
-    const capital = parseFloat(document.getElementById('modalCapital').value) || 10000;
-    const risk = parseFloat(document.getElementById('modalRisk').value) || 1;
-    const uid = document.getElementById('modalUID').value;
-    if (capital > 0) window.GoldAI_Data.setCapital(capital);
-    window.GoldAI_Config.DEFAULT_RISK_PERCENT = risk;
-    this.currentUID = uid;
-    const stored = JSON.parse(localStorage.getItem('goldai_settings') || '{}');
-    stored.capital = capital;
-    stored.risk = risk;
-    stored.uid = uid;
-    localStorage.setItem('goldai_settings', JSON.stringify(stored));
-    this.updateRiskUI();
-    this.closeSettings();
-    alert('✅ تنظیمات ذخیره شد');
-  },
-
-  closeSettings() {
-    document.getElementById('settingsModal')?.remove();
-  },
-
-  async changeSymbol() {
-    const select = document.getElementById("symbolSelect");
-    if (!select) return;
-    window.GoldAI_Config.SYMBOL = select.value;
-    const stored = JSON.parse(localStorage.getItem('goldai_settings') || "{}");
-    stored.symbol = select.value;
-    localStorage.setItem('goldai_settings', JSON.stringify(stored));
-    const data = window.GoldAI_Data;
-    data.resetData();
-    await data.loadAll();
-    data.seedDemo();
-    await this.fetchPriceFromBackend();
-    this.updatePriceUI();
-    document.getElementById("resultCard")?.classList.add("hidden");
-  },
-
-  changeStrategy() {
-    const select = document.getElementById("strategySelect");
-    if (select) {
-      window.GoldAI_Config.STRATEGY_MODE = select.value;
-      const stored = JSON.parse(localStorage.getItem('goldai_settings') || "{}");
-      stored.strategy = select.value;
-      localStorage.setItem('goldai_settings', JSON.stringify(stored));
-    }
+  showPanel(name) {
+    document.querySelectorAll(".panel").forEach(p => p.classList.add("hidden"));
+    document.getElementById("panel-" + name)?.classList.remove("hidden");
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    document.querySelector(`[data-panel="${name}"]`)?.classList.add("active");
+    if (name === "details" && this.lastResult) this.render(this.lastResult);
   },
 
   async sendToBackend(result) {
@@ -770,113 +550,13 @@ window.GoldAI = {
     } catch (e) { console.warn('Backend error:', e); }
   },
 
-  showPanel(name) {
-    document.querySelectorAll(".panel").forEach(p => p.classList.add("hidden"));
-    document.getElementById("panel-" + name)?.classList.remove("hidden");
-    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-    document.querySelector(`[data-panel="${name}"]`)?.classList.add("active");
-    if (name === "performance") this.renderPerformance();
-    if (name === "details" && this.lastResult) this.render(this.lastResult);
-  },
-
-  renderPerformance() {
-    let h = [];
-    try { h = JSON.parse(localStorage.getItem("goldai_history") || "[]"); } catch (_) {}
-    const symFilter = document.getElementById("perfSymbolFilter")?.value || "all";
-    const timeFilter = document.getElementById("perfTimeFilter")?.value || "all";
-    const now = Date.now();
-    const filtered = h.filter(x => {
-      if (symFilter !== "all" && (x.symbol || "XAU/USD") !== symFilter) return false;
-      if (timeFilter !== "all") {
-        const t = x.timestamp ? new Date(x.timestamp).getTime() : now;
-        const diff = now - t;
-        if (timeFilter === "24h" && diff > 24*3600000) return false;
-        if (timeFilter === "7d" && diff > 7*24*3600000) return false;
-        if (timeFilter === "30d" && diff > 30*24*3600000) return false;
-      }
-      return true;
-    });
-
-    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-    if (!filtered.length) {
-      ["perfTotal","perfBuy","perfSell","perfWait"].forEach(id => set(id, "0"));
-      set("perfWinRate", "0%"); set("perfProfit", "$0.00"); set("perfLoss", "$0.00");
-      return;
-    }
-
-    let buys=0, sells=0, waits=0, wins=0, losses=0, profit=0, loss=0;
-    filtered.forEach(x => {
-      if (x.signal.includes("BUY")) buys++;
-      else if (x.signal.includes("SELL")) sells++;
-      else waits++;
-      if (!x.signal.includes("WAIT")) {
-        const isWin = x.conf > 68 || Math.random() > 0.35;
-        if (isWin) { wins++; profit += 200; }
-        else { losses++; loss += 100; }
-      }
-    });
-    const total = wins + losses;
-    const winRate = total > 0 ? ((wins/total)*100).toFixed(1) + "%" : "0%";
-    set("perfTotal", filtered.length);
-    set("perfBuy", buys);
-    set("perfSell", sells);
-    set("perfWait", waits);
-    set("perfWinRate", winRate);
-    set("perfProfit", `$${profit.toFixed(2)}`);
-    set("perfLoss", `$${loss.toFixed(2)}`);
-  },
-
-  clearPerformanceHistory() {
-    if (confirm("حذف تاریخچه؟")) {
-      localStorage.removeItem("goldai_history");
-      this.signalHistory = [];
-      this.renderPerformance();
-      alert("✅ پاک شد");
-    }
-  },
-
   shareSignal() {
     const r = this.lastResult;
     if (!r) return alert("ابتدا تحلیل کنید");
     const decs = this.getDecimals();
     const fmt = (n) => (n == null || isNaN(n) ? "—" : n.toFixed(decs));
-    const tpCount = window.GoldAI_Config.TP_COUNT || 3;
-    let tps = `TP1: ${fmt(r.tp1)}`;
-    if (tpCount >= 2) tps += ` | TP2: ${fmt(r.tp2)}`;
-    if (tpCount >= 3) tps += ` | TP3: ${fmt(r.tp3)}`;
-    const text =
-`🥇 GoldAI Signal
-${window.GoldAI_Config.SYMBOL || "XAU/USD"} | ${r.signal} | ${r.confidence}%
-Entry: ${fmt(r.entry)}
-SL: ${fmt(r.stopLoss)}
-${tps}
-RR: ${r.riskReward} | Lot: ${r.lot}
-${r.reason || ""}`;
-
-    const platforms = {
-      telegram: `https://t.me/share/url?url=&text=${encodeURIComponent(text)}`,
-      whatsapp: `https://wa.me/?text=${encodeURIComponent(text)}`,
-      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
-    };
-    document.getElementById('shareModal')?.remove();
-    const html = `
-      <div id="shareModal" class="modal">
-        <div class="modal-content">
-          <h3>📤 اشتراک سیگنال</h3>
-          <div class="share-options">
-            <button class="share-btn telegram" onclick="window.open('${platforms.telegram}','_blank')">✈️ تلگرام</button>
-            <button class="share-btn whatsapp" onclick="window.open('${platforms.whatsapp}','_blank')">💬 واتس‌اپ</button>
-            <button class="share-btn twitter" onclick="window.open('${platforms.twitter}','_blank')">🐦 توییتر</button>
-          </div>
-          <div class="share-preview"><pre style="margin:0;font-size:12px;white-space:pre-wrap;">${text}</pre></div>
-          <div class="share-actions">
-            <button class="btn-main" style="margin:0;background:var(--line);color:#fff;" onclick="navigator.clipboard.writeText(\`${text.replace(/`/g,'\\`')}\`).then(()=>alert('✅ کپی شد'))">📋 کپی</button>
-            <button class="btn-ghost" style="margin:0;" onclick="document.getElementById('shareModal').remove()">❌ بستن</button>
-          </div>
-        </div>
-      </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', html);
+    const text = `🥇 GoldAI Signal\n${window.GoldAI_Config.SYMBOL || "XAU/USD"} | ${r.signal} | ${r.confidence}%\nEntry: ${fmt(r.entry)}\nSL: ${fmt(r.stopLoss)}\nTP1: ${fmt(r.tp1)}\nRR: ${r.riskReward} | Lot: ${r.lot}`;
+    navigator.clipboard?.writeText(text).then(() => alert('✅ کپی شد')).catch(() => alert(text));
   }
 };
 
