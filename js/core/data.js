@@ -1,257 +1,146 @@
 // =====================================
-// GoldAI — Data Layer (fast live price + essential TFs)
+// GoldAI — Data Layer
+// Prefers backend; tracks dataMode + manual price lock
 // =====================================
 
 window.GoldAI_Data = {
-
   goldPrice: 0,
-  candles: { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
+  capital: 10000,
   closes: { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
-  highs:  { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
-  lows:   { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
-  volumes:{ m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
+  highs: { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
+  lows: { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
+  volumes: { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
+  candles: { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
 
-  // "live" | "demo" | "mixed" — transparently tracks data source
   dataMode: "demo",
-  lastFetchTime: {},
-  cache: {},
-  lastPriceFetchTime: 0,
+  manualPriceLock: false,
   livePriceOk: false,
+  lastPriceFetchTime: 0,
 
-  mapTF(tf) {
-    const m = { "1min": "m1", "5min": "m5", "15min": "m15", "1h": "h1", "4h": "h4", "1day": "daily" };
-    return m[tf] || "m5";
-  },
+  getCapital() { return this.capital || 10000; },
+  setCapital(v) { this.capital = Number(v) || 10000; },
 
-  isLive() {
+  isLiveReady() {
     return this.dataMode === "live" && this.livePriceOk;
   },
 
-  async fetchSeries(interval) {
-    const cfg = window.GoldAI_Config;
-    const cacheKey = cfg.SYMBOL + "_" + interval;
-    const now = Date.now();
-    if (this.cache[cacheKey] && this.lastFetchTime[cacheKey] && (now - this.lastFetchTime[cacheKey] < 45000)) {
-      return this.cache[cacheKey];
-    }
-
-    // Prefer backend proxy (recommended path)
-    const backendBase = (cfg.BACKEND_URL || "http://localhost:5000/api").replace(/\/$/, "");
-    try {
-      const url = backendBase + "/historical?symbol=" + encodeURIComponent(cfg.SYMBOL) +
-        "&interval=" + encodeURIComponent(interval) +
-        "&outputsize=" + (cfg.CANDLE_COUNT || 120);
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.values && data.values.length) {
-          const values = data.values.slice().reverse();
-          this.cache[cacheKey] = values;
-          this.lastFetchTime[cacheKey] = now;
-          this.dataMode = this.livePriceOk ? "live" : "mixed";
-          return values;
-        }
-      }
-    } catch (e) {
-      console.warn("[Series/backend]", interval, e.message);
-    }
-
-    // Fallback: direct Twelve Data only if API_KEY still present (legacy)
-    if (cfg.API_KEY && cfg.API_KEY !== "YOUR_TWELVE_DATA_API_KEY" && cfg.API_KEY !== "your_twelve_data_api_key_here") {
-      try {
-        const url =
-          "https://api.twelvedata.com/time_series?symbol=" + encodeURIComponent(cfg.SYMBOL) +
-          "&interval=" + interval + "&outputsize=" + (cfg.CANDLE_COUNT || 120) +
-          "&apikey=" + cfg.API_KEY;
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.values && data.values.length) {
-          const values = data.values.slice().reverse();
-          this.cache[cacheKey] = values;
-          this.lastFetchTime[cacheKey] = now;
-          this.dataMode = this.livePriceOk ? "live" : "mixed";
-          return values;
-        }
-      } catch (e) {
-        console.error("Error fetching " + cacheKey + ":", e);
-      }
-    }
-
-    return this.cache[cacheKey] || null;
-  },
-
-  store(key, values) {
-    this.candles[key] = values;
-    this.closes[key]  = values.map(function (c) { return Number(c.close); });
-    this.highs[key]   = values.map(function (c) { return Number(c.high); });
-    this.lows[key]    = values.map(function (c) { return Number(c.low); });
-    this.volumes[key] = values.map(function (c) { return Number(c.volume || 0); });
-  },
-
-  async loadEssential() {
-    const cfg = window.GoldAI_Config;
-    try {
-      await this.loadPrice(true);
-
-      var plan;
-      if (cfg.STRATEGY_MODE === "swing") {
-        plan = [
-          [cfg.TF_TREND, "h1"],
-          [cfg.TF_H4, "h4"],
-          [cfg.TF_DAILY, "daily"],
-          [cfg.TF_SWING, "m15"]
-        ];
-      } else {
-        plan = [
-          [cfg.TF_ENTRY, "m5"],
-          [cfg.TF_SWING, "m15"],
-          [cfg.TF_TREND, "h1"],
-          [cfg.TF_SCALP, "m1"]
-        ];
-      }
-
-      for (var i = 0; i < plan.length; i++) {
-        var interval = plan[i][0];
-        var key = plan[i][1];
-        if (this.closes[key] && this.closes[key].length > 30) {
-          var cacheKey = cfg.SYMBOL + "_" + interval;
-          var t = this.lastFetchTime[cacheKey] || 0;
-          if (Date.now() - t < 45000) continue;
-        }
-        var values = await this.fetchSeries(interval);
-        if (values && values.length) this.store(key, values);
-      }
-
-      if (!this.livePriceOk || !this.goldPrice) {
-        var primary = this.closes.m5.length ? this.closes.m5
-          : (this.closes.h1.length ? this.closes.h1 : this.closes.m1);
-        if (primary && primary.length) this.goldPrice = primary[primary.length - 1];
-      }
-    } catch (e) {
-      console.error("loadEssential error:", e);
-    }
-    return this;
-  },
-
   async loadAll() {
-    return this.loadEssential();
+    const cfg = window.GoldAI_Config || {};
+    const backend = (cfg.BACKEND_URL || "http://localhost:5000/api").replace(/\/$/, "");
+    let gotHistory = false;
+
+    // Prefer backend historical
+    try {
+      const symbol = encodeURIComponent(cfg.SYMBOL || "XAU/USD");
+      const intervals = [
+        ["m5", "5min"], ["m1", "1min"], ["m15", "15min"],
+        ["h1", "1h"], ["h4", "4h"], ["daily", "1day"]
+      ];
+      for (const [key, interval] of intervals) {
+        try {
+          const res = await fetch(`${backend}/historical?symbol=${symbol}&interval=${interval}&outputsize=${cfg.CANDLE_COUNT || 120}`);
+          if (!res.ok) continue;
+          const data = await res.json();
+          if (data.values && data.values.length) {
+            this._applySeries(key, data.values);
+            gotHistory = true;
+          }
+        } catch (_) {}
+      }
+      if (gotHistory) {
+        this.dataMode = this.livePriceOk ? "live" : "mixed";
+      }
+    } catch (_) {}
+
+    if (!gotHistory) {
+      // try frontend twelve-data style if any config
+      try {
+        // fallback seed handled by caller
+      } catch (_) {}
+    }
+
+    await this.loadPrice(true);
+    if (!this.closes.m5.length) {
+      // leave empty; app may seedDemo
+    } else if (!this.goldPrice) {
+      const primary = this.closes.m5;
+      if (primary && primary.length) this.goldPrice = primary[primary.length - 1];
+    }
+  },
+
+  _applySeries(key, values) {
+    // Twelve Data returns newest first
+    const rows = values.slice().reverse();
+    this.closes[key] = rows.map(r => Number(r.close));
+    this.highs[key] = rows.map(r => Number(r.high));
+    this.lows[key] = rows.map(r => Number(r.low));
+    this.volumes[key] = rows.map(r => Number(r.volume || 0));
+    this.candles[key] = rows.map(r => ({
+      open: Number(r.open), high: Number(r.high),
+      low: Number(r.low), close: Number(r.close),
+      volume: Number(r.volume || 0)
+    }));
   },
 
   async loadPrice(force) {
-    const cfg = window.GoldAI_Config;
-    // Prefer backend for live price
-    const backendBase = (cfg.BACKEND_URL || "http://localhost:5000/api").replace(/\/$/, "");
+    if (this.manualPriceLock && this.goldPrice > 0) return this.goldPrice;
     const now = Date.now();
     if (!force && this.goldPrice > 0 && (now - this.lastPriceFetchTime < 1500)) {
       return this.goldPrice;
     }
+    const cfg = window.GoldAI_Config || {};
+    const backend = (cfg.BACKEND_URL || "http://localhost:5000/api").replace(/\/$/, "");
     try {
-      const res = await fetch(backendBase + "/price?symbol=" + encodeURIComponent(cfg.SYMBOL || "XAU/USD"));
+      const symbol = encodeURIComponent(cfg.SYMBOL || "XAU/USD");
+      const res = await fetch(`${backend}/price?symbol=${symbol}`, { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         if (data.price) {
           this.goldPrice = Number(data.price);
-          this.lastPriceFetchTime = now;
           this.livePriceOk = true;
+          this.lastPriceFetchTime = now;
           if (this.dataMode === "demo") this.dataMode = "mixed";
           return this.goldPrice;
         }
       }
-    } catch (e) {
-      console.warn("[Price/backend]", e.message);
-    }
-    // Legacy direct fallback
-    if (cfg.API_KEY && cfg.API_KEY !== "YOUR_TWELVE_DATA_API_KEY" && cfg.API_KEY !== "your_twelve_data_api_key_here") {
-      try {
-        const url = "https://api.twelvedata.com/price?symbol=" +
-          encodeURIComponent(cfg.SYMBOL) + "&apikey=" + cfg.API_KEY;
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.price) {
-          this.goldPrice = Number(data.price);
-          this.lastPriceFetchTime = now;
-          this.livePriceOk = true;
-          if (this.dataMode === "demo") this.dataMode = "mixed";
-        }
-      } catch (e) {
-        console.error("Price error:", e);
-      }
-    }
+    } catch (_) {}
     return this.goldPrice;
   },
 
-  getCapital() {
-    return Number(localStorage.getItem("goldai_capital") || window.GoldAI_Config.DEFAULT_CAPITAL);
-  },
-
-  setCapital(v) {
-    localStorage.setItem("goldai_capital", String(Number(v)));
-  },
-
-  resetData() {
-    this.goldPrice = 0;
-    this.livePriceOk = false;
-    this.dataMode = "demo";
-    this.candles = { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] };
-    this.closes = { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] };
-    this.highs = { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] };
-    this.lows = { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] };
-    this.volumes = { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] };
-  },
-
   seedDemo() {
-    var keepPrice = this.livePriceOk ? this.goldPrice : 0;
-    this.resetData();
+    const base = this.goldPrice > 0 ? this.goldPrice : 2650;
+    const n = 120;
+    let price = base;
+    const mk = () => {
+      const closes = [], highs = [], lows = [], vols = [], candles = [];
+      price = base;
+      for (let i = 0; i < n; i++) {
+        const drift = (Math.random() - 0.48) * 2.5;
+        const open = price;
+        const close = price + drift;
+        const high = Math.max(open, close) + Math.random() * 1.2;
+        const low = Math.min(open, close) - Math.random() * 1.2;
+        closes.push(close); highs.push(high); lows.push(low);
+        vols.push(100 + Math.random() * 50);
+        candles.push({ open, high, low, close, volume: vols[vols.length - 1] });
+        price = close;
+      }
+      return { closes, highs, lows, vols, candles };
+    };
+    const keepPrice = this.livePriceOk ? this.goldPrice : 0;
+    for (const k of ["m1", "m5", "m15", "h1", "h4", "daily"]) {
+      const s = mk();
+      this.closes[k] = s.closes;
+      this.highs[k] = s.highs;
+      this.lows[k] = s.lows;
+      this.volumes[k] = s.vols;
+      this.candles[k] = s.candles;
+    }
     this.dataMode = "demo";
     if (keepPrice) {
       this.goldPrice = keepPrice;
-      this.livePriceOk = true;
       this.dataMode = "mixed";
-    }
-
-    var cfg = window.GoldAI_Config;
-    var basePrice = keepPrice || 2350;
-    var volatilityScale = 1.0;
-    var sym = (cfg.SYMBOL || "XAU/USD").toUpperCase();
-
-    if (!keepPrice) {
-      if (sym.indexOf("EUR/USD") >= 0) { basePrice = 1.0850; volatilityScale = 0.0008; }
-      else if (sym.indexOf("GBP/USD") >= 0) { basePrice = 1.2720; volatilityScale = 0.0010; }
-      else if (sym.indexOf("USD/JPY") >= 0) { basePrice = 156.40; volatilityScale = 0.12; }
-      else if (sym.indexOf("AUD/USD") >= 0) { basePrice = 0.6650; volatilityScale = 0.0007; }
-      else if (sym.indexOf("USD/CAD") >= 0) { basePrice = 1.3680; volatilityScale = 0.0008; }
-      else if (sym.indexOf("GBP/JPY") >= 0) { basePrice = 198.80; volatilityScale = 0.18; }
-      else if (sym.indexOf("EUR/JPY") >= 0) { basePrice = 169.50; volatilityScale = 0.15; }
-      else { basePrice = 2350; volatilityScale = 1.2; }
     } else {
-      volatilityScale = (sym.indexOf("XAU") >= 0 || sym.indexOf("GOLD") >= 0) ? 1.2 : 0.001;
-    }
-
-    var p = basePrice;
-    var gen = function (n, vol) {
-      var c = [], h = [], l = [], cl = [], v = [];
-      for (var i = 0; i < n; i++) {
-        var d = (Math.random() - 0.48) * vol;
-        var o = p;
-        p = p + d;
-        var hi = Math.max(o, p) + Math.random() * vol * 0.3;
-        var lo = Math.min(o, p) - Math.random() * vol * 0.3;
-        c.push({ open: o, high: hi, low: lo, close: p, volume: 800 + Math.random() * 400 });
-        cl.push(p); h.push(hi); l.push(lo); v.push(800 + Math.random() * 400);
-      }
-      return { c: c, cl: cl, h: h, l: l, v: v };
-    };
-
-    ["m1", "m5", "m15", "h1", "h4", "daily"].forEach(function (k, i) {
-      var g = gen(100, volatilityScale * (0.8 + i * 0.4));
-      this.candles[k] = g.c;
-      this.closes[k] = g.cl;
-      this.highs[k] = g.h;
-      this.lows[k] = g.l;
-      this.volumes[k] = g.v;
-    }.bind(this));
-
-    if (!this.livePriceOk) {
       this.goldPrice = this.closes.m5[this.closes.m5.length - 1];
     }
   }
