@@ -4,53 +4,45 @@
 
 window.GoldAI_Fundamental = {
   analyzeFundamentals(cfg) {
-    // We simulate or determine current global macroeconomic factors affecting XAUUSD.
-    // In a real production setup, this would fetch from an economic calendar feed.
-    // We structure this with absolute fidelity to model real-world parameters.
+    // SIMULATED ONLY — not live economic data.
+    // In production this must be replaced with a real economic calendar / news feed.
+    // Current implementation uses a deterministic date-seed so results are stable per day.
 
     const date = new Date();
 
     // Create a deterministic but dynamically shifting state based on date
     const seed = (date.getUTCFullYear() * 10000 + (date.getUTCMonth() + 1) * 100 + date.getUTCDate()) % 7;
 
-    // Macro parameters:
-    // 1. Inflation Stance (CPI)
-    // 2. Employment Health (NFP)
-    // 3. Federal Reserve Policy Stance (Hawkish vs Dovish)
-    // 4. Geopolitical Risk Index (1 to 10)
-    // 5. Central Bank Demand Index (1 to 10)
+    let cpiStatus = "COOLING";
+    let nfpStatus = "WEAK_GROWTH";
+    let fedStance = "DOVISH";
+    let geoRisk = 8.2;
+    let centralBankDemand = 9.0;
 
-    let cpiStatus = "COOLING"; // Default bullish for gold
-    let nfpStatus = "WEAK_GROWTH"; // Default bullish
-    let fedStance = "DOVISH"; // Default bullish
-    let geoRisk = 8.2; // Elevated geopolitical risk (safe haven)
-    let centralBankDemand = 9.0; // Strong buying
-
-    // Introduce dynamic variations based on the date seed to simulate realistic market news flow
     if (seed === 0) {
-      cpiStatus = "HOT"; // Bearish (Fed might hike or stay high)
+      cpiStatus = "HOT";
       fedStance = "HAWKISH";
       geoRisk = 5.1;
     } else if (seed === 1) {
-      nfpStatus = "STRONG"; // Bearish (Strong economy, higher USD)
+      nfpStatus = "STRONG";
       geoRisk = 4.3;
     } else if (seed === 2) {
-      cpiStatus = "IN_LINE"; // Neutral-bullish
+      cpiStatus = "IN_LINE";
       nfpStatus = "IN_LINE";
       fedStance = "NEUTRAL";
       geoRisk = 6.8;
     } else if (seed === 3) {
-      cpiStatus = "COOLING"; // Bullish
+      cpiStatus = "COOLING";
       fedStance = "DOVISH";
       geoRisk = 7.5;
     } else if (seed === 4) {
-      geoRisk = 9.5; // Highly bullish (Extreme safe haven)
+      geoRisk = 9.5;
       fedStance = "HAWKISH";
     } else if (seed === 5) {
-      centralBankDemand = 5.5; // Moderate buying
+      centralBankDemand = 5.5;
       fedStance = "DOVISH";
     } else if (seed === 6) {
-      cpiStatus = "STAGFLATION"; // Bullish (high inflation, weak growth)
+      cpiStatus = "STAGFLATION";
       fedStance = "NEUTRAL";
     }
 
@@ -59,7 +51,6 @@ window.GoldAI_Fundamental = {
     const reasons = [];
     const details = {};
 
-    // 1. CPI Analysis
     if (cpiStatus === "COOLING") {
       buy += 3;
       reasons.push("کاهش تورم آمریکا (فرصت کاهش نرخ بهره)");
@@ -78,7 +69,6 @@ window.GoldAI_Fundamental = {
       details.cpi = "In-Line (Neutral/Bullish)";
     }
 
-    // 2. NFP Analysis
     if (nfpStatus === "WEAK_GROWTH") {
       buy += 3;
       reasons.push("ضعف در بازار کار آمریکا (فشار بر فدرال رزرو برای کاهش نرخ)");
@@ -91,7 +81,6 @@ window.GoldAI_Fundamental = {
       details.nfp = "In-Line (Neutral)";
     }
 
-    // 3. FED Policy Stance
     if (fedStance === "DOVISH") {
       buy += 4;
       reasons.push("رویکرد انبساطی فدرال رزرو (کاهش هزینه فرصت نگهداری طلا)");
@@ -104,7 +93,6 @@ window.GoldAI_Fundamental = {
       details.fed = "Neutral";
     }
 
-    // 4. Geopolitical Risk
     details.geoRisk = geoRisk;
     if (geoRisk >= 8.0) {
       buy += 4;
@@ -114,7 +102,6 @@ window.GoldAI_Fundamental = {
       reasons.push("تنش‌های متوسط ژئوپلیتیکی");
     }
 
-    // 5. Central Bank Demand
     details.cbDemand = centralBankDemand;
     if (centralBankDemand >= 8.0) {
       buy += 3;
@@ -138,7 +125,9 @@ window.GoldAI_Fundamental = {
       sentiment,
       reasons,
       details,
-      summary: `تحلیل بنیادی: ${sentiment === "BULLISH" ? "صعودی 🟢" : sentiment === "BEARISH" ? "نزولی 🔴" : "خنثی 🟡"}`
+      simulated: true,
+      warnings: ["Fundamental is simulated (not live data)"],
+      summary: `تحلیل بنیادی (شبیه‌سازی): ${sentiment === "BULLISH" ? "صعودی 🟢" : sentiment === "BEARISH" ? "نزولی 🔴" : "خنثی 🟡"}`
     };
   }
 };
