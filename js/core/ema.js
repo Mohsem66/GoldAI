@@ -76,7 +76,7 @@ function analyzeEMA(prices, price, cfg) {
     reasons.push(hasEma200 ? "EMA20 > EMA50" : "EMA20 > EMA50 (EMA200 N/A)");
   } else if (e20 < e50) {
     alignment = "BEARISH";
-    buy += 2;
+    sell += 2;
     reasons.push(hasEma200 ? "EMA20 < EMA50" : "EMA20 < EMA50 (EMA200 N/A)");
   }
 
