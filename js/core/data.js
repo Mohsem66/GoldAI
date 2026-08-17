@@ -11,45 +11,73 @@ window.GoldAI_Data = {
   lows:   { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
   volumes:{ m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] },
 
-  mapTF(tf) {
-    const m = { "1min": "m1", "5min": "m5", "15min": "m15", "1h": "h1", "4h": "h4", "1day": "daily" };
-    return m[tf] || "m5";
-  },
-
+  // "live" | "demo" | "mixed" — transparently tracks data source
+  dataMode: "demo",
   lastFetchTime: {},
   cache: {},
   lastPriceFetchTime: 0,
   livePriceOk: false,
 
+  mapTF(tf) {
+    const m = { "1min": "m1", "5min": "m5", "15min": "m15", "1h": "h1", "4h": "h4", "1day": "daily" };
+    return m[tf] || "m5";
+  },
+
+  isLive() {
+    return this.dataMode === "live" && this.livePriceOk;
+  },
+
   async fetchSeries(interval) {
     const cfg = window.GoldAI_Config;
-    if (!cfg.API_KEY || cfg.API_KEY === "YOUR_TWELVE_DATA_API_KEY") return null;
-
     const cacheKey = cfg.SYMBOL + "_" + interval;
     const now = Date.now();
     if (this.cache[cacheKey] && this.lastFetchTime[cacheKey] && (now - this.lastFetchTime[cacheKey] < 45000)) {
       return this.cache[cacheKey];
     }
 
-    const url =
-      "https://api.twelvedata.com/time_series?symbol=" + encodeURIComponent(cfg.SYMBOL) +
-      "&interval=" + interval + "&outputsize=" + (cfg.CANDLE_COUNT || 120) +
-      "&apikey=" + cfg.API_KEY;
+    // Prefer backend proxy (recommended path)
+    const backendBase = (cfg.BACKEND_URL || "http://localhost:5000/api").replace(/\/$/, "");
     try {
+      const url = backendBase + "/historical?symbol=" + encodeURIComponent(cfg.SYMBOL) +
+        "&interval=" + encodeURIComponent(interval) +
+        "&outputsize=" + (cfg.CANDLE_COUNT || 120);
       const res = await fetch(url);
-      const data = await res.json();
-      if (data.code || data.status === "error" || !data.values) {
-        console.warn("[Series]", interval, data.message || data.code || "no values");
-        return this.cache[cacheKey] || null;
+      if (res.ok) {
+        const data = await res.json();
+        if (data.values && data.values.length) {
+          const values = data.values.slice().reverse();
+          this.cache[cacheKey] = values;
+          this.lastFetchTime[cacheKey] = now;
+          this.dataMode = this.livePriceOk ? "live" : "mixed";
+          return values;
+        }
       }
-      const values = data.values.slice().reverse();
-      this.cache[cacheKey] = values;
-      this.lastFetchTime[cacheKey] = now;
-      return values;
     } catch (e) {
-      console.error("Error fetching " + cacheKey + ":", e);
-      return this.cache[cacheKey] || null;
+      console.warn("[Series/backend]", interval, e.message);
     }
+
+    // Fallback: direct Twelve Data only if API_KEY still present (legacy)
+    if (cfg.API_KEY && cfg.API_KEY !== "YOUR_TWELVE_DATA_API_KEY" && cfg.API_KEY !== "your_twelve_data_api_key_here") {
+      try {
+        const url =
+          "https://api.twelvedata.com/time_series?symbol=" + encodeURIComponent(cfg.SYMBOL) +
+          "&interval=" + interval + "&outputsize=" + (cfg.CANDLE_COUNT || 120) +
+          "&apikey=" + cfg.API_KEY;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.values && data.values.length) {
+          const values = data.values.slice().reverse();
+          this.cache[cacheKey] = values;
+          this.lastFetchTime[cacheKey] = now;
+          this.dataMode = this.livePriceOk ? "live" : "mixed";
+          return values;
+        }
+      } catch (e) {
+        console.error("Error fetching " + cacheKey + ":", e);
+      }
+    }
+
+    return this.cache[cacheKey] || null;
   },
 
   store(key, values) {
@@ -60,7 +88,6 @@ window.GoldAI_Data = {
     this.volumes[key] = values.map(function (c) { return Number(c.volume || 0); });
   },
 
-  // Only TFs needed for current strategy (much faster)
   async loadEssential() {
     const cfg = window.GoldAI_Config;
     try {
@@ -112,27 +139,43 @@ window.GoldAI_Data = {
 
   async loadPrice(force) {
     const cfg = window.GoldAI_Config;
-    if (!cfg.API_KEY || cfg.API_KEY === "YOUR_TWELVE_DATA_API_KEY") {
-      return this.goldPrice;
-    }
+    // Prefer backend for live price
+    const backendBase = (cfg.BACKEND_URL || "http://localhost:5000/api").replace(/\/$/, "");
     const now = Date.now();
     if (!force && this.goldPrice > 0 && (now - this.lastPriceFetchTime < 1500)) {
       return this.goldPrice;
     }
     try {
-      const url = "https://api.twelvedata.com/price?symbol=" +
-        encodeURIComponent(cfg.SYMBOL) + "&apikey=" + cfg.API_KEY;
-      const res = await fetch(url);
-      const data = await res.json();
-      if (data.price) {
-        this.goldPrice = Number(data.price);
-        this.lastPriceFetchTime = now;
-        this.livePriceOk = true;
-      } else if (data.code || data.status === "error") {
-        console.warn("[Price]", data.message || data.code);
+      const res = await fetch(backendBase + "/price?symbol=" + encodeURIComponent(cfg.SYMBOL || "XAU/USD"));
+      if (res.ok) {
+        const data = await res.json();
+        if (data.price) {
+          this.goldPrice = Number(data.price);
+          this.lastPriceFetchTime = now;
+          this.livePriceOk = true;
+          if (this.dataMode === "demo") this.dataMode = "mixed";
+          return this.goldPrice;
+        }
       }
     } catch (e) {
-      console.error("Price error:", e);
+      console.warn("[Price/backend]", e.message);
+    }
+    // Legacy direct fallback
+    if (cfg.API_KEY && cfg.API_KEY !== "YOUR_TWELVE_DATA_API_KEY" && cfg.API_KEY !== "your_twelve_data_api_key_here") {
+      try {
+        const url = "https://api.twelvedata.com/price?symbol=" +
+          encodeURIComponent(cfg.SYMBOL) + "&apikey=" + cfg.API_KEY;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.price) {
+          this.goldPrice = Number(data.price);
+          this.lastPriceFetchTime = now;
+          this.livePriceOk = true;
+          if (this.dataMode === "demo") this.dataMode = "mixed";
+        }
+      } catch (e) {
+        console.error("Price error:", e);
+      }
     }
     return this.goldPrice;
   },
@@ -148,6 +191,7 @@ window.GoldAI_Data = {
   resetData() {
     this.goldPrice = 0;
     this.livePriceOk = false;
+    this.dataMode = "demo";
     this.candles = { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] };
     this.closes = { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] };
     this.highs = { m1: [], m5: [], m15: [], h1: [], h4: [], daily: [] };
@@ -158,9 +202,11 @@ window.GoldAI_Data = {
   seedDemo() {
     var keepPrice = this.livePriceOk ? this.goldPrice : 0;
     this.resetData();
+    this.dataMode = "demo";
     if (keepPrice) {
       this.goldPrice = keepPrice;
       this.livePriceOk = true;
+      this.dataMode = "mixed";
     }
 
     var cfg = window.GoldAI_Config;
