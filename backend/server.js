@@ -14,9 +14,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// =============================================
-// Live price from Twelve Data (via backend only)
-// =============================================
 app.get('/api/price', async (req, res) => {
   try {
     if (!TWELVE_DATA_API_KEY || String(TWELVE_DATA_API_KEY).includes('your_twelve_data')) {
@@ -36,9 +33,6 @@ app.get('/api/price', async (req, res) => {
   }
 });
 
-// =============================================
-// Historical candles (for analysis / backtest)
-// =============================================
 app.get('/api/historical', async (req, res) => {
   try {
     if (!TWELVE_DATA_API_KEY || String(TWELVE_DATA_API_KEY).includes('your_twelve_data')) {
@@ -60,9 +54,6 @@ app.get('/api/historical', async (req, res) => {
   }
 });
 
-// =============================================
-// Firebase
-// =============================================
 const admin = require('firebase-admin');
 const firebaseConfig = require('./firebase-config');
 
@@ -77,22 +68,27 @@ const authRoutes = require('./routes/auth');
 const signalRoutes = require('./routes/signals');
 const performanceRoutes = require('./routes/performance');
 const mt5Routes = require('./routes/mt5');
+const fundamentalRoutes = require('./routes/fundamental');
 
 app.use('/api/auth', authRoutes(auth, db));
 app.use('/api/signals', signalRoutes(db));
 app.use('/api/performance', performanceRoutes(db));
 app.use('/api/mt5', mt5Routes);
+app.use('/api/fundamental', fundamentalRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    hasApiKey: !!(TWELVE_DATA_API_KEY && !String(TWELVE_DATA_API_KEY).includes('your_twelve_data'))
+    hasApiKey: !!(TWELVE_DATA_API_KEY && !String(TWELVE_DATA_API_KEY).includes('your_twelve_data')),
+    timestamp: new Date().toISOString()
   });
 });
 
 app.listen(PORT, () => {
-  console.log(`GoldAI backend running on http://localhost:${PORT}`);
+  console.log(`GoldAI backend on http://localhost:${PORT}`);
   if (!TWELVE_DATA_API_KEY || String(TWELVE_DATA_API_KEY).includes('your_twelve_data')) {
-    console.warn('WARNING: TWELVE_DATA_API_KEY not set — live data endpoints will return 503');
+    console.warn('WARNING: TWELVE_DATA_API_KEY not set');
   }
 });
+
+module.exports = { app, db, auth };
