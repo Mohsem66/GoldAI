@@ -309,6 +309,61 @@ body {
   font-weight: 700;
 }
 
+/* Risk Guard status */
+.rg-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+}
+.rg-badge.rg-ok {
+  background: rgba(92, 212, 154, 0.15);
+  color: var(--green);
+  border-color: rgba(92, 212, 154, 0.4);
+}
+.rg-badge.rg-blocked {
+  background: rgba(240, 122, 122, 0.15);
+  color: var(--red);
+  border-color: rgba(240, 122, 122, 0.45);
+}
+.risk-guard-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 4px 0 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+.rg-item {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 6px 4px;
+  text-align: center;
+}
+.rg-item span {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+}
+.rg-item b {
+  display: block;
+  font-size: 13px;
+  color: var(--gold);
+  font-weight: 700;
+  margin-top: 2px;
+}
+.rg-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+.btn-sm {
+  width: auto !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+}
+
 .performance-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -540,6 +595,7 @@ body.light .nav-btn.active { background: #dce3ec; }
   .signal-details { grid-template-columns: repeat(2, 1fr); }
   .trade-settings-card .settings-grid { grid-template-columns: 1fr; }
   .risk-main-row { grid-template-columns: repeat(2, 1fr); }
+  .risk-guard-row { grid-template-columns: repeat(2, 1fr); }
   .performance-stats { grid-template-columns: repeat(2, 1fr); }
   .time-display .clocks { gap: 6px; }
   .time-display .clocks span { font-size: 11px; padding: 2px 6px; }
