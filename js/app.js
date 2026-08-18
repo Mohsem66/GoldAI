@@ -250,17 +250,26 @@ window.GoldAI = {
       const raw = window.GoldAI_Score.runScoreEngine(layers);
       let final = window.GoldAI_Conflict.runConflictFilter(raw, layers, cfg);
 
-      if (reversal.signal !== 'NONE' && reversal.strength > 60) {
-        if (reversal.signal === 'BUY' && final.signal === 'WAIT') {
+      // Reversal can only promote from WAIT when data is not DEMO
+      const dModeEarly = (data.dataMode || "demo").toLowerCase();
+      if (dModeEarly !== "demo" && reversal.signal !== 'NONE' && reversal.strength > 60) {
+        if (reversal.signal === 'BUY' && final.signal && final.signal.includes('WAIT')) {
           final.signal = 'BUY (Reversal)';
           final.confidence = Math.min(85, final.confidence + 15);
           final.reason = (final.reason || '') + ' | 🔄 Reversal: ' + reversal.type;
         }
-        if (reversal.signal === 'SELL' && final.signal === 'WAIT') {
+        if (reversal.signal === 'SELL' && final.signal && final.signal.includes('WAIT')) {
           final.signal = 'SELL (Reversal)';
           final.confidence = Math.min(85, final.confidence + 15);
           final.reason = (final.reason || '') + ' | 🔄 Reversal: ' + reversal.type;
         }
+      }
+
+      // Hard DEMO block (safety net — also enforced in conflict-filter)
+      if (dModeEarly === "demo" && final.signal && !final.signal.includes("WAIT")) {
+        final.signal = "WAIT 🟡";
+        final.confidence = Math.min(final.confidence || 0, 35);
+        final.warnings = (final.warnings || []).concat(["DEMO data → forced WAIT"]);
       }
 
       const userLot = cfg.USER_LOT || 0;
@@ -293,6 +302,13 @@ window.GoldAI = {
         }
       } else if (dMode === "mixed") {
         result.warnings.push("⚠️ داده Mixed (قیمت زنده + کندل ساختگی) — با احتیاط استفاده شود");
+      }
+
+      // Risk Guard: count only final accepted directional signals
+      if (result.signal && !String(result.signal).includes("WAIT") && window.GoldAI_RiskGuard) {
+        try {
+          window.GoldAI_RiskGuard.recordSignalAccepted();
+        } catch (_) {}
       }
 
       this.lastResult = result;
