@@ -22,10 +22,11 @@
     }
     .price-input-wrap:focus-within{border-color:var(--gold,#d4af37);box-shadow:0 0 0 2px rgba(212,175,55,.18)}
     .manual-price-input{
-      width:150px;padding:10px 40px 10px 12px;border:0;outline:0;
-      background:transparent;color:var(--text,#eee);font-size:14px;
+      width:150px;padding:10px 40px 10px 8px;border:0;outline:0;
+      background:transparent;color:var(--text,#eee);font-size:13px;
       direction:ltr;text-align:left;font-family:inherit
     }
+    .manual-price-input::placeholder{opacity:.5}
     .price-check-btn{
       position:absolute;right:5px;top:50%;transform:translateY(-50%);
       width:28px;height:28px;border:0;border-radius:8px;cursor:pointer;
@@ -37,7 +38,6 @@
       background:var(--card,#1a1a22);color:var(--text,#ddd);cursor:pointer;font-size:17px
     }
     .price-refresh-btn:hover{border-color:var(--gold,#d4af37)}
-    .price-hint{font-size:11px;opacity:.55;margin-top:4px;text-align:center}
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:9998;display:flex;align-items:center;justify-content:center;padding:16px}
     .modal-sheet{
       background:linear-gradient(180deg,#1c1c26 0%,#15151c 100%);
@@ -71,6 +71,10 @@
     .perf-item b{font-size:15px}
     .perf-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
     .backtest-box{margin-top:12px;padding:12px;border-radius:12px;border:1px solid #2a2a35;background:rgba(0,0,0,.2);font-size:13px;line-height:1.7}
+    .share-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+    .share-grid button{margin:0;padding:10px 8px;border-radius:12px;border:1px solid #2a2a35;background:rgba(255,255,255,.04);color:#eee;cursor:pointer;font-size:12px}
+    .share-grid button:hover{border-color:#d4af37;background:rgba(212,175,55,.12)}
+    .share-preview{margin-top:4px;padding:10px;border-radius:10px;background:rgba(0,0,0,.25);font-size:12px;direction:ltr;text-align:left;white-space:pre-wrap;max-height:120px;overflow:auto}
     .hidden{display:none!important}
     @media(max-width:480px){
       .settings-modal-grid{grid-template-columns:1fr}
@@ -106,12 +110,11 @@
         <div class="price-big" id="goldPrice">—</div>
         <div class="price-edit">
           <div class="price-input-wrap">
-            <input type="number" id="manualEntryInput" class="manual-price-input" placeholder="Manual price" step="any" inputmode="decimal" />
+            <input type="number" id="manualEntryInput" class="manual-price-input" placeholder="Price" step="any" inputmode="decimal" />
             <button type="button" class="price-check-btn" onclick="GoldAI.applyManualPrice()" title="اعمال قیمت دستی">✓</button>
           </div>
           <button type="button" class="price-refresh-btn" onclick="GoldAI.refreshPrice()" title="برگشت به قیمت آنلاین">↻</button>
         </div>
-        <div class="price-hint">✓ قیمت دستی &nbsp;|&nbsp; ↻ آنلاین</div>
         <div class="market-badge">
           <span class="market-status" id="marketStatus">—</span>
           <span class="session" id="marketSession">—</span>
@@ -141,7 +144,7 @@
         <div class="signal-details" id="signalDetails"></div>
         <div id="warnings" class="warnings"></div>
         <div class="signal-actions">
-          <button type="button" class="btn-ghost" onclick="GoldAI.shareSignal()">📤 اشتراک / Signal Swift</button>
+          <button type="button" class="btn-ghost" onclick="GoldAI.shareSignal()">📤 اشتراک</button>
         </div>
       </div>
 
