@@ -250,7 +250,6 @@ window.GoldAI = {
       const raw = window.GoldAI_Score.runScoreEngine(layers);
       let final = window.GoldAI_Conflict.runConflictFilter(raw, layers, cfg);
 
-      // Reversal can only promote from WAIT when data is not DEMO
       const dModeEarly = (data.dataMode || "demo").toLowerCase();
       if (dModeEarly !== "demo" && reversal.signal !== 'NONE' && reversal.strength > 60) {
         if (reversal.signal === 'BUY' && final.signal && final.signal.includes('WAIT')) {
@@ -265,7 +264,6 @@ window.GoldAI = {
         }
       }
 
-      // Hard DEMO block (safety net — also enforced in conflict-filter)
       if (dModeEarly === "demo" && final.signal && !final.signal.includes("WAIT")) {
         final.signal = "WAIT 🟡";
         final.confidence = Math.min(final.confidence || 0, 35);
@@ -304,17 +302,15 @@ window.GoldAI = {
         result.warnings.push("⚠️ داده Mixed (قیمت زنده + کندل ساختگی) — با احتیاط استفاده شود");
       }
 
-      // Risk Guard: count only final accepted directional signals
       if (result.signal && !String(result.signal).includes("WAIT") && window.GoldAI_RiskGuard) {
-        try {
-          window.GoldAI_RiskGuard.recordSignalAccepted();
-        } catch (_) {}
+        try { window.GoldAI_RiskGuard.recordSignalAccepted(); } catch (_) {}
       }
 
       this.lastResult = result;
       window.GoldAI_V1_Result = result;
       this.render(result);
       this.saveHistory(result);
+      this.updateRiskUI();
 
       if (result.signal && !result.signal.includes('WAIT') && result.confidence >= 90) {
         this.sendNotification(`🥇 ${result.signal}`, `ورود: ${result.entry} | SL: ${result.stopLoss} | TP1: ${result.tp1}`);
@@ -486,6 +482,35 @@ window.GoldAI = {
     set('riskText', risk + "%");
     set('maxLossText', maxLoss);
     set('lotText', lot);
+
+    // Risk Guard status panel
+    try {
+      if (window.GoldAI_RiskGuard) {
+        const st = window.GoldAI_RiskGuard.getStatus(window.GoldAI_Config);
+        const maxT = st.maxTrades || 5;
+        const trades = st.trades || 0;
+        set('rgTrades', trades + ' / ' + maxT);
+        set('rgRealizedR', (st.realizedR != null ? st.realizedR : 0) + 'R');
+        set('rgDailyLimit', (st.dailyLossLimitPct || 3) + 'R');
+        const badge = document.getElementById('riskGuardBadge');
+        const statusEl = document.getElementById('rgStatus');
+        if (!st.allowed) {
+          if (badge) { badge.className = 'rg-badge rg-blocked'; badge.textContent = '🔴 مسدود'; }
+          if (statusEl) statusEl.textContent = st.reason || 'مسدود';
+        } else {
+          if (badge) { badge.className = 'rg-badge rg-ok'; badge.textContent = '🟢 فعال'; }
+          if (statusEl) statusEl.textContent = 'آماده';
+        }
+      }
+    } catch (_) {}
+  },
+
+  resetRiskGuard() {
+    if (!window.GoldAI_RiskGuard) return alert('Risk Guard لود نشده');
+    if (!confirm('شمارنده معاملات و R امروز ریست شود؟')) return;
+    window.GoldAI_RiskGuard.resetToday();
+    this.updateRiskUI();
+    alert('✅ Risk Guard امروز ریست شد');
   },
 
   updateMarketClock() {
@@ -563,7 +588,6 @@ window.GoldAI = {
     } catch (e) { console.warn('Backend error:', e); }
   },
 
-  // Format optimized for Signal Swift paste parser
   buildSwiftSignalText(r) {
     const decs = this.getDecimals();
     const fmt = (n) => (n == null || isNaN(n) ? null : Number(n).toFixed(decs));
