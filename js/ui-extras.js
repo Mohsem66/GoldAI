@@ -64,6 +64,7 @@
             var h = JSON.parse(localStorage.getItem("goldai_history") || "[]");
             this.signalHistory = h.slice(0, 50);
           } catch (e) {}
+          this.updateRiskUI && this.updateRiskUI();
           return out;
         } catch (e) {
           console.error("analyze error:", e);
@@ -232,13 +233,38 @@
         var losses = report.losses || 0;
         var net = report.netScore != null ? report.netScore : 0;
         var wr = report.winRate != null ? report.winRate : (trades > 0 ? ((wins / trades) * 100).toFixed(1) : 0);
+        var pf = report.profitFactor != null ? report.profitFactor : "—";
+        var avgW = report.avgWinPct != null ? report.avgWinPct : "—";
+        var avgL = report.avgLossPct != null ? report.avgLossPct : "—";
+        var maxCL = report.maxConsecLosses != null ? report.maxConsecLosses : "—";
+
+        var samplesHtml = "";
+        if (report.samples && report.samples.length) {
+          samplesHtml = "<div style='margin-top:10px;font-size:12px;opacity:.85'><b>نمونه سیگنال‌ها:</b><br>";
+          report.samples.slice(0, 8).forEach(function (s) {
+            var col = s.result === "WIN" ? "#5cd49a" : "#f07a7a";
+            samplesHtml += "<span style='color:" + col + "'>" + (s.signal || "") +
+              " → " + s.result + " (" + s.changePct + "%)</span> · conf " + (s.confidence || "—") + "<br>";
+          });
+          samplesHtml += "</div>";
+        }
+
+        var notes = (report.notes || []).map(function (n) {
+          return "<span style='opacity:.65;font-size:11px'>• " + n + "</span>";
+        }).join("<br>");
+
         if (box) {
           box.classList.remove("hidden");
           box.innerHTML =
-            "<b>نتیجه Walk-Forward</b><br>" +
-            "معاملات: <b>" + trades + "</b> | برد: <b>" + wins + "</b> | باخت: <b>" + losses + "</b><br>" +
-            "وین‌ریت: <b>" + wr + "%</b> | NetScore: <b>" + net + "</b><br>" +
-            "<span style='opacity:.7;font-size:12px'>بدون Look-Ahead — فقط روی داده گذشته</span>";
+            "<b>📊 نتیجه Walk-Forward (بدون Look-Ahead)</b><br><br>" +
+            "معاملات: <b>" + trades + "</b> &nbsp;|&nbsp; برد: <b style='color:var(--green)'>" + wins +
+            "</b> &nbsp;|&nbsp; باخت: <b style='color:var(--red)'>" + losses + "</b><br>" +
+            "وین‌ریت: <b>" + wr + "%</b> &nbsp;|&nbsp; NetScore: <b>" + net + "</b><br>" +
+            "Profit Factor: <b>" + pf + "</b><br>" +
+            "میانگین برد: <b>" + avgW + "%</b> &nbsp;|&nbsp; میانگین باخت: <b>" + avgL + "%</b><br>" +
+            "حداکثر باخت متوالی: <b>" + maxCL + "</b><br>" +
+            samplesHtml +
+            "<div style='margin-top:8px'>" + notes + "</div>";
         }
       } catch (e) {
         console.error(e);
