@@ -24,6 +24,10 @@ window.GoldAI_Backtest = {
       losses: 0,
       winRate: 0,
       netScore: 0,
+      profitFactor: 0,
+      avgWinPct: 0,
+      avgLossPct: 0,
+      maxConsecLosses: 0,
       notes: [],
       samples: []
     };
@@ -34,7 +38,10 @@ window.GoldAI_Backtest = {
     }
 
     let wins = 0, losses = 0, trades = 0;
+    let grossWin = 0, grossLoss = 0;
     let net = 0;
+    let consecLoss = 0, maxConsecLoss = 0;
+    const winPcts = [], lossPcts = [];
 
     for (let i = warmup; i < closes.length - horizon; i += step) {
       const sliceCloses = closes.slice(0, i + 1);
@@ -69,9 +76,22 @@ window.GoldAI_Backtest = {
       const change = ((future - price) / price) * 100;
       const isBuy = final.signal.includes("BUY");
       const isWin = (isBuy && change > 0) || (!isBuy && change < 0);
+      const absCh = Math.abs(change);
 
-      if (isWin) { wins++; net += Math.abs(change); }
-      else { losses++; net -= Math.abs(change); }
+      if (isWin) {
+        wins++;
+        net += absCh;
+        grossWin += absCh;
+        winPcts.push(absCh);
+        consecLoss = 0;
+      } else {
+        losses++;
+        net -= absCh;
+        grossLoss += absCh;
+        lossPcts.push(absCh);
+        consecLoss++;
+        if (consecLoss > maxConsecLoss) maxConsecLoss = consecLoss;
+      }
 
       if (report.samples.length < 12) {
         report.samples.push({
@@ -89,8 +109,13 @@ window.GoldAI_Backtest = {
     report.losses = losses;
     report.winRate = trades > 0 ? Number(((wins / trades) * 100).toFixed(1)) : 0;
     report.netScore = Number(net.toFixed(2));
+    report.profitFactor = grossLoss > 0 ? Number((grossWin / grossLoss).toFixed(2)) : (grossWin > 0 ? 99 : 0);
+    report.avgWinPct = winPcts.length ? Number((winPcts.reduce((a, b) => a + b, 0) / winPcts.length).toFixed(3)) : 0;
+    report.avgLossPct = lossPcts.length ? Number((lossPcts.reduce((a, b) => a + b, 0) / lossPcts.length).toFixed(3)) : 0;
+    report.maxConsecLosses = maxConsecLoss;
     report.notes.push("Educational only — not brokerage execution simulation");
-    report.notes.push("Outcome = price change after " + horizon + " bars");
+    report.notes.push("Outcome = price change after " + horizon + " bars (no spread/slippage)");
+    report.notes.push("Simulated macro weight=0 in this backtest path");
     return report;
   }
 };

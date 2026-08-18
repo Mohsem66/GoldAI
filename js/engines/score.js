@@ -1,5 +1,6 @@
 // =====================================
 // GoldAI — Score Aggregator (balanced quality)
+// Simulated macro weight = 0 (safety)
 // =====================================
 
 function runScoreEngine(layers) {
@@ -30,15 +31,21 @@ function runScoreEngine(layers) {
   add(layers.candles, 0.85);
   add(layers.liquidity, 1.4);
 
-  // Simulated macro — very low weight + explicit warning (not real live data)
-  // These must NOT drive the final decision until real data feeds are connected.
+  // Simulated macro — WEIGHT ZERO until real live feeds are connected.
+  // Still collect warnings so UI remains transparent.
   if (layers.fundamental) {
-    add(layers.fundamental, 0.15);
-    warnings.push("Fundamental is simulated (not live)");
+    // add(layers.fundamental, 0);  // intentionally zero
+    if (layers.fundamental.simulated !== false) {
+      warnings.push("Fundamental is simulated (not live) — weight=0");
+    }
+    if (layers.fundamental.warnings) warnings.push(...layers.fundamental.warnings);
   }
   if (layers.correlation) {
-    add(layers.correlation, 0.12);
-    warnings.push("Correlation is simulated (not live)");
+    // add(layers.correlation, 0);  // intentionally zero
+    if (layers.correlation.simulated !== false) {
+      warnings.push("Correlation is simulated (not live) — weight=0");
+    }
+    if (layers.correlation.warnings) warnings.push(...layers.correlation.warnings);
   }
 
   // AI Brain is meta-bias only — light nudge, no double-count of tech
@@ -86,7 +93,7 @@ function runScoreEngine(layers) {
 
   if (diff < 1.0) warnings.push("Conflicting / weak edge");
 
-  // Balanced entry threshold (was 1.5 — slightly firmer, not extreme)
+  // Balanced entry threshold
   let signal = "WAIT 🟡";
   if (buyScore > sellScore + 2.0) signal = "BUY 🟢";
   else if (sellScore > buyScore + 2.0) signal = "SELL 🔴";

@@ -18,9 +18,26 @@ Professional multi-engine signal system for **XAUUSD** and major FX pairs.
 | Candles | Hammer, engulfing, pin, doji |
 | Liquidity | Equal H/L, stop sweeps (SMC) |
 | Score + Conflict Filter | Final decision gate |
+| Risk Guard | Daily loss limit + max trades (circuit breaker) |
 | Trade Management | Lot, multi-TP, R:R |
 
-> **Note:** Fundamental & Correlation engines are **simulated** (not live data). They have very low weight and always emit warnings.
+> **Note:** Fundamental & Correlation engines are **simulated** (not live data).  
+> Their weight in the Score engine is **zero**. They only emit warnings for transparency.
+
+## Safety layer (new)
+
+| Feature | Behavior |
+|---------|----------|
+| **DEMO mode** | All directional signals forced to **WAIT** |
+| **MIXED mode** | Confidence reduced + clear warning |
+| **Risk Guard** | Blocks new signals after `MAX_TRADES_PER_DAY` or `DAILY_LOSS_LIMIT_PCT` |
+| **Confidence** | Technical score 0–100 — **not** a win probability |
+
+Config keys (see `js/config.js`):
+
+- `MAX_TRADES_PER_DAY` (default 5)
+- `DAILY_LOSS_LIMIT_PCT` (default 3)
+- `STRICT_DATA_MODE` (default true)
 
 ## Data modes
 
@@ -57,8 +74,8 @@ Open `index.html`. Without backend / API key the app runs in **Demo** mode (safe
 Multi-TF data (prefer backend)
   → Structure + EMA + RSI + Div + MACD + ADX
   → Volume + S/R + Candles + Liquidity
-  → Score Engine (simulated macro = very low weight)
-  → Conflict Filter  (WAIT if conflict / low confidence / Demo data)
+  → Score Engine (simulated macro weight = 0)
+  → Conflict Filter  (WAIT if conflict / low confidence / Demo / Risk Guard)
   → ATR Trade Plan (SL / TP1-3 / Lot)
 ```
 
@@ -78,3 +95,10 @@ All main controls are in one card:
 Educational use only. Not financial advice.  
 **Confidence is a technical score (0–100), not a real win-probability.**  
 Trade at your own risk.
+
+### Still missing for serious capital use
+
+- Full statistical backtest with spread/slippage and multi-year data
+- Live fundamental / correlation feeds
+- Production-ready MT5 execution bridge
+- Institutional-grade risk (portfolio heat, correlation limits)

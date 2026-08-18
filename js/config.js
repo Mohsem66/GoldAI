@@ -25,6 +25,10 @@ window.GoldAI_Config = {
   DEFAULT_RISK_PERCENT: 1.0,
   MAX_TRADES_PER_DAY: 5,
 
+  // Safety — Risk Guard
+  DAILY_LOSS_LIMIT_PCT: 3,     // stop new signals after ~3R daily loss
+  STRICT_DATA_MODE: true,      // DEMO → force WAIT; MIXED → heavy warning + lower conf
+
   STRATEGY_MODE: "scalp",
 
   TP_COUNT: 3,

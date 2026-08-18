@@ -1,5 +1,5 @@
 // =====================================
-// GoldAI — Conflict Filter (balanced gate)
+// GoldAI — Conflict Filter (balanced gate + safety)
 // =====================================
 
 function runConflictFilter(score, layers, cfg) {
@@ -7,6 +7,34 @@ function runConflictFilter(score, layers, cfg) {
   let confidence = score.confidence;
   const warnings = [];
   const confirms = [];
+
+  // --- Data mode hard guards ---
+  const dataMode = (window.GoldAI_Data && window.GoldAI_Data.dataMode
+    ? String(window.GoldAI_Data.dataMode).toLowerCase()
+    : "demo");
+
+  if (cfg && cfg.STRICT_DATA_MODE !== false) {
+    if (dataMode === "demo") {
+      if (signal && !signal.includes("WAIT")) {
+        signal = "WAIT 🟡";
+        confidence = Math.min(confidence, 35);
+        warnings.push("DEMO data → forced WAIT (not tradable)");
+      }
+    } else if (dataMode === "mixed") {
+      confidence = Math.max(0, confidence - 12);
+      warnings.push("MIXED data (live price + synthetic candles) — reduced confidence");
+    }
+  }
+
+  // --- Risk Guard (circuit breaker) ---
+  if (window.GoldAI_RiskGuard && signal && !signal.includes("WAIT")) {
+    const rg = window.GoldAI_RiskGuard.check(cfg || window.GoldAI_Config);
+    if (!rg.allowed) {
+      signal = "WAIT 🟡";
+      confidence = Math.min(confidence, 30);
+      warnings.push("Risk Guard: " + (rg.reason || "blocked"));
+    }
+  }
 
   if (layers.ema) {
     if (signal.includes("BUY") && layers.ema.trend === "BEARISH") {
@@ -79,14 +107,14 @@ function runConflictFilter(score, layers, cfg) {
   if (confidence < 0) confidence = 0;
   confidence = Math.round(confidence);
 
-  // Balanced floor: not too soft (68), not ultra-strict (75+)
+  // Balanced floor
   const minC = (cfg && cfg.MIN_CONFIDENCE) ? Math.max(cfg.MIN_CONFIDENCE, 66) : 70;
   if (cfg && cfg.STRICT_MODE && confidence < minC && !signal.includes("WAIT")) {
     signal = "WAIT 🟡";
     warnings.push("Confidence " + confidence + " < " + minC);
   }
 
-  // Need a real edge (balanced)
+  // Need a real edge
   const edge = Math.abs((score.buyScore || 0) - (score.sellScore || 0));
   if (edge < 2.2 && !signal.includes("WAIT")) {
     signal = "WAIT 🟡";
